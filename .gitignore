@@ -1,0 +1,29 @@
+# 默认拒绝：只有下方明确放行的模组构建文件才进入 Git。
+/*
+
+# 本地工作区内容（即使未来调整白名单，也必须保持忽略）。
+/docs/
+/tmp/
+/tool/
+/.codegraph/
+/.gradle/
+/build/
+/run/
+/run-data/
+/.idea/
+/.vscode/
+*.iml
+
+# 根目录必需文件。
+!/.gitattributes
+!/.gitignore
+!/LICENSE
+!/build.gradle
+!/gradle.properties
+!/gradlew
+!/gradlew.bat
+!/settings.gradle
+
+# 构建与模组源码。
+!/gradle/
+!/src/
