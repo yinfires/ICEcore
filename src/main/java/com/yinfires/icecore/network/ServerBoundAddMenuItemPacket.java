@@ -33,9 +33,8 @@ public final class ServerBoundAddMenuItemPacket {
 
             ItemStack stack = itemStack.copy();
             stack.setCount(1);
-            if (CozyCafeCompat.addToMenu(player, stack)) {
-                ICECoreNetwork.sendToPlayer(new ClientBoundAddMenuItemPacket(stack), player);
-            }
+            boolean added = CozyCafeCompat.addToMenu(player, stack);
+            ICECoreNetwork.sendToPlayer(new ClientBoundAddMenuItemPacket(stack, added), player);
         });
         context.setPacketHandled(true);
     }

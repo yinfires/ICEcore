@@ -34,7 +34,6 @@ public final class CozyCafeCompat {
             ItemStack normalizedStack = itemStack.copy();
             normalizedStack.setCount(1);
             boolean added = (Boolean) addToMenu.invoke(blockEntity, normalizedStack);
-            setAdditionStatus(menu, added);
             return added;
         } catch (ReflectiveOperationException | LinkageError | RuntimeException ignored) {
             return false;
@@ -49,22 +48,37 @@ public final class CozyCafeCompat {
         return menu != null && menu.getClass().getName().equals(MENU_SELECTOR_MENU);
     }
 
-    public static void addToClientMenu(ItemStack itemStack) {
+    public static void handleClientMenuAddition(ItemStack itemStack, boolean added) {
+        Object minecraft;
+        Object screen;
+        Object menu;
         try {
             Class<?> minecraftClass = Class.forName("net.minecraft.client.Minecraft");
-            Object minecraft = findNoArgMethod(minecraftClass, "getInstance", "m_91087_").invoke(null);
-            Object screen = findField(minecraftClass, "screen", "f_91080_").get(minecraft);
+            minecraft = findNoArgMethod(minecraftClass, "getInstance", "m_91087_").invoke(null);
+            screen = findField(minecraftClass, "screen", "f_91080_").get(minecraft);
             if (screen == null) {
                 return;
             }
 
-            Object menu = findNoArgMethod(screen.getClass(), "getMenu", "m_6262_").invoke(screen);
+            menu = findNoArgMethod(screen.getClass(), "getMenu", "m_6262_").invoke(screen);
             if (!isMenuSelectorMenu(menu)) {
                 return;
             }
-            findMethod(menu.getClass(), "addToClientMenu", ItemStack.class).invoke(menu, itemStack.copy());
         } catch (ReflectiveOperationException | LinkageError | RuntimeException ignored) {
+            return;
         }
+
+        if (added) {
+            try {
+                findMethod(menu.getClass(), "addToClientMenu", ItemStack.class).invoke(menu, itemStack.copy());
+            } catch (ReflectiveOperationException | RuntimeException ignored) {
+            }
+        }
+
+        setAdditionStatus(menu, added);
+        syncClientScreen(screen, menu);
+        setScreenLastStatus(screen, added);
+        playAdditionSound(minecraft, added);
     }
 
     public static Optional<MenuItemInfo> getMenuItemInfo(Item item) {
@@ -88,12 +102,63 @@ public final class CozyCafeCompat {
         }
     }
 
-    private static void setAdditionStatus(AbstractContainerMenu menu, boolean added) {
+    private static void setAdditionStatus(Object menu, boolean added) {
         try {
             Method method = findDeclaredMethod(menu.getClass(), "toggleMenuItemAdditionStatus", boolean.class);
             method.setAccessible(true);
             method.invoke(menu, added);
         } catch (ReflectiveOperationException | RuntimeException ignored) {
+        }
+    }
+
+    private static void syncClientScreen(Object screen, Object menu) {
+        try {
+            Object cafeMenu = findMethod(menu.getClass(), "getCafeMenu").invoke(menu);
+            Field cafeMenuField = findDeclaredField(screen.getClass(), "cafeMenu");
+            cafeMenuField.setAccessible(true);
+            cafeMenuField.set(screen, cafeMenu);
+        } catch (ReflectiveOperationException | RuntimeException ignored) {
+        }
+    }
+
+    private static void setScreenLastStatus(Object screen, boolean added) {
+        try {
+            Field lastStatusField = findDeclaredField(screen.getClass(), "lastStatus");
+            lastStatusField.setAccessible(true);
+            Object[] constants = lastStatusField.getType().getEnumConstants();
+            if (constants == null) {
+                return;
+            }
+
+            String expectedName = added ? "VALID" : "INVALID";
+            for (Object constant : constants) {
+                if (constant instanceof Enum<?> enumConstant && enumConstant.name().equals(expectedName)) {
+                    lastStatusField.set(screen, constant);
+                    return;
+                }
+            }
+        } catch (ReflectiveOperationException | RuntimeException ignored) {
+        }
+    }
+
+    private static void playAdditionSound(Object minecraft, boolean added) {
+        try {
+            Class<?> soundEventsClass = Class.forName("net.minecraft.sounds.SoundEvents");
+            String soundName = added ? "NOTE_BLOCK_CHIME" : "NOTE_BLOCK_BASS";
+            String fallbackSoundName = added ? "f_12211_" : "f_12209_";
+            Object soundHolder = findField(soundEventsClass, soundName, fallbackSoundName).get(null);
+            Class<?> soundEventClass = Class.forName("net.minecraft.sounds.SoundEvent");
+            Object soundEvent = soundEventClass.isInstance(soundHolder)
+                    ? soundHolder
+                    : findNoArgMethod(soundHolder.getClass(), "get", "value").invoke(soundHolder);
+            Object player = findField(minecraft.getClass(), "player", "f_91074_").get(minecraft);
+            if (player == null || !soundEventClass.isInstance(soundEvent)) {
+                return;
+            }
+
+            findMethod(player.getClass(), "playSound", "m_5496_", soundEventClass, float.class, float.class)
+                    .invoke(player, soundEvent, 1.0F, 1.0F);
+        } catch (ReflectiveOperationException | LinkageError | RuntimeException ignored) {
         }
     }
 
@@ -118,9 +183,22 @@ public final class CozyCafeCompat {
         return type.getMethod(name, parameterTypes);
     }
 
+    private static Method findMethod(Class<?> type, String name, String fallbackName, Class<?>... parameterTypes)
+            throws NoSuchMethodException {
+        try {
+            return type.getMethod(name, parameterTypes);
+        } catch (NoSuchMethodException ignored) {
+            return type.getMethod(fallbackName, parameterTypes);
+        }
+    }
+
     private static Method findDeclaredMethod(Class<?> type, String name, Class<?>... parameterTypes)
             throws NoSuchMethodException {
         return type.getDeclaredMethod(name, parameterTypes);
+    }
+
+    private static Field findDeclaredField(Class<?> type, String name) throws NoSuchFieldException {
+        return type.getDeclaredField(name);
     }
 
     private static Field findField(Class<?> type, String name, String... fallbackNames)
