@@ -23,6 +23,7 @@
 !/gradlew
 !/gradlew.bat
 !/settings.gradle
+!/CHANGELOG.md
 
 # 构建与模组源码。
 !/gradle/
