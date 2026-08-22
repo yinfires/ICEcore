@@ -1,5 +1,6 @@
 package com.yinfires.icecore.building;
 
+import com.yinfires.icecore.compat.cozycafe.range.CozyCafeRangeAdjustmentManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -22,15 +23,13 @@ public final class AdjustmentModeManager {
     }
 
     public static boolean enter(ServerPlayer player, String regionName) {
-        InteractionHand hand = player.getMainHandItem().is(Items.STICK) ? InteractionHand.MAIN_HAND
-                : player.getOffhandItem().is(Items.STICK) ? InteractionHand.OFF_HAND : null;
+        CozyCafeRangeAdjustmentManager.exit(player);
+        InteractionHand hand = isPlainStick(player.getMainHandItem()) ? InteractionHand.MAIN_HAND
+                : isPlainStick(player.getOffhandItem()) ? InteractionHand.OFF_HAND : null;
         if (hand == null) {
             return false;
         }
         ItemStack stack = player.getItemInHand(hand);
-        if (!isPlainStick(stack)) {
-            return false;
-        }
         exit(player);
         State state = new State(hand, stack.copy(), regionName);
         CompoundTag tag = stack.getOrCreateTag();

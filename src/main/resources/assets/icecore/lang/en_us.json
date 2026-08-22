@@ -12,5 +12,16 @@
   "icecore.build.adjust.invalid_stick": "Hold a plain stick to enter adjustment mode.",
   "icecore.build.adjust.enter": "Entered adjustment mode for region %s.",
   "icecore.build.adjust.first": "First position set: %s",
-  "icecore.build.adjust.second": "Second position set: %s"
+  "icecore.build.adjust.second": "Second position set: %s",
+  "icecore.cozycafe.range.mod_missing": "CozyCafe is not installed, so computer recognition ranges cannot be edited.",
+  "icecore.cozycafe.range.player_only": "Only a player can edit a CozyCafe computer recognition range.",
+  "icecore.cozycafe.range.invalid_stick": "Hold a plain stick to enter computer range adjustment mode.",
+  "icecore.cozycafe.range.invalid_target": "Look at a CozyCafe cafe manager within interaction range.",
+  "icecore.cozycafe.range.enter": "Entered range adjustment mode for the computer at %s.",
+  "icecore.cozycafe.range.wand_name": "Computer range: %s",
+  "icecore.cozycafe.range.first": "Computer range first position set: %s",
+  "icecore.cozycafe.range.second": "Computer range second position set: %s",
+  "icecore.cozycafe.range.save_failed": "Failed to save the computer recognition range: %s",
+  "icecore.cozycafe.range.too_large": "A computer recognition range may contain at most %s blocks.",
+  "icecore.cozycafe.range.too_many": "This world may store custom ranges for at most %s computers."
 }

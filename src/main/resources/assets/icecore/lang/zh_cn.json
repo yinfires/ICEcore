@@ -12,5 +12,16 @@
   "icecore.build.adjust.invalid_stick": "必须手持普通木棍才能进入调整模式。",
   "icecore.build.adjust.enter": "已进入区域 %s 的调整模式。",
   "icecore.build.adjust.first": "已设置第一个坐标：%s",
-  "icecore.build.adjust.second": "已设置第二个坐标：%s"
+  "icecore.build.adjust.second": "已设置第二个坐标：%s",
+  "icecore.cozycafe.range.mod_missing": "未安装 CozyCafe，无法修改电脑识别范围。",
+  "icecore.cozycafe.range.player_only": "只有玩家可以修改 CozyCafe 电脑识别范围。",
+  "icecore.cozycafe.range.invalid_stick": "必须手持普通木棍才能进入电脑范围修改模式。",
+  "icecore.cozycafe.range.invalid_target": "请在交互距离内对准 CozyCafe 咖啡馆电脑。",
+  "icecore.cozycafe.range.enter": "已进入坐标 %s 处电脑的范围修改模式。",
+  "icecore.cozycafe.range.wand_name": "电脑范围：%s",
+  "icecore.cozycafe.range.first": "已设置电脑范围的第一个坐标：%s",
+  "icecore.cozycafe.range.second": "已设置电脑范围的第二个坐标：%s",
+  "icecore.cozycafe.range.save_failed": "电脑识别范围保存失败：%s",
+  "icecore.cozycafe.range.too_large": "电脑识别范围最多可包含 %s 个方块。",
+  "icecore.cozycafe.range.too_many": "当前世界最多可保存 %s 台电脑的自定义范围。"
 }

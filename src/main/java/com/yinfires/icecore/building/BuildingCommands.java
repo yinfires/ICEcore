@@ -4,6 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
+import com.yinfires.icecore.compat.cozycafe.range.CozyCafeRangeCommands;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.network.chat.Component;
@@ -65,6 +66,7 @@ public final class BuildingCommands {
         var faceEdit = literal("face").then(argument("list", StringArgumentType.word()).suggests(BuildingCommands::listNames).then(faceName));
         build.then(literal("list").then(listAdd).then(listRemove).then(blockEdit).then(regionEdit).then(supportEdit).then(faceEdit));
         root.then(build);
+        CozyCafeRangeCommands.attach(root);
         dispatcher.register(root);
     }
 
