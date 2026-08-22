@@ -1,6 +1,7 @@
 package com.yinfires.icecore.network;
 
 import com.yinfires.icecore.ICECore;
+import com.yinfires.icecore.building.ClientBoundBuildingRulesPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
@@ -38,6 +39,11 @@ public final class ICECoreNetwork {
                 .decoder(ClientBoundAddMenuItemPacket::new)
                 .consumerMainThread(ClientBoundAddMenuItemPacket::handle)
                 .add();
+        CHANNEL.messageBuilder(ClientBoundBuildingRulesPacket.class, 2, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(ClientBoundBuildingRulesPacket::encode)
+                .decoder(ClientBoundBuildingRulesPacket::new)
+                .consumerMainThread(ClientBoundBuildingRulesPacket::handle)
+                .add();
     }
 
     public static void sendToServer(ServerBoundAddMenuItemPacket packet) {
@@ -45,6 +51,10 @@ public final class ICECoreNetwork {
     }
 
     public static void sendToPlayer(ClientBoundAddMenuItemPacket packet, ServerPlayer player) {
+        CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);
+    }
+
+    public static void sendToPlayer(ClientBoundBuildingRulesPacket packet, ServerPlayer player) {
         CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);
     }
 }

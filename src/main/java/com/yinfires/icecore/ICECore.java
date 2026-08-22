@@ -1,6 +1,9 @@
 package com.yinfires.icecore;
 
 import com.yinfires.icecore.network.ICECoreNetwork;
+import com.yinfires.icecore.item.ModCreativeTabs;
+import com.yinfires.icecore.item.ModItems;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod(ICECore.MOD_ID)
@@ -9,5 +12,8 @@ public final class ICECore {
 
     public ICECore() {
         ICECoreNetwork.register();
+        var modBus = FMLJavaModLoadingContext.get().getModEventBus();
+        ModItems.ITEMS.register(modBus);
+        ModCreativeTabs.TABS.register(modBus);
     }
 }

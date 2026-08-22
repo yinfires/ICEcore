@@ -91,7 +91,11 @@ tasks.named('jar', Jar).configure {
                 'Specification-Version' : '1',
                 'Implementation-Title'  : mod_name,
                 'Implementation-Version': project.jar.archiveVersion,
-                'Implementation-Vendor' : mod_authors
+                'Implementation-Vendor' : mod_authors,
+                // Forge 1.20.1 discovers Sponge Mixin configs from the JAR
+                // manifest. The [[mixins]] mods.toml entry is not enough for
+                // the client launch path used by the pack.
+                'MixinConfigs'          : 'icecore.mixins.json'
         ])
     }
 

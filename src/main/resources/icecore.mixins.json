@@ -1,0 +1,19 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.yinfires.icecore.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "BlockStateUseMixin"
+  ],
+  "client": [
+    "RenderChunkRegionMixin",
+    "BlockEntityRenderDispatcherMixin",
+    "MultiPlayerGameModeMixin",
+    "ClientBlockStateUseMixin",
+    "EmbeddiumWorldSliceMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

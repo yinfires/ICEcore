@@ -1,0 +1,16 @@
+{
+  "item.icecore.wrench": "扳手",
+  "item.icecore.wrench.tooltip": "右键拆除物体",
+  "itemGroup.icecore.main": "ICEcore",
+  "icecore.build.reload.success": "建造规则已重新加载。",
+  "icecore.build.reload.failed": "建造规则加载失败：%s",
+  "icecore.build.save.failed": "建造规则保存失败：%s",
+  "icecore.build.exists": "目标名称已存在。",
+  "icecore.build.missing": "目标不存在。",
+  "icecore.build.invalid": "建造规则修改无效。",
+  "icecore.build.inventory_full": "物品栏已满，无法拆除。",
+  "icecore.build.adjust.invalid_stick": "必须手持普通木棍才能进入调整模式。",
+  "icecore.build.adjust.enter": "已进入区域 %s 的调整模式。",
+  "icecore.build.adjust.first": "已设置第一个坐标：%s",
+  "icecore.build.adjust.second": "已设置第二个坐标：%s"
+}

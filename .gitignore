@@ -6,6 +6,8 @@
 /docs/
 /tmp/
 /tool/
+# GitHub Wiki is a separate Git repository kept at the project root.
+/wiki/
 /.codegraph/
 /.gradle/
 /build/

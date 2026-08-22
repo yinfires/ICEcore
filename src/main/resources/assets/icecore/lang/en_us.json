@@ -1,0 +1,16 @@
+{
+  "item.icecore.wrench": "Wrench",
+  "item.icecore.wrench.tooltip": "Right-click to dismantle a block",
+  "itemGroup.icecore.main": "ICEcore",
+  "icecore.build.reload.success": "Building rules reloaded.",
+  "icecore.build.reload.failed": "Failed to load building rules: %s",
+  "icecore.build.save.failed": "Failed to save building rules: %s",
+  "icecore.build.exists": "That name already exists.",
+  "icecore.build.missing": "That entry does not exist.",
+  "icecore.build.invalid": "That building rule change is invalid.",
+  "icecore.build.inventory_full": "Your inventory is full; the block cannot be dismantled.",
+  "icecore.build.adjust.invalid_stick": "Hold a plain stick to enter adjustment mode.",
+  "icecore.build.adjust.enter": "Entered adjustment mode for region %s.",
+  "icecore.build.adjust.first": "First position set: %s",
+  "icecore.build.adjust.second": "Second position set: %s"
+}
