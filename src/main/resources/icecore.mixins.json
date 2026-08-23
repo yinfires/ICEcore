@@ -12,6 +12,7 @@
     "BlockEntityRenderDispatcherMixin",
     "MultiPlayerGameModeMixin",
     "ClientBlockStateUseMixin",
+    "PaladinFurnitureSpriteLoaderMixin",
     "EmbeddiumWorldSliceMixin"
   ],
   "injectors": {
