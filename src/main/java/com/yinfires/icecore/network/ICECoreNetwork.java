@@ -3,6 +3,7 @@ package com.yinfires.icecore.network;
 import com.yinfires.icecore.ICECore;
 import com.yinfires.icecore.building.ClientBoundBuildingRulesPacket;
 import com.yinfires.icecore.compat.cozycafe.range.ClientBoundCozyCafeRangesPacket;
+import com.yinfires.icecore.currency.ClientBoundCurrencyPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
@@ -11,7 +12,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class ICECoreNetwork {
-    private static final String PROTOCOL_VERSION = "3";
+    private static final String PROTOCOL_VERSION = "4";
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             ResourceLocation.fromNamespaceAndPath(ICECore.MOD_ID, "main"),
             () -> PROTOCOL_VERSION,
@@ -50,6 +51,11 @@ public final class ICECoreNetwork {
                 .decoder(ClientBoundCozyCafeRangesPacket::new)
                 .consumerMainThread(ClientBoundCozyCafeRangesPacket::handle)
                 .add();
+        CHANNEL.messageBuilder(ClientBoundCurrencyPacket.class, 4, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(ClientBoundCurrencyPacket::encode)
+                .decoder(ClientBoundCurrencyPacket::new)
+                .consumerMainThread(ClientBoundCurrencyPacket::handle)
+                .add();
     }
 
     public static void sendToServer(ServerBoundAddMenuItemPacket packet) {
@@ -65,6 +71,10 @@ public final class ICECoreNetwork {
     }
 
     public static void sendToPlayer(ClientBoundCozyCafeRangesPacket packet, ServerPlayer player) {
+        CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);
+    }
+
+    public static void sendToPlayer(ClientBoundCurrencyPacket packet, ServerPlayer player) {
         CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);
     }
 }

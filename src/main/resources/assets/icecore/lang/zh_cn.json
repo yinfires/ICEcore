@@ -23,5 +23,8 @@
   "icecore.cozycafe.range.second": "已设置电脑范围的第二个坐标：%s",
   "icecore.cozycafe.range.save_failed": "电脑识别范围保存失败：%s",
   "icecore.cozycafe.range.too_large": "电脑识别范围最多可包含 %s 个方块。",
-  "icecore.cozycafe.range.too_many": "当前世界最多可保存 %s 台电脑的自定义范围。"
+  "icecore.cozycafe.range.too_many": "当前世界最多可保存 %s 台电脑的自定义范围。",
+  "icecore.currency.get": "当前全服货币余额：$%s",
+  "icecore.currency.hud.enabled": "全服货币 HUD 已开启。",
+  "icecore.currency.hud.disabled": "全服货币 HUD 已关闭。"
 }
