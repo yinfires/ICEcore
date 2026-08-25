@@ -1,5 +1,6 @@
 package com.yinfires.icecore.building;
 
+import com.yinfires.icecore.feedback.PlayerFeedback;
 import com.yinfires.icecore.item.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -104,7 +105,7 @@ public final class BuildingServerActions {
         }
         List<BlockPos> structure = BuildingStructure.positions(state, keyPosition);
         if (!canFit(player.getInventory(), returns)) {
-            player.sendSystemMessage(net.minecraft.network.chat.Component.translatable("icecore.build.inventory_full"));
+            PlayerFeedback.show(player, net.minecraft.network.chat.Component.translatable("icecore.build.inventory_full"));
             return false;
         }
         for (BlockPos part : structure) {

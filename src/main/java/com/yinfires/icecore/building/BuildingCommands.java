@@ -6,6 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.yinfires.icecore.compat.cozycafe.range.CozyCafeRangeCommands;
 import com.yinfires.icecore.currency.CurrencyCommands;
+import com.yinfires.icecore.feedback.PlayerFeedback;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.network.chat.Component;
@@ -92,7 +93,7 @@ public final class BuildingCommands {
         String name = getString(context, "name");
         if (!BuildingDataManager.get().data().regions().containsKey(name)) return fail(context, "icecore.build.missing");
         if (!AdjustmentModeManager.enter(player, name)) return fail(context, "icecore.build.adjust.invalid_stick");
-        player.sendSystemMessage(Component.translatable("icecore.build.adjust.enter", name));
+        PlayerFeedback.show(player, Component.translatable("icecore.build.adjust.enter", name));
         return 1;
     }
 
@@ -180,7 +181,7 @@ public final class BuildingCommands {
     }
 
     private static int fail(CommandContext<CommandSourceStack> context, String key) {
-        context.getSource().sendFailure(Component.translatable(key));
+        PlayerFeedback.showFailure(context.getSource(), Component.translatable(key));
         return 0;
     }
 

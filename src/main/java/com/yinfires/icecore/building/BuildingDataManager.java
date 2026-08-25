@@ -2,6 +2,7 @@ package com.yinfires.icecore.building;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.yinfires.icecore.feedback.PlayerFeedback;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -69,12 +70,12 @@ public final class BuildingDataManager {
             BuildingRuntimeCache.rebuild(data, server);
             BuildingNetworking.broadcastRules(server, data, revision);
             if (feedback != null) {
-                feedback.sendSystemMessage(Component.translatable("icecore.build.reload.success"));
+                PlayerFeedback.show(feedback, Component.translatable("icecore.build.reload.success"));
             }
             return true;
         } catch (Exception exception) {
             if (feedback != null) {
-                feedback.sendSystemMessage(Component.translatable("icecore.build.reload.failed", exception.getMessage()));
+                PlayerFeedback.show(feedback, Component.translatable("icecore.build.reload.failed", exception.getMessage()));
             }
             return false;
         }
@@ -93,7 +94,7 @@ public final class BuildingDataManager {
             return true;
         } catch (Exception exception) {
             if (feedback != null) {
-                feedback.sendSystemMessage(Component.translatable("icecore.build.save.failed", exception.getMessage()));
+                PlayerFeedback.show(feedback, Component.translatable("icecore.build.save.failed", exception.getMessage()));
             }
             return false;
         }

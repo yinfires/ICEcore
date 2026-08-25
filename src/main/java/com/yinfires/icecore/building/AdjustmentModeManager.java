@@ -1,6 +1,7 @@
 package com.yinfires.icecore.building;
 
 import com.yinfires.icecore.compat.cozycafe.range.CozyCafeRangeAdjustmentManager;
+import com.yinfires.icecore.feedback.PlayerFeedback;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -64,7 +65,7 @@ public final class AdjustmentModeManager {
             RegionDefinition definition = data.regions().get(region);
             if (definition != null) definition.setFirst(player.serverLevel().dimension(), pos);
         }, player);
-        if (saved) player.sendSystemMessage(Component.translatable("icecore.build.adjust.first", pos.toShortString()));
+        if (saved) PlayerFeedback.show(player, Component.translatable("icecore.build.adjust.first", pos.toShortString()));
     }
 
     public static void setSecond(ServerPlayer player, BlockPos pos) {
@@ -75,7 +76,7 @@ public final class AdjustmentModeManager {
             RegionDefinition definition = data.regions().get(region);
             if (definition != null) definition.setSecond(player.serverLevel().dimension(), pos);
         }, player);
-        if (saved) player.sendSystemMessage(Component.translatable("icecore.build.adjust.second", pos.toShortString()));
+        if (saved) PlayerFeedback.show(player, Component.translatable("icecore.build.adjust.second", pos.toShortString()));
     }
 
     public static void tick(ServerPlayer player) {

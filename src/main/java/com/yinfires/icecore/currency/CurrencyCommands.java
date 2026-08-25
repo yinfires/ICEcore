@@ -3,6 +3,7 @@ package com.yinfires.icecore.currency;
 import com.mojang.brigadier.arguments.LongArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.yinfires.icecore.feedback.PlayerFeedback;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 
@@ -34,7 +35,7 @@ public final class CurrencyCommands {
     }
 
     private static int get(CommandContext<CommandSourceStack> context) {
-        context.getSource().sendSuccess(() -> Component.translatable("icecore.currency.get",
+        PlayerFeedback.showSuccess(context.getSource(), () -> Component.translatable("icecore.currency.get",
                 format(CurrencyService.balance())), false);
         return 1;
     }
@@ -59,14 +60,14 @@ public final class CurrencyCommands {
     }
 
     private static int getHud(CommandContext<CommandSourceStack> context) {
-        context.getSource().sendSuccess(() -> Component.translatable(
+        PlayerFeedback.showSuccess(context.getSource(), () -> Component.translatable(
                 CurrencyService.hudEnabled() ? "icecore.currency.hud.enabled" : "icecore.currency.hud.disabled"), false);
         return 1;
     }
 
     private static int setHud(CommandContext<CommandSourceStack> context, boolean enabled) {
         CurrencyService.setHudEnabled(enabled);
-        context.getSource().sendSuccess(() -> Component.translatable(
+        PlayerFeedback.showSuccess(context.getSource(), () -> Component.translatable(
                 enabled ? "icecore.currency.hud.enabled" : "icecore.currency.hud.disabled"), true);
         return 1;
     }

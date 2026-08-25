@@ -3,6 +3,7 @@ package com.yinfires.icecore.compat.cozycafe.range;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.logging.LogUtils;
+import com.yinfires.icecore.feedback.PlayerFeedback;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -65,7 +66,7 @@ public final class CozyCafeRangeDataManager {
             return true;
         }
         if (data.ranges().size() >= CozyCafeRangeData.MAX_RANGES) {
-            player.sendSystemMessage(Component.translatable("icecore.cozycafe.range.too_many",
+            PlayerFeedback.show(player, Component.translatable("icecore.cozycafe.range.too_many",
                     CozyCafeRangeData.MAX_RANGES));
             return false;
         }
@@ -154,7 +155,7 @@ public final class CozyCafeRangeDataManager {
         } catch (Exception exception) {
             LOGGER.error("Failed to save CozyCafe range data", exception);
             if (feedback != null) {
-                feedback.sendSystemMessage(Component.translatable(
+                PlayerFeedback.show(feedback, Component.translatable(
                         "icecore.cozycafe.range.save_failed", exception.getMessage()));
             }
             return false;
@@ -170,7 +171,7 @@ public final class CozyCafeRangeDataManager {
     }
 
     private static void rangeTooLarge(ServerPlayer player) {
-        player.sendSystemMessage(Component.translatable("icecore.cozycafe.range.too_large",
+        PlayerFeedback.show(player, Component.translatable("icecore.cozycafe.range.too_large",
                 CozyCafeRangeDefinition.MAX_SCAN_VOLUME));
     }
 

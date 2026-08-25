@@ -1,6 +1,7 @@
 package com.yinfires.icecore.compat.cozycafe.range;
 
 import com.yinfires.icecore.building.AdjustmentModeManager;
+import com.yinfires.icecore.feedback.PlayerFeedback;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -71,7 +72,7 @@ public final class CozyCafeRangeAdjustmentManager {
             return;
         }
         if (CozyCafeRangeDataManager.get().setFirst(player, state.key, position)) {
-            player.sendSystemMessage(Component.translatable(
+            PlayerFeedback.show(player, Component.translatable(
                     "icecore.cozycafe.range.first", position.toShortString()));
         }
     }
@@ -82,7 +83,7 @@ public final class CozyCafeRangeAdjustmentManager {
             return;
         }
         if (CozyCafeRangeDataManager.get().setSecond(player, state.key, position)) {
-            player.sendSystemMessage(Component.translatable(
+            PlayerFeedback.show(player, Component.translatable(
                     "icecore.cozycafe.range.second", position.toShortString()));
         }
     }

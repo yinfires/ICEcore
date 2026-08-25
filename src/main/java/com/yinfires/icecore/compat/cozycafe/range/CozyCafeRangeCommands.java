@@ -2,6 +2,7 @@ package com.yinfires.icecore.compat.cozycafe.range;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.yinfires.icecore.feedback.PlayerFeedback;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -46,13 +47,13 @@ public final class CozyCafeRangeCommands {
         if (!CozyCafeRangeAdjustmentManager.enter(player, blockHit.getBlockPos())) {
             return 0;
         }
-        player.sendSystemMessage(Component.translatable("icecore.cozycafe.range.enter",
+        PlayerFeedback.show(player, Component.translatable("icecore.cozycafe.range.enter",
                 blockHit.getBlockPos().toShortString()));
         return 1;
     }
 
     private static int fail(CommandContext<CommandSourceStack> context, String key) {
-        context.getSource().sendFailure(Component.translatable(key));
+        PlayerFeedback.showFailure(context.getSource(), Component.translatable(key));
         return 0;
     }
 }
