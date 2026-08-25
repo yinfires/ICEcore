@@ -10,11 +10,15 @@
   ],
   "client": [
     "RenderChunkRegionMixin",
+    "ChunkRebuildTaskMixin",
     "BlockEntityRenderDispatcherMixin",
     "MultiPlayerGameModeMixin",
     "ClientBlockStateUseMixin",
     "PaladinFurnitureSpriteLoaderMixin",
-    "EmbeddiumWorldSliceMixin"
+    "EmbeddiumWorldSliceMixin",
+    "EmbeddiumChunkBuildOutputMixin",
+    "EmbeddiumRenderSectionMixin",
+    "EmbeddiumRenderRegionManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -30,6 +30,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Mod.EventBusSubscriber(modid = ICECore.MOD_ID, value = net.minecraftforge.api.distmarker.Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -42,6 +43,10 @@ public final class BuildingClientEvents {
     private static InteractionHand suppressPlacementPreviewHand;
     private static ItemStack suppressPlacementPreviewStack = ItemStack.EMPTY;
     private static PoseStack lastPreviewPoseStack;
+    private static WrenchPreview desiredWrenchPreview;
+    private static WrenchPreview committedWrenchPreview;
+    private static WrenchPreview queuedWrenchPreview;
+    private static long desiredWrenchGeneration;
     private static final MultiBufferSource.BufferSource PREVIEW_BUFFER_SOURCE =
             MultiBufferSource.immediate(new BufferBuilder(RenderType.translucent().bufferSize()));
 
@@ -260,53 +265,65 @@ public final class BuildingClientEvents {
         // elsewhere.  update() short-circuits when the key set is unchanged, so
         // per-frame calls only mark chunks dirty when the target actually moves.
         refreshHiddenRenderState(minecraft);
+        if (BuildingClientRenderState.committedGeneration() == desiredWrenchGeneration) {
+            committedWrenchPreview = desiredWrenchPreview;
+            if (!Objects.equals(queuedWrenchPreview, desiredWrenchPreview)) {
+                WrenchPreview queued = queuedWrenchPreview;
+                queuedWrenchPreview = desiredWrenchPreview;
+                requestWrenchPreview(queued);
+            }
+        }
+        if (desiredWrenchPreview != null && !Objects.equals(desiredWrenchPreview, committedWrenchPreview)) {
+            renderWrenchPreviewModel(event.getPoseStack(), minecraft, desiredWrenchPreview, true);
+        }
         renderAdjustmentBorder(event.getPoseStack(), minecraft);
         if (isAdjustmentStick(minecraft.player.getMainHandItem())
                 || isAdjustmentStick(minecraft.player.getOffhandItem())) {
-            BuildingClientRenderState.clear();
+            clearAndRenderWrench(event.getPoseStack(), minecraft);
             return;
         }
         if (minecraft.gameMode.getPlayerMode() != GameType.ADVENTURE) {
-            BuildingClientRenderState.clear();
+            clearAndRenderWrench(event.getPoseStack(), minecraft);
             return;
         }
         if (minecraft.hitResult == null || minecraft.player.distanceToSqr(minecraft.hitResult.getLocation().x,
                 minecraft.hitResult.getLocation().y, minecraft.hitResult.getLocation().z)
                 > Math.pow(minecraft.gameMode.getPickRange(), 2.0D)) {
-            BuildingClientRenderState.clear();
+            clearAndRenderWrench(event.getPoseStack(), minecraft);
             return;
         }
         InteractionHand heldHand = previewHand(minecraft.player);
         if (heldHand == null) {
-            BuildingClientRenderState.clear();
+            clearAndRenderWrench(event.getPoseStack(), minecraft);
             return;
         }
         ItemStack held = minecraft.player.getItemInHand(heldHand);
         BlockItem blockItem = held.getItem() instanceof BlockItem bi ? bi : null;
         if (!(minecraft.hitResult instanceof BlockHitResult hit)) {
-            BuildingClientRenderState.clear();
+            clearAndRenderWrench(event.getPoseStack(), minecraft);
             return;
         }
         if (held.is(ModItems.WRENCH.get())) {
-            WrenchPreview preview = wrenchPreview(minecraft, hit);
-            if (preview == null) {
-                BuildingClientRenderState.clear();
-                return;
+            if (committedWrenchPreview != null) {
+                renderWrenchPreviewModel(event.getPoseStack(), minecraft, committedWrenchPreview, false);
             }
-            renderWrenchPreviewModel(event.getPoseStack(), minecraft, preview);
+            return;
+        }
+        if (committedWrenchPreview != null) {
+            renderWrenchPreviewModel(event.getPoseStack(), minecraft, committedWrenchPreview, false);
             return;
         }
         if (blockItem == null || !BuildingClientRules.isManaged(blockItem.getBlock().defaultBlockState())) {
-            BuildingClientRenderState.clear();
+            clearPreviewState();
             return;
         }
         if (isPlacementPreviewSuppressed(minecraft, held, heldHand)) {
-            BuildingClientRenderState.clear();
+            clearPreviewState();
             return;
         }
         PlacementPreview placement = computePlacementPreview(minecraft, held, heldHand, hit);
         if (placement == null) {
-            BuildingClientRenderState.clear();
+            clearPreviewState();
             return;
         }
         if (placement.allowed()) {
@@ -319,7 +336,7 @@ public final class BuildingClientEvents {
     }
 
     private static void renderWrenchPreviewModel(PoseStack poseStack, Minecraft minecraft,
-                                                  WrenchPreview preview) {
+                                                  WrenchPreview preview, boolean desired) {
         // Identical to the failed placement preview: same model renderer,
         // vertex tint, alpha and vanilla RenderType.translucent() batch.  The
         // original block is already removed from the chunk mesh by
@@ -328,8 +345,21 @@ public final class BuildingClientEvents {
         // No depth mask is used: a depth-only near-offset mask would cull the
         // terrain behind the block and force the translucent model to blend
         // with the cleared sky instead.
-        renderInvalidPreview(poseStack, minecraft, preview.position(), preview.state(),
-                RenderType.translucent(), INVALID_PREVIEW_ALPHA);
+        MultiBufferSource.BufferSource bufferSource = previewBufferSource();
+        MultiBufferSource previewBuffers = new PreviewBufferSource(
+                bufferSource, INVALID_PREVIEW_RED, INVALID_PREVIEW_GREEN, INVALID_PREVIEW_BLUE,
+                INVALID_PREVIEW_ALPHA, true);
+        for (BlockPos previewPos : previewPositions(preview.state(), preview.position())) {
+            boolean render = desired
+                    ? BuildingClientRenderState.shouldRenderDesired(previewPos)
+                    : BuildingClientRenderState.shouldRenderCommitted(previewPos);
+            if (render) {
+                renderGhost(poseStack, previewPos,
+                        BuildingStructure.stateAt(preview.state(), preview.position(), previewPos),
+                        previewBuffers, RenderType.translucent());
+            }
+        }
+        bufferSource.endBatch(RenderType.translucent());
     }
 
     private static WrenchPreview wrenchPreview(Minecraft minecraft, BlockHitResult hit) {
@@ -484,7 +514,7 @@ public final class BuildingClientEvents {
             }
         }
         if (minecraft.gameMode == null || minecraft.player == null) {
-            BuildingClientRenderState.clear();
+            clearPreviewState();
             return;
         }
         // Hidden-coordinate refresh moved to the render path (onRender) so it
@@ -502,11 +532,9 @@ public final class BuildingClientEvents {
     /**
      * Updates the render-only hidden-coordinate snapshot from the current
      * preview target.  Called once per frame from {@link #onRender} so the
-     * hidden set stays in step with the drawn preview; chunk meshes still
-     * rebuild asynchronously, so a target switch leaves a brief transition while
-     * the affected sections recompile.  {@link BuildingClientRenderState#update}
-     * short-circuits when the key set is unchanged, so a stationary cursor marks
-     * nothing dirty.
+     * desired target. The wrench path commits its visible model only after all
+     * affected section meshes have uploaded, so the model and terrain change as
+     * one transaction instead of exposing an asynchronous transition frame.
      */
     private static void refreshHiddenRenderState(Minecraft minecraft) {
         if (minecraft.level == null || minecraft.player == null || minecraft.gameMode == null
@@ -517,19 +545,22 @@ public final class BuildingClientEvents {
                 || !(minecraft.hitResult instanceof BlockHitResult hit)
                 || minecraft.player.distanceToSqr(hit.getLocation().x, hit.getLocation().y, hit.getLocation().z)
                 > Math.pow(minecraft.gameMode.getPickRange(), 2.0D)) {
-            BuildingClientRenderState.clear();
+            clearPreviewState();
             return;
         }
         InteractionHand hand = previewHand(minecraft.player);
         if (hand == null) {
-            BuildingClientRenderState.clear();
+            clearPreviewState();
             return;
         }
         ItemStack held = minecraft.player.getItemInHand(hand);
         if (held.is(ModItems.WRENCH.get())) {
             WrenchPreview preview = wrenchPreview(minecraft, hit);
-            BuildingClientRenderState.update(preview == null
-                    ? Set.of() : previewPositions(preview.state(), preview.position()));
+            requestWrenchPreview(preview);
+            return;
+        }
+        if (desiredWrenchPreview != null || committedWrenchPreview != null) {
+            requestWrenchPreview(null);
             return;
         }
         if (isPlacementPreviewSuppressed(minecraft, held, hand)) {
@@ -542,6 +573,33 @@ public final class BuildingClientEvents {
             return;
         }
         BuildingClientRenderState.update(previewPositions(placement.state(), placement.origin()));
+    }
+
+    private static void requestWrenchPreview(WrenchPreview preview) {
+        if (BuildingClientRenderState.transactionPending()) {
+            queuedWrenchPreview = preview;
+            return;
+        }
+        if (Objects.equals(desiredWrenchPreview, preview)) return;
+        desiredWrenchPreview = preview;
+        queuedWrenchPreview = preview;
+        desiredWrenchGeneration = BuildingClientRenderState.requestWrench(preview == null
+                ? Set.of() : previewPositions(preview.state(), preview.position()));
+    }
+
+    private static void clearPreviewState() {
+        if (desiredWrenchPreview != null || committedWrenchPreview != null) {
+            requestWrenchPreview(null);
+        } else {
+            BuildingClientRenderState.clear();
+        }
+    }
+
+    private static void clearAndRenderWrench(PoseStack poseStack, Minecraft minecraft) {
+        clearPreviewState();
+        if (committedWrenchPreview != null) {
+            renderWrenchPreviewModel(poseStack, minecraft, committedWrenchPreview, false);
+        }
     }
 
     private static boolean isPlacementPreviewSuppressed(Minecraft minecraft, ItemStack held, InteractionHand hand) {
@@ -765,8 +823,11 @@ public final class BuildingClientEvents {
     @SubscribeEvent
     public static void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
         lastPreviewPoseStack = null;
-        BuildingClientRenderState.clear();
+        desiredWrenchPreview = null;
+        committedWrenchPreview = null;
+        queuedWrenchPreview = null;
+        desiredWrenchGeneration = 0L;
+        BuildingClientRenderState.reset();
         BuildingClientState.reset();
     }
 }
-
