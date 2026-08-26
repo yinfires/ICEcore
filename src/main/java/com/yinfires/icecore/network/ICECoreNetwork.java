@@ -62,6 +62,12 @@ public final class ICECoreNetwork {
         CHANNEL.messageBuilder(ClientBoundCutscenePacket.class, 7, NetworkDirection.PLAY_TO_CLIENT).encoder(ClientBoundCutscenePacket::encode).decoder(ClientBoundCutscenePacket::new).consumerMainThread(ClientBoundCutscenePacket::handle).add();
         CHANNEL.messageBuilder(ServerBoundCutsceneAckPacket.class, 8, NetworkDirection.PLAY_TO_SERVER).encoder(ServerBoundCutsceneAckPacket::encode).decoder(ServerBoundCutsceneAckPacket::new).consumerMainThread(ServerBoundCutsceneAckPacket::handle).add();
         CHANNEL.messageBuilder(ClientBoundDaySummaryPacket.class, 9, NetworkDirection.PLAY_TO_CLIENT).encoder(ClientBoundDaySummaryPacket::encode).decoder(ClientBoundDaySummaryPacket::new).consumerMainThread(ClientBoundDaySummaryPacket::handle).add();
+        CHANNEL.messageBuilder(ServerBoundGiveItemPacket.class, 10, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(ServerBoundGiveItemPacket::encode).decoder(ServerBoundGiveItemPacket::new)
+                .consumerMainThread(ServerBoundGiveItemPacket::handle).add();
+        CHANNEL.messageBuilder(ClientBoundGiveResultPacket.class, 11, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(ClientBoundGiveResultPacket::encode).decoder(ClientBoundGiveResultPacket::new)
+                .consumerMainThread(ClientBoundGiveResultPacket::handle).add();
     }
 
     public static void sendToServer(ServerBoundAddMenuItemPacket packet) {
@@ -88,4 +94,6 @@ public final class ICECoreNetwork {
     public static void sendToPlayer(ClientBoundCutscenePacket packet,ServerPlayer player){CHANNEL.send(PacketDistributor.PLAYER.with(()->player),packet);}
     public static void sendToPlayer(ClientBoundDaySummaryPacket packet,ServerPlayer player){CHANNEL.send(PacketDistributor.PLAYER.with(()->player),packet);}
     public static void sendToServer(ServerBoundCutsceneAckPacket packet){CHANNEL.sendToServer(packet);}
+    public static void sendToServer(ServerBoundGiveItemPacket packet){CHANNEL.sendToServer(packet);}
+    public static void sendToPlayer(ClientBoundGiveResultPacket packet, ServerPlayer player){CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);}
 }

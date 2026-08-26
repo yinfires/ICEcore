@@ -7,6 +7,9 @@
     "BlockStateUseMixin",
     "CozyCafeManagerRangeMixin",
     "CozyCafePaymentMixin"
+    ,"AdventureDropPacketMixin"
+    ,"AdventureCarriedStackMixin"
+    ,"AdventureMenuCloseMixin"
     ,"ServerLevelTimeMixin"
     ,"TimeCommandMixin"
   ],
@@ -23,6 +26,9 @@
     "EmbeddiumRenderRegionManagerMixin"
     ,"JadeOverlayRendererMixin"
     ,"ClientLevelTimeMixin"
+    ,"AdventureLocalPlayerDropMixin"
+    ,"AdventureKeyDropMixin"
+    ,"AdventureContainerScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

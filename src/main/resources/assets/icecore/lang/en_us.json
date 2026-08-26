@@ -50,4 +50,6 @@
   "icecore.time.summary.title": "A New Day",
   "icecore.time.summary.income": "Yesterday's net income: %s$",
   "icecore.time.summary.encourage": "Keep it up"
+  ,"icecore.adventure_give.hud": "Q Give"
+  ,"icecore.adventure_give.full": "Cannot give: the recipient's inventory is full"
 }

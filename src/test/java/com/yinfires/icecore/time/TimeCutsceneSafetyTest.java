@@ -19,8 +19,8 @@ final class TimeCutsceneSafetyTest {
     @Test
     void nonCancelableKeyEventIsNeverCanceled() throws IOException {
         String source = source("TimeCutsceneClient.java");
-        assertTrue(source.contains("void key(InputEvent.Key e){if(active())KeyMapping.releaseAll();}"));
-        assertFalse(source.contains("void key(InputEvent.Key e){if(active())e.setCanceled(true);}"));
+        assertFalse(source.contains("void key(InputEvent.Key"));
+        assertFalse(source.contains("InputEvent.Key e){if(active())e.setCanceled(true)"));
     }
 
     @Test
@@ -31,8 +31,38 @@ final class TimeCutsceneSafetyTest {
         assertTrue(source.contains("e.setPitch(packet.camera().pitch())"));
         assertTrue(source.contains("RenderGuiOverlayEvent.Pre"));
         assertTrue(source.contains("void hideHud(RenderGuiOverlayEvent.Pre e){if(cameraActive)e.setCanceled(true);}"));
-        assertTrue(source.contains("void hideHand(RenderHandEvent e){if(cameraActive)e.setCanceled(true);}"));
+        assertTrue(source.contains("void hideHand(RenderHandEvent e){if(active())e.setCanceled(true);}"));
         assertTrue(source.contains("camera.setOldPosAndRot()"));
+        assertTrue(source.contains("mc.player.setOldPosAndRot()"));
+    }
+
+    @Test
+    void singleplayerPauseFreezesCutsceneWithoutBlockingScreens() throws IOException {
+        String source = source("TimeCutsceneClient.java");
+        assertTrue(source.contains("if(mc.isPaused())return"));
+        assertTrue(source.contains("elapsedClientTicks++"));
+        assertTrue(source.contains("elapsedClientTicks+Minecraft.getInstance().getFrameTime()"));
+        assertFalse(source.contains("System.currentTimeMillis()"));
+        assertFalse(source.contains("ScreenEvent.Opening"));
+        assertFalse(source.contains("PauseScreen"));
+        assertTrue(source.contains("Minecraft.getInstance().screen==null"));
+        assertTrue(source.contains("if(mc.screen==null)KeyMapping.releaseAll()"));
+    }
+
+    @Test
+    void bedLabelsWaitForPostCutsceneVoteState() throws IOException {
+        String cutscene = source("TimeCutsceneClient.java");
+        String voteEvents = source("TimeVoteClientEvents.java");
+        String voteState = source("TimeVoteClientState.java");
+        assertTrue(cutscene.contains("TimeVoteClientState.suppressLabelsUntilUpdate()"));
+        assertTrue(voteEvents.contains("TimeVoteClientState.labelsSuppressed()"));
+        assertTrue(voteState.contains("labelsSuppressed=false"));
+    }
+
+    @Test
+    void bedVoteLabelIsHiddenWhenThereIsOnlyOneParticipant() throws IOException {
+        String source = source("TimeVoteClientEvents.java");
+        assertTrue(source.contains("if(TimeVoteClientState.total() <= 1)return;"));
     }
 
     @Test

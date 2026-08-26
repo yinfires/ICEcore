@@ -31,8 +31,11 @@ public final class TimeVoteClientEvents {
         }
     }
     @SubscribeEvent public static void render(RenderLevelStageEvent e){
-        if(e.getStage()!=RenderLevelStageEvent.Stage.AFTER_PARTICLES||TimeCutsceneClient.active())return;Minecraft mc=Minecraft.getInstance();
+        if(e.getStage()!=RenderLevelStageEvent.Stage.AFTER_PARTICLES||TimeCutsceneClient.active()||TimeVoteClientState.labelsSuppressed())return;Minecraft mc=Minecraft.getInstance();
         if(mc.player==null||mc.level==null||!(mc.hitResult instanceof BlockHitResult hit))return;
+        // With only one overworld participant there is nobody else to confirm,
+        // so the multiplayer vote instruction is not applicable.
+        if(TimeVoteClientState.total() <= 1)return;
         var match=TimeRules.match(mc.level,hit.getBlockPos(),TimeClientState.config(),BuildingClientState.data());if(match==null)return;
         PoseStack pose=e.getPoseStack();var cam=e.getCamera().getPosition();pose.pushPose();pose.translate(match.labelX()-cam.x,match.labelY()-cam.y,match.labelZ()-cam.z);pose.mulPose(mc.getEntityRenderDispatcher().cameraOrientation());pose.scale(-0.025F,-0.025F,0.025F);
         MultiBufferSource.BufferSource buffers=mc.renderBuffers().bufferSource();Font font=mc.font;

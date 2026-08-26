@@ -21,7 +21,7 @@ import net.minecraftforge.fml.common.Mod;
 public final class TimeCutsceneClient {
     private static ClientBoundCutscenePacket packet;
     private static long lastSequence=Long.MIN_VALUE;
-    private static long startedMillis;
+    private static long elapsedClientTicks;
     private static ArmorStand camera;
     private static boolean cameraActive;
     private static boolean acked;
@@ -34,11 +34,14 @@ public final class TimeCutsceneClient {
         lastSequence=value.sequence();
         if(value.abort()){reset();return;}
         NaturalDaySummaryClient.reset();
+        TimeVoteClientState.suppressLabelsUntilUpdate();
         if(cameraActive)restorePlayerCamera();
-        packet=value;startedMillis=System.currentTimeMillis();acked=false;cameraActive=false;
+        packet=value;elapsedClientTicks=0L;acked=false;cameraActive=false;
     }
     @SubscribeEvent public static void tick(TickEvent.ClientTickEvent e){
         if(e.phase!=TickEvent.Phase.END||packet==null)return;Minecraft mc=Minecraft.getInstance();if(mc.player==null||mc.level==null){reset();return;}
+        if(mc.isPaused())return;
+        elapsedClientTicks++;
         double ticks=elapsedTicks();TimeTimings t=packet.timings();
         if(!cameraActive&&ticks>=t.fadeToCameraTicks()){
             activateCamera(mc);
@@ -50,15 +53,14 @@ public final class TimeCutsceneClient {
         }else if(ticks>=fastStart+t.fastForwardTicks())TimeClientState.setVisualDayTime(packet.targetTime());
         int summaryDuration=DaySummaryRenderer.durationTicks(packet.income(),t);
         int restore=t.fadeToCameraTicks()+t.revealCameraTicks()+t.fastForwardTicks()+summaryDuration+t.fadeToPlayerTicks();
-        if(cameraActive&&ticks>=restore){mc.setCameraEntity(mc.player);cameraActive=false;camera=null;}
+        if(cameraActive&&ticks>=restore)restorePlayerCamera();
         int total=restore+t.revealPlayerTicks();if(!acked&&ticks>=total){acked=true;long completedSequence=packet.sequence();TimeNetworking.ack(completedSequence);reset();return;}
         lockInput(mc);
     }
-    @SubscribeEvent public static void mouse(InputEvent.MouseButton.Pre e){if(active())e.setCanceled(true);}
-    @SubscribeEvent public static void key(InputEvent.Key e){if(active())KeyMapping.releaseAll();}
+    @SubscribeEvent public static void mouse(InputEvent.MouseButton.Pre e){if(active()&&Minecraft.getInstance().screen==null)e.setCanceled(true);}
     @SubscribeEvent public static void cameraAngles(ViewportEvent.ComputeCameraAngles e){if(cameraActive&&packet!=null){e.setYaw(packet.camera().yaw());e.setPitch(packet.camera().pitch());e.setRoll(0F);}}
     @SubscribeEvent(priority=EventPriority.HIGHEST) public static void hideHud(RenderGuiOverlayEvent.Pre e){if(cameraActive)e.setCanceled(true);}
-    @SubscribeEvent(priority=EventPriority.HIGHEST) public static void hideHand(RenderHandEvent e){if(cameraActive)e.setCanceled(true);}
+    @SubscribeEvent(priority=EventPriority.HIGHEST) public static void hideHand(RenderHandEvent e){if(active())e.setCanceled(true);}
     @SubscribeEvent public static void render(RenderGuiEvent.Post e){if(packet==null)return;render(e.getGuiGraphics());}
     private static void render(GuiGraphics g){
         Minecraft mc=Minecraft.getInstance();int w=mc.getWindow().getGuiScaledWidth(),h=mc.getWindow().getGuiScaledHeight();double tick=elapsedTicks();TimeTimings t=packet.timings();int fast=t.fadeToCameraTicks()+t.revealCameraTicks();int summaryStart=fast+t.fastForwardTicks();int fadeBack=summaryStart+DaySummaryRenderer.durationTicks(packet.income(),t);int restore=fadeBack+t.fadeToPlayerTicks();int end=restore+t.revealPlayerTicks();
@@ -67,7 +69,7 @@ public final class TimeCutsceneClient {
         int a=Math.max(0,Math.min(255,Math.round(black*255F)));if(a>=4)g.fill(0,0,w,h,(a<<24));
     }
     private static float ease(float x){x=Math.max(0,Math.min(1,x));return x*x*(3-2*x);}
-    private static double elapsedTicks(){return (System.currentTimeMillis()-startedMillis)/50D;}
+    private static double elapsedTicks(){return elapsedClientTicks+Minecraft.getInstance().getFrameTime();}
     private static void activateCamera(Minecraft mc){
         TimeCamera target=packet.camera();camera=new ArmorStand(mc.level,target.x(),target.y(),target.z());camera.setInvisible(true);camera.setNoGravity(true);moveCameraToRecordedEye(target);camera.setOldPosAndRot();camera.yHeadRot=target.yaw();camera.yHeadRotO=target.yaw();mc.setCameraEntity(camera);cameraActive=true;
     }
@@ -77,10 +79,22 @@ public final class TimeCutsceneClient {
     private static void moveCameraToRecordedEye(TimeCamera target){camera.absMoveTo(target.x(),cameraBaseY(target.y(),camera.getEyeHeight()),target.z(),target.yaw(),target.pitch());}
     static double cameraBaseY(double recordedEyeY,float cameraEyeHeight){return recordedEyeY-cameraEyeHeight;}
     private static void lockInput(Minecraft mc){
-        KeyMapping.releaseAll();
+        if(mc.screen==null)KeyMapping.releaseAll();
         if(mc.player!=null){mc.player.input.leftImpulse=0;mc.player.input.forwardImpulse=0;mc.player.input.jumping=false;mc.player.input.shiftKeyDown=false;}
     }
-    private static void restorePlayerCamera(){Minecraft mc=Minecraft.getInstance();if(mc.player!=null&&cameraActive)mc.setCameraEntity(mc.player);camera=null;cameraActive=false;}
+    private static void restorePlayerCamera(){
+        Minecraft mc=Minecraft.getInstance();
+        if(mc.player!=null&&cameraActive){
+            // Camera interpolation reads the target entity's previous transform. Collapse it to
+            // the current player transform before switching so the first restored world/hand
+            // frame cannot interpolate from a stale position or rotation.
+            mc.player.setOldPosAndRot();
+            mc.player.yHeadRotO=mc.player.yHeadRot;
+            mc.player.yBodyRotO=mc.player.yBodyRot;
+            mc.setCameraEntity(mc.player);
+        }
+        camera=null;cameraActive=false;
+    }
     private static void reset(){restorePlayerCamera();packet=null;acked=false;KeyMapping.releaseAll();}
     @SubscribeEvent public static void logout(ClientPlayerNetworkEvent.LoggingOut e){reset();lastSequence=Long.MIN_VALUE;TimeClientState.reset();TimeVoteClientState.reset();}
 }

@@ -50,4 +50,6 @@
   "icecore.time.summary.title": "新的一天",
   "icecore.time.summary.income": "昨日净收入: %s$",
   "icecore.time.summary.encourage": "继续努力吧"
+  ,"icecore.adventure_give.hud": "Q 给予"
+  ,"icecore.adventure_give.full": "无法给予，对方物品栏已满"
 }

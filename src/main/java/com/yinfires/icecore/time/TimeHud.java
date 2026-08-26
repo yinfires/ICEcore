@@ -15,7 +15,6 @@ import java.util.Locale;
 public final class TimeHud {
     private static final int CLOCK_Y = 33;
     private static final int GLYPH_HEIGHT = 10;
-    private static final int ICON_SIZE = 16;
     private static final int ICON_GAP = 4;
     private static final double VANILLA_REAL_MILLIS_PER_MINUTE = 50_000.0D / 60.0D;
     private static final double MAX_ROLL_MILLIS = 250.0D;
@@ -65,8 +64,10 @@ public final class TimeHud {
         int minute = minuteOfDay(visualTime);
         updateClockAnimation(minute);
         int clockWidth = minecraft.font.width(clockText(targetMinute));
-        int iconX = right - clockWidth - ICON_GAP - ICON_SIZE;
-        drawCelestialIcon(graphics, iconX, 31, wholeTime);
+        String celestialSymbol = celestialSymbol(wholeTime);
+        Font font = minecraft.font;
+        int iconX = right - clockWidth - ICON_GAP - font.width(celestialSymbol);
+        drawCelestialIcon(graphics, iconX, CLOCK_Y, celestialSymbol);
         drawClock(graphics, right, CLOCK_Y);
     }
 
@@ -132,40 +133,17 @@ public final class TimeHud {
         }
     }
 
-    private static void drawCelestialIcon(GuiGraphics graphics, int x, int y, long dayTime) {
+    private static String celestialSymbol(long dayTime) {
         int hour = TimeCalendar.hour(dayTime);
         if (hour >= 6 && hour < 18) {
-            drawSun(graphics, x, y);
-            return;
+            return "☀";
         }
-        drawMoon(graphics, x, y);
+        return "☾";
     }
 
-    private static void drawSun(GuiGraphics graphics, int x, int y) {
-        int gold = 0xFFFFA800;
-        int bright = 0xFFFFD21A;
-        graphics.fill(x + 7, y, x + 9, y + 3, gold);
-        graphics.fill(x + 7, y + 13, x + 9, y + 16, gold);
-        graphics.fill(x, y + 7, x + 3, y + 9, gold);
-        graphics.fill(x + 13, y + 7, x + 16, y + 9, gold);
-        graphics.fill(x + 2, y + 2, x + 4, y + 4, gold);
-        graphics.fill(x + 12, y + 2, x + 14, y + 4, gold);
-        graphics.fill(x + 2, y + 12, x + 4, y + 14, gold);
-        graphics.fill(x + 12, y + 12, x + 14, y + 14, gold);
-        graphics.fill(x + 5, y + 4, x + 11, y + 12, gold);
-        graphics.fill(x + 4, y + 6, x + 12, y + 10, gold);
-        graphics.fill(x + 6, y + 5, x + 10, y + 11, bright);
-    }
-
-    private static void drawMoon(GuiGraphics graphics, int x, int y) {
-        int blue = 0xFF3020F2;
-        int violet = 0xFF6950FF;
-        graphics.fill(x + 6, y + 1, x + 11, y + 3, violet);
-        graphics.fill(x + 4, y + 3, x + 10, y + 5, blue);
-        graphics.fill(x + 3, y + 5, x + 8, y + 9, blue);
-        graphics.fill(x + 4, y + 9, x + 9, y + 11, blue);
-        graphics.fill(x + 6, y + 11, x + 11, y + 13, blue);
-        graphics.fill(x + 9, y + 12, x + 12, y + 14, blue);
+    private static void drawCelestialIcon(GuiGraphics graphics, int x, int y, String symbol) {
+        // Font glyphs share the clock baseline and native height; no oversized bitmap is drawn.
+        graphics.drawString(Minecraft.getInstance().font, symbol, x, y, 0xFFFFFFFF, true);
     }
 
     static int minuteOfDay(double dayTime) {
