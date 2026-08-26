@@ -69,6 +69,7 @@ public final class BuildingDataManager {
             revision++;
             BuildingRuntimeCache.rebuild(data, server);
             BuildingNetworking.broadcastRules(server, data, revision);
+            com.yinfires.icecore.time.TimeConfigManager.get().referencesChanged();
             if (feedback != null) {
                 PlayerFeedback.show(feedback, Component.translatable("icecore.build.reload.success"));
             }
@@ -91,6 +92,7 @@ public final class BuildingDataManager {
             revision++;
             BuildingRuntimeCache.rebuild(data, server);
             BuildingNetworking.broadcastRules(server, data, revision);
+            com.yinfires.icecore.time.TimeConfigManager.get().referencesChanged();
             return true;
         } catch (Exception exception) {
             if (feedback != null) {

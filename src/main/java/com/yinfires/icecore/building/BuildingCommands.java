@@ -7,6 +7,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.yinfires.icecore.compat.cozycafe.range.CozyCafeRangeCommands;
 import com.yinfires.icecore.currency.CurrencyCommands;
 import com.yinfires.icecore.feedback.PlayerFeedback;
+import com.yinfires.icecore.time.TimeCommands;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.network.chat.Component;
@@ -70,6 +71,7 @@ public final class BuildingCommands {
         root.then(build);
         CurrencyCommands.attach(root);
         CozyCafeRangeCommands.attach(root);
+        TimeCommands.attach(root);
         dispatcher.register(root);
     }
 

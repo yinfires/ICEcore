@@ -7,6 +7,8 @@
     "BlockStateUseMixin",
     "CozyCafeManagerRangeMixin",
     "CozyCafePaymentMixin"
+    ,"ServerLevelTimeMixin"
+    ,"TimeCommandMixin"
   ],
   "client": [
     "RenderChunkRegionMixin",
@@ -19,6 +21,8 @@
     "EmbeddiumChunkBuildOutputMixin",
     "EmbeddiumRenderSectionMixin",
     "EmbeddiumRenderRegionManagerMixin"
+    ,"JadeOverlayRendererMixin"
+    ,"ClientLevelTimeMixin"
   ],
   "injectors": {
     "defaultRequire": 1

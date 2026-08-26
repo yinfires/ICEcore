@@ -46,6 +46,7 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
+    mavenCentral()
     maven {
         name = 'BlameJared'
         url = 'https://maven.blamejared.com'
@@ -57,6 +58,11 @@ dependencies {
     compileOnly fg.deobf('mezz.jei:jei-1.20.1-common-api:15.49.0.188')
     compileOnly fg.deobf('mezz.jei:jei-1.20.1-forge-api:15.49.0.188')
     runtimeOnly fg.deobf('mezz.jei:jei-1.20.1-forge:15.49.0.188')
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+}
+
+tasks.named('test', Test).configure {
+    useJUnitPlatform()
 }
 
 tasks.named('processResources', ProcessResources).configure {

@@ -93,6 +93,7 @@ public final class CurrencyService {
         }
 
         data.setBalance(current);
+        com.yinfires.icecore.time.TimeService.recordIncome(current - previous);
         CurrencyChange change = new CurrencyChange(previous, current, current - previous, request.amount,
                 request.operation, request.source, normalizeSource(request.commandSource));
         writeChangeStorage(change);
