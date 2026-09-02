@@ -28,6 +28,9 @@ public final class CurrencyEvents {
     public static void onLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             CurrencyService.sendSnapshot(player);
+            if (net.minecraftforge.fml.ModList.get().isLoaded("sdmshoprework")) {
+                com.yinfires.icecore.compat.sdmshop.SDMShopCompat.syncPlayer(player);
+            }
         }
     }
 

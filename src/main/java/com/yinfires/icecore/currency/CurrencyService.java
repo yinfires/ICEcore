@@ -98,6 +98,9 @@ public final class CurrencyService {
                 request.operation, request.source, normalizeSource(request.commandSource));
         writeChangeStorage(change);
         CurrencyNetworking.broadcastChange(change);
+        if (net.minecraftforge.fml.ModList.get().isLoaded("sdmshoprework")) {
+            com.yinfires.icecore.compat.sdmshop.SDMShopCompat.syncAll();
+        }
         CurrencySoundHooks.onBalanceChanged(change.delta());
         CALLBACKS.addLast(change);
         return Result.CHANGED;

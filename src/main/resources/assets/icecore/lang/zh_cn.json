@@ -57,5 +57,16 @@
   "icecore.time.summary.income": "昨日净收入: %s$",
   "icecore.time.summary.encourage": "继续努力吧"
   ,"icecore.adventure_give.hud": "Q 给予"
-  ,"icecore.adventure_give.full": "无法给予，对方物品栏已满"
+  ,"icecore.adventure_give.full": "无法给予，对方物品栏已满",
+  "entity.icecore.npc": "NPC",
+  "npc.icecore.fire": "火",
+  "icecore.npc.fire.dialogue.hello": "你好",
+  "icecore.npc.fire.option.hello": "你好",
+  "icecore.npc.fire.option.goodbye": "再见",
+  "icecore.npc.summon.success": "已创建 NPC：%s",
+  "icecore.npc.remove.success": "已移除 NPC：%s",
+  "icecore.npc.definition.missing": "NPC 定义不存在：%s",
+  "icecore.npc.remove.invalid_target": "请在 8 格内对准 ICEcore NPC。",
+  "icecore.npc.player_only": "只有玩家可以执行此操作。",
+  "icecore.sdmshop.migrated": "SDM 商店迁移完成。"
 }

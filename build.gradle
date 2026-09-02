@@ -61,6 +61,9 @@ dependencies {
     runtimeOnly fg.deobf('mezz.jei:jei-1.20.1-forge:15.49.0.188')
     compileOnly fg.deobf('local:cozycafe:1.9-all')
     compileOnly fg.deobf('local:kaleidoscopetavern:1.2.0-forge+mc1.20.1')
+    compileOnly fg.deobf('local:chatbox:1.1.4+1.20.1-forge')
+    compileOnly files('libs/sdmshoprework-forge-1.20.1-6.11-pre.jar')
+    compileOnly files('libs/ftb-library-forge-2001.2.10.jar', 'libs/architectury-9.2.14-forge.jar')
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
 }
 

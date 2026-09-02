@@ -17,6 +17,10 @@
     "CozyCafeManagerMenuStateMixin",
     "CozyCafeOrphanedMenuMixin",
     "CozyCafePaymentMixin"
+    ,"SDMShopEconomyMixin"
+    ,"SDMShopMoneyFormatMixin"
+    ,"SDMShopSaveMixin"
+    ,"SDMShopNotifyMixin"
     ,"AdventureDropPacketMixin"
     ,"AdventureCarriedStackMixin"
     ,"AdventureMenuCloseMixin"
@@ -42,6 +46,7 @@
     ,"AdventureLocalPlayerDropMixin"
     ,"AdventureKeyDropMixin"
     ,"AdventureContainerScreenMixin"
+    ,"SDMShopClientMixin"
   ],
   "injectors": {
     "defaultRequire": 1

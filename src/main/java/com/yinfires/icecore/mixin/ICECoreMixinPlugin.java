@@ -14,11 +14,12 @@ public final class ICECoreMixinPlugin implements IMixinConfigPlugin {
     @Override public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         if (mixinClassName.contains("Tavern")) return present("com.github.ysbbbbbb.kaleidoscopetavern.KaleidoscopeTavern");
         if (mixinClassName.contains("CozyCafe")) return present("io.github.chakyl.cozycafe.CozyCafe");
+        if (mixinClassName.contains("SDMShop")) return present("net.sixik.sdmshoprework.SDMShopRework");
         return true;
     }
     private static boolean present(String name) {
-        try { Class.forName(name, false, ICECoreMixinPlugin.class.getClassLoader()); return true; }
-        catch (ClassNotFoundException | LinkageError ignored) { return false; }
+        String resourceName = name.replace('.', '/') + ".class";
+        return ICECoreMixinPlugin.class.getClassLoader().getResource(resourceName) != null;
     }
     @Override public void acceptTargets(Set<String> myTargets, Set<String> otherTargets) {}
     @Override public List<String> getMixins() { return null; }

@@ -25,3 +25,17 @@ mandatory=true
 versionRange="${minecraft_version_range}"
 ordering="NONE"
 side="BOTH"
+
+[[dependencies.${mod_id}]]
+modId="chatbox"
+mandatory=true
+versionRange="[1.1.4]"
+ordering="AFTER"
+side="BOTH"
+
+[[dependencies.${mod_id}]]
+modId="sdmshoprework"
+mandatory=false
+versionRange="[0,)"
+ordering="AFTER"
+side="BOTH"
