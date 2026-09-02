@@ -9,6 +9,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
+import com.yinfires.icecore.building.BuildingDataManager;
+import com.yinfires.icecore.building.RegionDefinition;
 import net.minecraft.world.level.storage.LevelResource;
 import org.slf4j.Logger;
 
@@ -91,6 +93,36 @@ public final class CozyCafeRangeDataManager {
             return false;
         }
         return mutate(copy -> definition(copy, key).setSecond(position), player);
+    }
+
+    public boolean setSpawnRegion(ServerPlayer player, BlockPos computer, String regionName) {
+        RegionDefinition region = BuildingDataManager.get().data().regions().get(regionName);
+        if (region == null || !region.isComplete()
+                || !player.serverLevel().dimension().location().toString().equals(region.dimension())) {
+            PlayerFeedback.show(player, Component.translatable("icecore.cozycafe.spawn_region.invalid_region", regionName));
+            return false;
+        }
+        if (!ensureComputer(player, computer)) {
+            return false;
+        }
+        String key = CozyCafeRangeDefinition.key(player.serverLevel().dimension(), computer);
+        return mutate(copy -> definition(copy, key).setSpawnRegion(regionName), player);
+    }
+
+    public boolean clearSpawnRegion(ServerPlayer player, BlockPos computer) {
+        String key = CozyCafeRangeDefinition.key(player.serverLevel().dimension(), computer);
+        CozyCafeRangeDefinition current = data.ranges().get(key);
+        if (current == null || current.spawnRegion() == null) {
+            return true;
+        }
+        return mutate(copy -> definition(copy, key).setSpawnRegion(null), player);
+    }
+
+    public CozyCafeRangeDefinition definition(Level level, BlockPos computer) {
+        if (level == null || level.isClientSide || computer == null) {
+            return null;
+        }
+        return data.ranges().get(CozyCafeRangeDefinition.key(level.dimension(), computer));
     }
 
     /** Returns null until both custom corners are present, preserving CozyCafe's original range meanwhile. */

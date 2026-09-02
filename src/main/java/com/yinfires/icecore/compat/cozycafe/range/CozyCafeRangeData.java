@@ -9,7 +9,7 @@ import java.util.Map;
 
 /** Serialized world data for per-computer CozyCafe recognition ranges. */
 public final class CozyCafeRangeData {
-    public static final int FORMAT_VERSION = 1;
+    public static final int FORMAT_VERSION = 2;
     public static final int MAX_RANGES = 1_024;
     private final Map<String, CozyCafeRangeDefinition> ranges = new LinkedHashMap<>();
 
@@ -28,7 +28,11 @@ public final class CozyCafeRangeData {
     }
 
     public static CozyCafeRangeData fromJson(JsonObject object) {
-        if (!object.has("formatVersion") || object.get("formatVersion").getAsInt() != FORMAT_VERSION) {
+        if (!object.has("formatVersion")) {
+            throw new IllegalArgumentException("unsupported formatVersion");
+        }
+        int version = object.get("formatVersion").getAsInt();
+        if (version != 1 && version != FORMAT_VERSION) {
             throw new IllegalArgumentException("unsupported formatVersion");
         }
         CozyCafeRangeData data = gson().fromJson(object, CozyCafeRangeData.class);

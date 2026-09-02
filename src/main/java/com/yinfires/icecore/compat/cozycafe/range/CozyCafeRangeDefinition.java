@@ -14,6 +14,7 @@ public final class CozyCafeRangeDefinition {
     private int[] computer;
     private int[] pos1;
     private int[] pos2;
+    private String spawnRegion;
 
     public CozyCafeRangeDefinition() {
     }
@@ -37,6 +38,14 @@ public final class CozyCafeRangeDefinition {
 
     public int[] pos2() {
         return pos2 == null ? null : pos2.clone();
+    }
+
+    public String spawnRegion() {
+        return spawnRegion;
+    }
+
+    public void setSpawnRegion(String spawnRegion) {
+        this.spawnRegion = spawnRegion == null || spawnRegion.isBlank() ? null : spawnRegion;
     }
 
     public void setFirst(BlockPos position) {
@@ -93,6 +102,9 @@ public final class CozyCafeRangeDefinition {
         }
         if (isComplete() && !withinScanLimit(position(pos1), position(pos2))) {
             throw new IllegalArgumentException("CozyCafe range exceeds scan volume limit");
+        }
+        if (spawnRegion != null && spawnRegion.isBlank()) {
+            throw new IllegalArgumentException("invalid CozyCafe spawn region");
         }
     }
 

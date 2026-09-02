@@ -47,6 +47,7 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
     mavenCentral()
+    flatDir { dirs 'libs' }
     maven {
         name = 'BlameJared'
         url = 'https://maven.blamejared.com'
@@ -58,6 +59,8 @@ dependencies {
     compileOnly fg.deobf('mezz.jei:jei-1.20.1-common-api:15.49.0.188')
     compileOnly fg.deobf('mezz.jei:jei-1.20.1-forge-api:15.49.0.188')
     runtimeOnly fg.deobf('mezz.jei:jei-1.20.1-forge:15.49.0.188')
+    compileOnly fg.deobf('local:cozycafe:1.9-all')
+    compileOnly fg.deobf('local:kaleidoscopetavern:1.2.0-forge+mc1.20.1')
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
 }
 
