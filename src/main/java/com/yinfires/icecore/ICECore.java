@@ -14,6 +14,10 @@ public final class ICECore {
 
     public ICECore() {
         ICECoreNetwork.register();
+        com.yinfires.icecore.quest.objective.ObjectiveRegistry.bootstrap();
+        com.yinfires.icecore.quest.QuestNetworking.install();
+        com.yinfires.icecore.tutorial.TutorialNetworking.install();
+        com.yinfires.icecore.journal.ChatBoxJournalEvents.register();
         var modBus = FMLJavaModLoadingContext.get().getModEventBus();
         ModItems.ITEMS.register(modBus);
         ModCreativeTabs.TABS.register(modBus);

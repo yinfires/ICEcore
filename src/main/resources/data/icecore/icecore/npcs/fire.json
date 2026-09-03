@@ -1,9 +1,0 @@
-{
-  "name": "npc.icecore.fire",
-  "texture": "icecore:textures/entity/npc/fire.png",
-  "model": "slim",
-  "dialogue": {
-    "resource": "icecore:npc/fire",
-    "group": "greeting"
-  }
-}

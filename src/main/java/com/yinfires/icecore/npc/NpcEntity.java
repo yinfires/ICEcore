@@ -149,6 +149,10 @@ public final class NpcEntity extends Mob {
             return InteractionResult.FAIL;
         }
         lookTarget = serverPlayer;
+        // Advance any active talk_to_npc quest objective that targets this NPC definition.
+        com.yinfires.icecore.quest.QuestService.notifyObjectiveEvent(serverPlayer,
+                net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(com.yinfires.icecore.ICECore.MOD_ID, "talk_to_npc"),
+                definitionId.toString());
         ChatBoxCommandUtil.serverSkipDialogues(serverPlayer, definition.dialogue(), definition.dialogueGroup());
         return InteractionResult.CONSUME;
     }

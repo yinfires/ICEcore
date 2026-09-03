@@ -74,6 +74,8 @@ public final class BuildingCommands {
         CozyCafeRangeCommands.attach(root);
         TimeCommands.attach(root);
         SDMShopCommands.attach(root);
+        com.yinfires.icecore.quest.QuestCommands.attach(root);
+        com.yinfires.icecore.tutorial.TutorialCommands.attach(root);
         dispatcher.register(root);
     }
 

@@ -13,7 +13,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class ICECoreNetwork {
-    private static final String PROTOCOL_VERSION = "7";
+    private static final String PROTOCOL_VERSION = "8";
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             ResourceLocation.fromNamespaceAndPath(ICECore.MOD_ID, "main"),
             () -> PROTOCOL_VERSION,
@@ -68,6 +68,21 @@ public final class ICECoreNetwork {
         CHANNEL.messageBuilder(ClientBoundGiveResultPacket.class, 11, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(ClientBoundGiveResultPacket::encode).decoder(ClientBoundGiveResultPacket::new)
                 .consumerMainThread(ClientBoundGiveResultPacket::handle).add();
+        CHANNEL.messageBuilder(ClientBoundQuestSyncPacket.class, 12, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(ClientBoundQuestSyncPacket::encode).decoder(ClientBoundQuestSyncPacket::new)
+                .consumerMainThread(ClientBoundQuestSyncPacket::handle).add();
+        CHANNEL.messageBuilder(ClientBoundTutorialSyncPacket.class, 13, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(ClientBoundTutorialSyncPacket::encode).decoder(ClientBoundTutorialSyncPacket::new)
+                .consumerMainThread(ClientBoundTutorialSyncPacket::handle).add();
+        CHANNEL.messageBuilder(ServerBoundSetMarkPacket.class, 14, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(ServerBoundSetMarkPacket::encode).decoder(ServerBoundSetMarkPacket::new)
+                .consumerMainThread(ServerBoundSetMarkPacket::handle).add();
+        CHANNEL.messageBuilder(ServerBoundMarkTutorialReadPacket.class, 15, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(ServerBoundMarkTutorialReadPacket::encode).decoder(ServerBoundMarkTutorialReadPacket::new)
+                .consumerMainThread(ServerBoundMarkTutorialReadPacket::handle).add();
+        CHANNEL.messageBuilder(ServerBoundJournalClosedPacket.class, 16, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(ServerBoundJournalClosedPacket::encode).decoder(ServerBoundJournalClosedPacket::new)
+                .consumerMainThread(ServerBoundJournalClosedPacket::handle).add();
     }
 
     public static void sendToServer(ServerBoundAddMenuItemPacket packet) {
@@ -96,4 +111,9 @@ public final class ICECoreNetwork {
     public static void sendToServer(ServerBoundCutsceneAckPacket packet){CHANNEL.sendToServer(packet);}
     public static void sendToServer(ServerBoundGiveItemPacket packet){CHANNEL.sendToServer(packet);}
     public static void sendToPlayer(ClientBoundGiveResultPacket packet, ServerPlayer player){CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);}
+    public static void sendToPlayer(ClientBoundQuestSyncPacket packet, ServerPlayer player){CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);}
+    public static void sendToPlayer(ClientBoundTutorialSyncPacket packet, ServerPlayer player){CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);}
+    public static void sendToServer(ServerBoundSetMarkPacket packet){CHANNEL.sendToServer(packet);}
+    public static void sendToServer(ServerBoundMarkTutorialReadPacket packet){CHANNEL.sendToServer(packet);}
+    public static void sendToServer(ServerBoundJournalClosedPacket packet){CHANNEL.sendToServer(packet);}
 }
