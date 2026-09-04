@@ -1,6 +1,6 @@
 package com.yinfires.icecore.mixin;
 
-import com.yinfires.icecore.time.TimeCutsceneClient;
+import com.yinfires.icecore.client.cutscene.CutsceneCamera;
 import net.minecraft.client.gui.GuiGraphics;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
@@ -14,6 +14,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class JadeOverlayRendererMixin {
     @Inject(method = "renderOverlay478757", at = @At("HEAD"), cancellable = true, remap = false)
     private static void icecore$hideDuringTimeCamera(GuiGraphics graphics, CallbackInfo callback) {
-        if (TimeCutsceneClient.cameraActive()) callback.cancel();
+        if (CutsceneCamera.cameraActive()) callback.cancel();
     }
 }

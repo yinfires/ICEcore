@@ -76,6 +76,7 @@ public final class BuildingCommands {
         SDMShopCommands.attach(root);
         com.yinfires.icecore.quest.QuestCommands.attach(root);
         com.yinfires.icecore.tutorial.TutorialCommands.attach(root);
+        com.yinfires.icecore.island.IslandCommands.attach(root);
         dispatcher.register(root);
     }
 

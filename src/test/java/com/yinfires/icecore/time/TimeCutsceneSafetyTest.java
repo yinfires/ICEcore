@@ -1,5 +1,6 @@
 package com.yinfires.icecore.time;
 
+import com.yinfires.icecore.client.cutscene.CutsceneCamera;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -16,37 +17,52 @@ final class TimeCutsceneSafetyTest {
         return Files.readString(Path.of("src/main/java/com/yinfires/icecore/time", name), StandardCharsets.UTF_8);
     }
 
+    /** The reusable camera/input/overlay suppression lives here after the extraction. */
+    private static String cutsceneCamera() throws IOException {
+        return Files.readString(Path.of("src/main/java/com/yinfires/icecore/client/cutscene/CutsceneCamera.java"),
+                StandardCharsets.UTF_8);
+    }
+
     @Test
     void nonCancelableKeyEventIsNeverCanceled() throws IOException {
-        String source = source("TimeCutsceneClient.java");
-        assertFalse(source.contains("void key(InputEvent.Key"));
-        assertFalse(source.contains("InputEvent.Key e){if(active())e.setCanceled(true)"));
+        // Cancelling InputEvent.Key crashes the game; neither the cutscene nor the
+        // shared camera controller may touch it (they only clear impulses/releaseAll).
+        assertFalse(source("TimeCutsceneClient.java").contains("InputEvent.Key"));
+        assertFalse(cutsceneCamera().contains("InputEvent.Key"));
     }
 
     @Test
     void configuredCameraIsStableAndHidesNormalHud() throws IOException {
-        String source = source("TimeCutsceneClient.java");
-        assertTrue(source.contains("ViewportEvent.ComputeCameraAngles"));
-        assertTrue(source.contains("e.setYaw(packet.camera().yaw())"));
-        assertTrue(source.contains("e.setPitch(packet.camera().pitch())"));
-        assertTrue(source.contains("RenderGuiOverlayEvent.Pre"));
-        assertTrue(source.contains("void hideHud(RenderGuiOverlayEvent.Pre e){if(cameraActive)e.setCanceled(true);}"));
-        assertTrue(source.contains("void hideHand(RenderHandEvent e){if(active())e.setCanceled(true);}"));
-        assertTrue(source.contains("camera.setOldPosAndRot()"));
-        assertTrue(source.contains("mc.player.setOldPosAndRot()"));
+        String camera = cutsceneCamera();
+        assertTrue(camera.contains("ViewportEvent.ComputeCameraAngles"));
+        assertTrue(camera.contains("e.setYaw(pose.yaw())"));
+        assertTrue(camera.contains("e.setPitch(pose.pitch())"));
+        assertTrue(camera.contains("RenderGuiOverlayEvent.Pre"));
+        // HUD/overlays hidden only while the camera actually drives the view.
+        assertTrue(camera.contains("hideHud(RenderGuiOverlayEvent.Pre"));
+        assertTrue(camera.contains("cameraActive()"));
+        // The held item is hidden for the whole engaged cutscene, camera or not.
+        assertTrue(camera.contains("hideHand(RenderHandEvent"));
+        // Anti-interpolation: collapse both the camera's and the player's previous
+        // transform so no restored frame lerps from a stale pose.
+        assertTrue(camera.contains("camera.setOldPosAndRot()"));
+        assertTrue(camera.contains("mc.player.setOldPosAndRot()"));
     }
 
     @Test
     void singleplayerPauseFreezesCutsceneWithoutBlockingScreens() throws IOException {
-        String source = source("TimeCutsceneClient.java");
-        assertTrue(source.contains("if(mc.isPaused())return"));
-        assertTrue(source.contains("elapsedClientTicks++"));
-        assertTrue(source.contains("elapsedClientTicks+Minecraft.getInstance().getFrameTime()"));
-        assertFalse(source.contains("System.currentTimeMillis()"));
-        assertFalse(source.contains("ScreenEvent.Opening"));
-        assertFalse(source.contains("PauseScreen"));
-        assertTrue(source.contains("Minecraft.getInstance().screen==null"));
-        assertTrue(source.contains("if(mc.screen==null)KeyMapping.releaseAll()"));
+        String cutscene = source("TimeCutsceneClient.java");
+        assertTrue(cutscene.contains("if(mc.isPaused())return"));
+        assertTrue(cutscene.contains("elapsedClientTicks++"));
+        assertTrue(cutscene.contains("elapsedClientTicks+Minecraft.getInstance().getFrameTime()"));
+        assertFalse(cutscene.contains("System.currentTimeMillis()"));
+        assertFalse(cutscene.contains("ScreenEvent.Opening"));
+        assertFalse(cutscene.contains("PauseScreen"));
+        // Input suppression must yield whenever a screen is open so menus stay usable.
+        String camera = cutsceneCamera();
+        assertTrue(camera.contains("Minecraft.getInstance().screen == null"));
+        assertTrue(camera.contains("mc.screen == null"));
+        assertTrue(camera.contains("KeyMapping.releaseAll()"));
     }
 
     @Test
@@ -67,7 +83,7 @@ final class TimeCutsceneSafetyTest {
 
     @Test
     void recordedEyePositionIsNotRaisedByCameraEntityEyeHeight() {
-        assertEquals(72.0D, TimeCutsceneClient.cameraBaseY(73.7775D, 1.7775F), 0.0001D);
+        assertEquals(72.0D, CutsceneCamera.cameraBaseY(73.7775D, 1.7775F), 0.0001D);
     }
 
     @Test
@@ -75,7 +91,7 @@ final class TimeCutsceneSafetyTest {
         String source = Files.readString(Path.of("src/main/java/com/yinfires/icecore/mixin/JadeOverlayRendererMixin.java"), StandardCharsets.UTF_8);
         assertTrue(source.contains("snownee.jade.overlay.OverlayRenderer"));
         assertTrue(source.contains("method = \"renderOverlay478757\""));
-        assertTrue(source.contains("TimeCutsceneClient.cameraActive()"));
+        assertTrue(source.contains("CutsceneCamera.cameraActive()"));
         assertTrue(source.contains("callback.cancel()"));
     }
 

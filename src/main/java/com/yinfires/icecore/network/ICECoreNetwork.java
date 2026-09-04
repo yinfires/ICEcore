@@ -83,6 +83,14 @@ public final class ICECoreNetwork {
         CHANNEL.messageBuilder(ServerBoundJournalClosedPacket.class, 16, NetworkDirection.PLAY_TO_SERVER)
                 .encoder(ServerBoundJournalClosedPacket::encode).decoder(ServerBoundJournalClosedPacket::new)
                 .consumerMainThread(ServerBoundJournalClosedPacket::handle).add();
+        CHANNEL.messageBuilder(com.yinfires.icecore.island.ClientBoundIslandEntrancePacket.class, 17, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(com.yinfires.icecore.island.ClientBoundIslandEntrancePacket::encode)
+                .decoder(com.yinfires.icecore.island.ClientBoundIslandEntrancePacket::new)
+                .consumerMainThread(com.yinfires.icecore.island.ClientBoundIslandEntrancePacket::handle).add();
+        CHANNEL.messageBuilder(com.yinfires.icecore.island.ClientBoundIslandEntranceDonePacket.class, 18, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(com.yinfires.icecore.island.ClientBoundIslandEntranceDonePacket::encode)
+                .decoder(com.yinfires.icecore.island.ClientBoundIslandEntranceDonePacket::new)
+                .consumerMainThread(com.yinfires.icecore.island.ClientBoundIslandEntranceDonePacket::handle).add();
     }
 
     public static void sendToServer(ServerBoundAddMenuItemPacket packet) {
@@ -116,4 +124,16 @@ public final class ICECoreNetwork {
     public static void sendToServer(ServerBoundSetMarkPacket packet){CHANNEL.sendToServer(packet);}
     public static void sendToServer(ServerBoundMarkTutorialReadPacket packet){CHANNEL.sendToServer(packet);}
     public static void sendToServer(ServerBoundJournalClosedPacket packet){CHANNEL.sendToServer(packet);}
+
+    /** Broadcasts an island entrance cutscene to every player in the given dimension. */
+    public static void sendToDimension(com.yinfires.icecore.island.ClientBoundIslandEntrancePacket packet,
+                                       net.minecraft.server.level.ServerLevel level) {
+        CHANNEL.send(PacketDistributor.DIMENSION.with(level::dimension), packet);
+    }
+
+    /** Broadcasts island-placement-done (reveal) to every player in the given dimension. */
+    public static void sendToDimension(com.yinfires.icecore.island.ClientBoundIslandEntranceDonePacket packet,
+                                       net.minecraft.server.level.ServerLevel level) {
+        CHANNEL.send(PacketDistributor.DIMENSION.with(level::dimension), packet);
+    }
 }

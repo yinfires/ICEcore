@@ -47,6 +47,7 @@
     ,"AdventureKeyDropMixin"
     ,"AdventureContainerScreenMixin"
     ,"SDMShopClientMixin"
+    ,"PostChainAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
