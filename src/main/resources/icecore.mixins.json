@@ -26,6 +26,7 @@
     ,"AdventureMenuCloseMixin"
     ,"ServerLevelTimeMixin"
     ,"TimeCommandMixin"
+    ,"RecipeManagerMixin"
   ],
   "client": [
     "TavernTextRendererMixin",
@@ -48,6 +49,7 @@
     ,"AdventureContainerScreenMixin"
     ,"SDMShopClientMixin"
     ,"PostChainAccessor"
+    ,"JeiRecipeManagerInternalMixin"
   ],
   "injectors": {
     "defaultRequire": 1

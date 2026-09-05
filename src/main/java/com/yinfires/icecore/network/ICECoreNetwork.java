@@ -91,6 +91,12 @@ public final class ICECoreNetwork {
                 .encoder(com.yinfires.icecore.island.ClientBoundIslandEntranceDonePacket::encode)
                 .decoder(com.yinfires.icecore.island.ClientBoundIslandEntranceDonePacket::new)
                 .consumerMainThread(com.yinfires.icecore.island.ClientBoundIslandEntranceDonePacket::handle).add();
+        CHANNEL.messageBuilder(ClientBoundRecipeHidePacket.class, 19, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(ClientBoundRecipeHidePacket::encode).decoder(ClientBoundRecipeHidePacket::new)
+                .consumerMainThread(ClientBoundRecipeHidePacket::handle).add();
+        CHANNEL.messageBuilder(ClientBoundRecipeExemptPacket.class, 20, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(ClientBoundRecipeExemptPacket::encode).decoder(ClientBoundRecipeExemptPacket::new)
+                .consumerMainThread(ClientBoundRecipeExemptPacket::handle).add();
     }
 
     public static void sendToServer(ServerBoundAddMenuItemPacket packet) {
@@ -121,6 +127,8 @@ public final class ICECoreNetwork {
     public static void sendToPlayer(ClientBoundGiveResultPacket packet, ServerPlayer player){CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);}
     public static void sendToPlayer(ClientBoundQuestSyncPacket packet, ServerPlayer player){CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);}
     public static void sendToPlayer(ClientBoundTutorialSyncPacket packet, ServerPlayer player){CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);}
+    public static void sendToPlayer(ClientBoundRecipeHidePacket packet, ServerPlayer player){CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);}
+    public static void sendToPlayer(ClientBoundRecipeExemptPacket packet, ServerPlayer player){CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);}
     public static void sendToServer(ServerBoundSetMarkPacket packet){CHANNEL.sendToServer(packet);}
     public static void sendToServer(ServerBoundMarkTutorialReadPacket packet){CHANNEL.sendToServer(packet);}
     public static void sendToServer(ServerBoundJournalClosedPacket packet){CHANNEL.sendToServer(packet);}

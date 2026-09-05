@@ -94,5 +94,16 @@
   "gui.icecore.journal.objectives": "目标",
   "gui.icecore.journal.objective.generic": "完成目标",
   "gui.icecore.journal.hint.new_quest": "有新任务，按 J 查看",
-  "gui.icecore.journal.hint.new_tutorial": "有新教程，按 I 查看"
+  "gui.icecore.journal.hint.new_tutorial": "有新教程，按 I 查看",
+  "icecore.recipe.hide.all": "已隐藏所有配方",
+  "icecore.recipe.show.all": "已显示所有配方",
+  "icecore.recipe.hide.item": "已隐藏物品 %s 的配方",
+  "icecore.recipe.show.item": "已显示物品 %s 的配方",
+  "icecore.recipe.hide.item.only": "已隐藏物品 %s（无可隐藏的配方）",
+  "icecore.recipe.show.item.only": "已显示物品 %s（无可解锁的配方）",
+  "icecore.recipe.item.invalid": "未知物品：%s",
+  "icecore.recipe.not_ready": "配方隐藏服务尚未就绪",
+  "icecore.recipe.exempt.on": "已进入豁免模式：JEI 中显示全部配方与物品",
+  "icecore.recipe.exempt.off": "已退出豁免模式：恢复隐藏",
+  "icecore.recipe.exempt.player_only": "该指令只能由玩家执行"
 }

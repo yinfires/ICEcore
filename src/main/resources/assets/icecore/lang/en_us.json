@@ -94,5 +94,16 @@
   "gui.icecore.journal.objectives": "Objectives",
   "gui.icecore.journal.objective.generic": "Complete the objective",
   "gui.icecore.journal.hint.new_quest": "New quest — press J",
-  "gui.icecore.journal.hint.new_tutorial": "New tutorial — press I"
+  "gui.icecore.journal.hint.new_tutorial": "New tutorial — press I",
+  "icecore.recipe.hide.all": "Hid all recipes",
+  "icecore.recipe.show.all": "Showed all recipes",
+  "icecore.recipe.hide.item": "Hid recipes for %s",
+  "icecore.recipe.show.item": "Showed recipes for %s",
+  "icecore.recipe.hide.item.only": "Hid item %s (no recipes to hide)",
+  "icecore.recipe.show.item.only": "Showed item %s (no recipes to unlock)",
+  "icecore.recipe.item.invalid": "Unknown item: %s",
+  "icecore.recipe.not_ready": "Recipe hide service is not ready",
+  "icecore.recipe.exempt.on": "Exempt mode on: JEI shows all recipes and items",
+  "icecore.recipe.exempt.off": "Exempt mode off: hiding restored",
+  "icecore.recipe.exempt.player_only": "This command must be run by a player"
 }

@@ -77,6 +77,7 @@ public final class BuildingCommands {
         com.yinfires.icecore.quest.QuestCommands.attach(root);
         com.yinfires.icecore.tutorial.TutorialCommands.attach(root);
         com.yinfires.icecore.island.IslandCommands.attach(root);
+        com.yinfires.icecore.recipehide.RecipeHideCommands.attach(root);
         dispatcher.register(root);
     }
 

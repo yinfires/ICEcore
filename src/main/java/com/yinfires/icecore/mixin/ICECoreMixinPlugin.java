@@ -15,6 +15,7 @@ public final class ICECoreMixinPlugin implements IMixinConfigPlugin {
         if (mixinClassName.contains("Tavern")) return present("com.github.ysbbbbbb.kaleidoscopetavern.KaleidoscopeTavern");
         if (mixinClassName.contains("CozyCafe")) return present("io.github.chakyl.cozycafe.CozyCafe");
         if (mixinClassName.contains("SDMShop")) return present("net.sixik.sdmshoprework.SDMShopRework");
+        if (mixinClassName.contains("Jei")) return present("mezz.jei.library.recipes.RecipeManagerInternal");
         return true;
     }
     private static boolean present(String name) {
