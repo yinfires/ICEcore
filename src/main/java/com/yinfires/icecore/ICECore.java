@@ -22,6 +22,9 @@ public final class ICECore {
         ModItems.ITEMS.register(modBus);
         ModCreativeTabs.TABS.register(modBus);
         ModEntities.ENTITY_TYPES.register(modBus);
+        if (ModList.get().isLoaded("cozycafe")) {
+            com.yinfires.icecore.compat.cozycafe.seating.CozyCafeSeatingEvents.register();
+        }
         if (ModList.get().isLoaded("cozycafe") && ModList.get().isLoaded("kaleidoscope_tavern")) {
             com.yinfires.icecore.compat.cozycafe.board.CozyCafeBoardEvents.register();
         }

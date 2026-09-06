@@ -65,6 +65,23 @@ public final class CozyCafeSpawnRegionService {
         return randomPosition(level, computer, level.random) != null;
     }
 
+    /** Returns a bounded, evenly distributed entrance pool for one opening-cycle route snapshot. */
+    public static List<BlockPos> entranceCandidates(ServerLevel level, BlockPos computer) {
+        if (randomPosition(level, computer, level.random) == null) return List.of();
+        CozyCafeRangeDefinition link = CozyCafeRangeDataManager.get().definition(level, computer);
+        if (link == null || link.spawnRegion() == null) return List.of();
+        Cache cache = CACHE.get(level.dimension().location() + "|" + link.spawnRegion());
+        if (cache == null || cache.positions.isEmpty()) return List.of();
+        int count = Math.min(16, cache.positions.size());
+        List<BlockPos> result = new ArrayList<>(count);
+        for (int index = 0; index < count; index++) {
+            int source = (int) (((long) index * cache.positions.size() + cache.positions.size() / 2L) / count);
+            BlockPos candidate = cache.positions.get(Math.min(source, cache.positions.size() - 1));
+            if (isWalkable(level, candidate)) result.add(candidate);
+        }
+        return List.copyOf(result);
+    }
+
     public static BlockPos exitSignPosition(ServerLevel level, BlockPos computer, BlockPos fallbackSign) {
         BlockPos exit = randomPosition(level, computer, level.random);
         return exit == null ? fallbackSign : exit.above();

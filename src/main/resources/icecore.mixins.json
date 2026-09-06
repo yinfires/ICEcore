@@ -10,6 +10,11 @@
     "CozyCafeSpawnRegionManagerMixin",
     "CozyCafeSpawnRegionMenuMixin",
     "CozyCafeCustomerDoorMixin",
+    "CozyCafeCustomerSeatingMixin",
+    "CozyCafeCustomerCollisionMixin",
+    "CozyCafeNavigateToMenuMixin",
+    "CozyCafeManagerSeatingMixin",
+    "CozyCafeMenuSeatingMixin",
     "TavernBoardPlacementMixin",
     "TavernTextBlockEntityMixin",
     "TavernTextUpdateMixin",
@@ -29,9 +34,11 @@
     ,"RecipeManagerMixin"
   ],
   "client": [
+    "CozyCafeManagerScreenErrorMixin",
     "TavernTextRendererMixin",
     "CozyCafeClearButtonMixin",
     "CozyCafeManagerNameMixin",
+    "CozyCafeMenuRendererSeatingMixin",
     "RenderChunkRegionMixin",
     "ChunkRebuildTaskMixin",
     "BlockEntityRenderDispatcherMixin",

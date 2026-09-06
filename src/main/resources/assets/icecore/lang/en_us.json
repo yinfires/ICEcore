@@ -45,6 +45,7 @@
   "icecore.cozycafe.board.bound": "Board bound to café “%s”.",
   "icecore.cozycafe.board.open": "OPEN",
   "icecore.cozycafe.board.closed": "CLOSED",
+  "icecore.cozycafe.no_valid_menu_seat": "No valid cafe menu and seat",
   "icecore.currency.get": "Current shared currency balance: $%s",
   "icecore.currency.hud.enabled": "The shared currency HUD is enabled.",
   "icecore.currency.hud.disabled": "The shared currency HUD is disabled.",

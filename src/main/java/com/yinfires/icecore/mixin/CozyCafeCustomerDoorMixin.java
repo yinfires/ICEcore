@@ -31,12 +31,12 @@ public abstract class CozyCafeCustomerDoorMixin {
             if (!state.hasProperty(BlockStateProperties.OPEN) || state.getValue(BlockStateProperties.OPEN)) continue;
             if (state.getBlock() instanceof DoorBlock && state.is(BlockTags.WOODEN_DOORS)) {
                 customer.level().setBlock(pos, state.setValue(BlockStateProperties.OPEN, true), 10);
-                customer.getNavigation().recomputePath();
+                com.yinfires.icecore.compat.cozycafe.seating.CozyCafeSeatingService.requestPathRecovery(customer);
                 return;
             }
             if (state.getBlock() instanceof FenceGateBlock) {
                 customer.level().setBlock(pos, state.setValue(BlockStateProperties.OPEN, true), 10);
-                customer.getNavigation().recomputePath();
+                com.yinfires.icecore.compat.cozycafe.seating.CozyCafeSeatingService.requestPathRecovery(customer);
                 return;
             }
         }

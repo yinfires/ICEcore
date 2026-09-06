@@ -45,6 +45,7 @@
   "icecore.cozycafe.board.bound": "已将展板绑定到咖啡馆“%s”。",
   "icecore.cozycafe.board.open": "营业中",
   "icecore.cozycafe.board.closed": "停业中",
+  "icecore.cozycafe.no_valid_menu_seat": "无有效的菜单与座位",
   "icecore.currency.get": "当前全服货币余额：$%s",
   "icecore.currency.hud.enabled": "全服货币 HUD 已开启。",
   "icecore.currency.hud.disabled": "全服货币 HUD 已关闭。",

@@ -2,6 +2,7 @@ package com.yinfires.icecore.mixin;
 
 import com.yinfires.icecore.compat.cozycafe.board.CozyCafeBoardService;
 import com.yinfires.icecore.compat.cozycafe.spawn.CozyCafeSpawnRegionService;
+import com.yinfires.icecore.compat.cozycafe.seating.CozyCafeSeatingService;
 import io.github.chakyl.cozycafe.CozyCafe;
 import io.github.chakyl.cozycafe.blockentities.CafeManagerBlockEntity;
 import io.github.chakyl.cozycafe.blockentities.CafeSignBlockEntity;
@@ -38,6 +39,8 @@ public abstract class CozyCafeSpawnRegionManagerMixin extends BlockEntity {
     @Shadow public abstract int getStarsFromReputation();
     @Shadow protected abstract boolean hasNearbyOpenManagers();
     @Shadow public abstract void sendCloseCommandToMenus(Level level, BlockPos pos, net.minecraft.world.level.block.state.BlockState state);
+    @Shadow private BlockPos getFirstPos(net.minecraft.world.level.block.state.BlockState state, BlockPos pos) { throw new AssertionError(); }
+    @Shadow private BlockPos getSecondPos(net.minecraft.world.level.block.state.BlockState state, BlockPos pos) { throw new AssertionError(); }
 
     @Unique private BlockPos icecore$originalSign;
     @Unique private boolean icecore$usingRegion;
@@ -52,7 +55,9 @@ public abstract class CozyCafeSpawnRegionManagerMixin extends BlockEntity {
     private void icecore$substituteEntrance(Level level, BlockPos pos,
                                             net.minecraft.world.level.block.state.BlockState state, CallbackInfo ci) {
         if (level instanceof ServerLevel serverLevel) {
-            BlockPos entrance = CozyCafeSpawnRegionService.randomPosition(serverLevel, pos, serverLevel.random);
+            BlockPos entrance = com.yinfires.icecore.compat.cozycafe.seating.CozyCafeSeatingService
+                    .snapshotEntrance(serverLevel, pos, serverLevel.random);
+            if (entrance == null) entrance = CozyCafeSpawnRegionService.randomPosition(serverLevel, pos, serverLevel.random);
             if (entrance != null) {
                 icecore$originalSign = linkedSign;
                 linkedSign = entrance.above();
@@ -93,7 +98,18 @@ public abstract class CozyCafeSpawnRegionManagerMixin extends BlockEntity {
             EvilPacketsIHateThem.sendToPlayer(new ClientBoundCafeCannotOpenPacket((byte) 3), player); cir.setReturnValue(false);
         } else if (hasNearbyOpenManagers()) {
             EvilPacketsIHateThem.sendToPlayer(new ClientBoundCafeCannotOpenPacket((byte) 4), player); cir.setReturnValue(false);
-        } else cir.setReturnValue(true);
+        } else if (!CozyCafeSeatingService.hasAnyValidMenu(serverLevel,
+                getFirstPos(getBlockState(), worldPosition), getSecondPos(getBlockState(), worldPosition))) {
+            // This mixin exits canBeOpened early for custom entrances, so the common RETURN hook
+            // is not guaranteed to run.  Apply the same structural menu/seat check here; route
+            // warmup is deliberately not part of opening validation.
+            EvilPacketsIHateThem.sendToPlayer(new ClientBoundCafeCannotOpenPacket((byte) 5), player);
+            cir.setReturnValue(false);
+        } else {
+            // The common RETURN hook performs the single structural menu-seat validation and starts
+            // bounded route warmup. A custom entrance replaces only the missing-sign condition.
+            cir.setReturnValue(true);
+        }
     }
 
     @Inject(method = "setOpen(ZZ)V", at = @At("HEAD"), cancellable = true, remap = false)
