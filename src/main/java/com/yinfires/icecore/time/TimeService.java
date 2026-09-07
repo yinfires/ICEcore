@@ -29,6 +29,9 @@ public final class TimeService {
     public static void resetFraction() { fraction = 0.0D; advancedNaturally = false; }
     public static long previousIncome() { return saved == null ? 0L : saved.previousIncome(); }
     public static long currentIncome() { return saved == null ? 0L : saved.currentIncome(); }
+    public static long dewDropProcessedDay() { return saved == null ? Long.MIN_VALUE : saved.dewDropProcessedDay(); }
+    public static void markDewDropProcessedDay(long day) { if (saved != null) saved.setDewDropProcessedDay(day); }
+    public static void clearDewDropProcessedDay() { if (saved != null) saved.clearDewDropProcessedDay(); }
     public static void recordIncome(long delta) { if (saved != null) saved.addIncome(delta); }
 
     /** Called instead of vanilla's isolated dayTime + 1 operation. */

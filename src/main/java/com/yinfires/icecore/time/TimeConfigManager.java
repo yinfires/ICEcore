@@ -1,5 +1,6 @@
 package com.yinfires.icecore.time;
 
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.yinfires.icecore.building.BuildingDataManager;
 import com.yinfires.icecore.feedback.PlayerFeedback;
@@ -39,8 +40,13 @@ public final class TimeConfigManager {
                 // but defer cross-file validity until an administrator binds a real list.
                 write(loaded, path);
             } else {
-                loaded = TimeConfigData.fromJson(JsonParser.parseString(Files.readString(path, StandardCharsets.UTF_8)).getAsJsonObject());
+                JsonObject object = JsonParser.parseString(Files.readString(path, StandardCharsets.UTF_8)).getAsJsonObject();
+                boolean addCompatibilityDefaults = !object.has("compatibility")
+                        || !object.get("compatibility").isJsonObject()
+                        || !object.getAsJsonObject("compatibility").has("dewDropFarmlandGrowth");
+                loaded = TimeConfigData.fromJson(object);
                 loaded.validateReferences(BuildingDataManager.get().data());
+                if (addCompatibilityDefaults) write(loaded, path);
             }
             data = loaded;
             revision++;

@@ -19,6 +19,7 @@ public final class TimeConfigData {
     private final Set<String> regions = new LinkedHashSet<>();
     private final Map<String, TimeCamera> cameras = new LinkedHashMap<>();
     private TimeTimings timings = new TimeTimings();
+    private TimeCompatibilityConfig compatibility = new TimeCompatibilityConfig();
 
     public double dayDurationMultiplier() { return dayDurationMultiplier; }
     public boolean hudEnabled() { return hudEnabled; }
@@ -27,6 +28,8 @@ public final class TimeConfigData {
     public Set<String> regions() { return regions; }
     public Map<String, TimeCamera> cameras() { return cameras; }
     public TimeTimings timings() { return timings; }
+    public TimeCompatibilityConfig compatibility() { return compatibility; }
+    public DewDropFarmlandTimeConfig dewDropFarmlandGrowth() { return compatibility.dewDropFarmlandGrowth(); }
     public void setDayDurationMultiplier(double value) { dayDurationMultiplier = value; }
     public void setHudEnabled(boolean value) { hudEnabled = value; }
     public void setNaturalDaySummaryEnabled(boolean value) { naturalDaySummaryEnabled = value; }
@@ -43,6 +46,9 @@ public final class TimeConfigData {
             throw new IllegalArgumentException("unsupported formatVersion");
         TimeConfigData data = gson().fromJson(object, TimeConfigData.class);
         if (!object.has("naturalDaySummaryEnabled")) data.naturalDaySummaryEnabled = true;
+        JsonObject compatibilityObject = object.has("compatibility") && object.get("compatibility").isJsonObject()
+                ? object.getAsJsonObject("compatibility") : null;
+        data.compatibility = TimeCompatibilityConfig.fromJson(compatibilityObject);
         JsonObject timingObject = object.has("timings") && object.get("timings").isJsonObject()
                 ? object.getAsJsonObject("timings") : null;
         if (timingObject != null && !timingObject.has("summaryFadeTicks")) {
@@ -57,9 +63,10 @@ public final class TimeConfigData {
     public void validateBasic() {
         if (!Double.isFinite(dayDurationMultiplier) || dayDurationMultiplier < 0.01D || dayDurationMultiplier > 100.0D)
             throw new IllegalArgumentException("dayDurationMultiplier must be 0.01..100");
-        if (triggerBlockList == null || triggerBlockList.isBlank() || regions == null || cameras == null || timings == null)
+        if (triggerBlockList == null || triggerBlockList.isBlank() || regions == null || cameras == null || timings == null || compatibility == null)
             throw new IllegalArgumentException("required time fields are missing");
         timings.validateConfiguration();
+        compatibility.validate();
         for (Map.Entry<String, TimeCamera> entry : cameras.entrySet()) {
             TimeCamera camera = entry.getValue();
             if (entry.getKey() == null || entry.getKey().isBlank() || camera == null

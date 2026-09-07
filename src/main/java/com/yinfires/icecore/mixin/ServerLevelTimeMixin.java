@@ -1,5 +1,6 @@
 package com.yinfires.icecore.mixin;
 
+import com.yinfires.icecore.compat.dewdrop.DewDropFarmlandTimeCompat;
 import com.yinfires.icecore.time.TimeService;
 import net.minecraft.server.level.ServerLevel;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,5 +19,9 @@ public abstract class ServerLevelTimeMixin {
     private void icecore$scaleDayTime(ServerLevel level,long vanillaValue){TimeService.advanceNatural(level);}
 
     @Inject(method = "m_8615_(J)V", at = @At("HEAD"))
-    private void icecore$observeExternalSet(long value, CallbackInfo ci){TimeService.beforeDayTimeSet();}
+    private void icecore$observeExternalSet(long value, CallbackInfo ci){
+        ServerLevel level=(ServerLevel)(Object)this;
+        DewDropFarmlandTimeCompat.observeDayTimeChange(level,level.getDayTime(),value);
+        TimeService.beforeDayTimeSet();
+    }
 }

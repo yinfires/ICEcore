@@ -1,6 +1,8 @@
 package com.yinfires.icecore.time;
 
 public final class TimeCalendar {
+    public static final int DAY_TICKS = 24_000;
+
     private TimeCalendar() {}
     public static long day(long dayTime) { return Math.floorDiv(dayTime, 24_000L) + 1L; }
     public static int weekday(long dayTime) { return (int) Math.floorMod(day(dayTime) - 1L, 7L); }
