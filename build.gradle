@@ -13,6 +13,13 @@ base {
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
+// Forge discovers nested Jar-in-Jar dependencies before any @Mod class is constructed.
+// CozyCafe 1.9 embeds LibTooltips 2.2 under this Curse Maven identity while
+// Starcatcher 3.1.4.1 embeds 2.3 under a different Modrinth identity. Supplying
+// the 2.3 binary under CozyCafe's identity makes JarJar discard its older copy;
+// either remaining libtooltips candidate is then the same 2.3 implementation.
+jarJar.enable()
+
 minecraft {
     mappings channel: mapping_channel, version: mapping_version
     copyIdeResources = true
@@ -52,10 +59,24 @@ repositories {
         name = 'BlameJared'
         url = 'https://maven.blamejared.com'
     }
+    ivy {
+        name = 'ICEcoreLibTooltipsCompat'
+        url = 'https://api.modrinth.com'
+        patternLayout {
+            artifact "maven/maven/modrinth/libtooltips/${libtooltips_compat_upstream_version}/libtooltips-${libtooltips_compat_upstream_version}.jar"
+        }
+        metadataSources { artifact() }
+        content { includeModule 'curse.maven', 'libtooltips-1370245' }
+    }
 }
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    def libtooltipsCompat = jarJar("curse.maven:libtooltips-1370245:${libtooltips_compat_selector_version}") {
+        transitive = false
+    }
+    jarJar.ranged(libtooltipsCompat, "[${libtooltips_compat_selector_version},${libtooltips_compat_selector_version.toInteger() + 1})")
+    jarJar.pin(libtooltipsCompat, libtooltips_compat_selector_version)
     compileOnly fg.deobf('mezz.jei:jei-1.20.1-common-api:15.49.0.188')
     compileOnly fg.deobf('mezz.jei:jei-1.20.1-forge-api:15.49.0.188')
     // Full JEI forge jar on the compile classpath too: recipe-hide favorites clearing must reference
@@ -95,6 +116,8 @@ tasks.named('processResources', ProcessResources).configure {
 }
 
 tasks.named('jar', Jar).configure {
+    archiveClassifier = 'slim'
+
     from('LICENSE') {
         rename { "${it}_${mod_id}" }
     }
@@ -115,6 +138,51 @@ tasks.named('jar', Jar).configure {
     }
 
     finalizedBy 'reobfJar'
+}
+
+tasks.named('jarJar', Jar).configure {
+    archiveClassifier = ''
+    dependsOn 'verifyLibtooltipsCompatSource'
+    finalizedBy 'reobfJarJar'
+}
+
+tasks.register('verifyLibtooltipsCompatSource') {
+    inputs.files(configurations.jarJar)
+    inputs.property('expectedSha256', libtooltips_compat_sha256)
+
+    doLast {
+        def artifacts = configurations.jarJar.resolvedConfiguration.resolvedArtifacts.findAll { resolved ->
+            resolved.moduleVersion.id.group == 'curse.maven'
+                    && resolved.name == 'libtooltips-1370245'
+                    && resolved.moduleVersion.id.version == libtooltips_compat_selector_version
+        }
+        if (artifacts.size() != 1) {
+            throw new GradleException("Expected exactly one LibTooltips compatibility artifact, found ${artifacts.size()}")
+        }
+
+        def artifact = artifacts.first().file
+        def digest = java.security.MessageDigest.getInstance('SHA-256')
+        artifact.withInputStream { stream ->
+            byte[] buffer = new byte[8192]
+            for (int read = stream.read(buffer); read >= 0; read = stream.read(buffer)) {
+                if (read > 0) digest.update(buffer, 0, read)
+            }
+        }
+        def actualSha256 = digest.digest().encodeHex().toString()
+        if (!actualSha256.equalsIgnoreCase(libtooltips_compat_sha256)) {
+            throw new GradleException("Unexpected LibTooltips compatibility artifact SHA-256: ${actualSha256}")
+        }
+
+        new java.util.zip.ZipFile(artifact).withCloseable { zip ->
+            if (zip.getEntry('com/wdiscute/libtooltips/Tooltips$ItemTooltip.class') == null) {
+                throw new GradleException('LibTooltips compatibility artifact does not contain Tooltips$ItemTooltip')
+            }
+            def modsToml = zip.getInputStream(zip.getEntry('META-INF/mods.toml')).getText('UTF-8')
+            if (!modsToml.contains("version=\"${libtooltips_compat_upstream_version}\"")) {
+                throw new GradleException("LibTooltips compatibility artifact is not ${libtooltips_compat_upstream_version}")
+            }
+        }
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {

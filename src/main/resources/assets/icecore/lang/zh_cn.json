@@ -2,6 +2,8 @@
   "item.icecore.wrench": "扳手",
   "item.icecore.wrench.tooltip": "右键拆除物体",
   "itemGroup.icecore.main": "ICEcore",
+  "pack.icecore.starcatcher_tide_compat": "ICEcore：捕星者 Tide 兼容修正",
+  "pack.icecore.starcatcher_tide_compat.description": "修正捕星者 3.1.4.1 内置 Tide 数据包的流星海星鱼饵格式",
   "icecore.island.region.missing": "区域「%s」不存在或未框选完整。",
   "icecore.island.region.dimension": "区域所在维度「%s」未加载。",
   "icecore.island.capture.failed": "捕获岛屿「%s」失败。",

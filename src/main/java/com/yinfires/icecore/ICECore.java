@@ -19,6 +19,7 @@ public final class ICECore {
         com.yinfires.icecore.tutorial.TutorialNetworking.install();
         com.yinfires.icecore.journal.ChatBoxJournalEvents.register();
         var modBus = FMLJavaModLoadingContext.get().getModEventBus();
+        com.yinfires.icecore.compat.starcatcher.StarcatcherTideDataPackCompat.register(modBus);
         ModItems.ITEMS.register(modBus);
         ModCreativeTabs.TABS.register(modBus);
         ModEntities.ENTITY_TYPES.register(modBus);

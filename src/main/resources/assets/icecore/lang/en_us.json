@@ -2,6 +2,8 @@
   "item.icecore.wrench": "Wrench",
   "item.icecore.wrench.tooltip": "Right-click to dismantle a block",
   "itemGroup.icecore.main": "ICEcore",
+  "pack.icecore.starcatcher_tide_compat": "ICEcore: Starcatcher Tide Compatibility",
+  "pack.icecore.starcatcher_tide_compat.description": "Corrects the Shooting Starfish bait format in Starcatcher 3.1.4.1's bundled Tide data pack",
   "icecore.island.region.missing": "Region '%s' does not exist or is incomplete.",
   "icecore.island.region.dimension": "Region dimension '%s' is not loaded.",
   "icecore.island.capture.failed": "Failed to capture island '%s'.",
