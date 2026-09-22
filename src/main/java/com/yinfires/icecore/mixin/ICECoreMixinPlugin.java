@@ -12,6 +12,7 @@ public final class ICECoreMixinPlugin implements IMixinConfigPlugin {
     @Override public void onLoad(String mixinPackage) {}
     @Override public String getRefMapperConfig() { return null; }
     @Override public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
+        if (mixinClassName.contains("GeckoLib")) return present(targetClassName);
         if (mixinClassName.contains("Tavern")) return present("com.github.ysbbbbbb.kaleidoscopetavern.KaleidoscopeTavern");
         if (mixinClassName.contains("CozyCafe")) return present("io.github.chakyl.cozycafe.CozyCafe");
         if (mixinClassName.contains("SDMShop")) return present("net.sixik.sdmshoprework.SDMShopRework");

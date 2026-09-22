@@ -1,0 +1,2731 @@
+[
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/cupcoffe.animation.json",
+    "frame": {
+      "pre": {
+        "vector": [
+          -5.35254,
+          -11.31255,
+          10.53051
+        ]
+      },
+      "post": {
+        "vector": [
+          -5.35254,
+          -11.31255,
+          10.53051
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/cupcoffe.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -14.91338,
+          -47.94528,
+          15.51793
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/cupcoffe.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -3.60988,
+          -49.56658,
+          0.52357
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/cupcoffe.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          15.45389,
+          -49.29927,
+          -24.8315
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/cupcoffe.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          26.60575,
+          -43.25969,
+          -40.71509
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/cupcoffe.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          31.61373,
+          -38.76746,
+          -48.67831
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/cupcoffe.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          20.81008,
+          -43.95146,
+          -33.51991
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/cupcoffe.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -19.12158,
+          -43.23155,
+          19.0659
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/cupcoffe.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/cupcoffe.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          2.5
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/cupcoffe.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/cupcoffe.animation.json",
+    "frame": {
+      "pre": {
+        "vector": [
+          0,
+          6,
+          0
+        ]
+      },
+      "post": {
+        "vector": [
+          0,
+          6,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/cupcoffe.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -1,
+          6.75,
+          1
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/cupcoffe.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -1,
+          6.25,
+          1
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/cupcoffe.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -1,
+          6.75,
+          1
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/cupcoffe.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -3.25,
+          2.25,
+          -1.25
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/cupcoffe.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -3.25,
+          10,
+          -1.25
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/cupcoffe.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -1.25,
+          10,
+          0.75
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/cupcoffe.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/cupcoffe.animation.json",
+    "frame": {
+      "pre": {
+        "vector": [
+          1,
+          1,
+          1
+        ]
+      },
+      "post": {
+        "vector": [
+          1,
+          1,
+          1
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/feng_ren_ji__-_converted.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/feng_ren_ji__-_converted.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/feng_ren_ji__-_converted.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/feng_ren_ji__-_converted.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          1
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/feng_ren_ji__-_converted.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/feng_ren_ji__-_converted.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          1,
+          1,
+          1
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/feng_ren_ji__-_converted.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          1,
+          1.5,
+          1
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/feng_ren_ji__-_converted.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          1,
+          0.7,
+          1
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/feng_ren_ji__-_converted.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          1,
+          1.4,
+          1
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/feng_ren_ji__-_converted.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          1,
+          0.6,
+          1
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/feng_ren_ji__-_converted.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          1,
+          1.5,
+          1
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/feng_ren_ji__-_converted.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          1,
+          1.4,
+          1
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/feng_ren_ji__-_converted.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          1,
+          0.7,
+          1
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/feng_ren_ji__-_converted.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          1,
+          1.4,
+          1
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/feng_ren_ji__-_converted.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          1,
+          0.6,
+          1
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/feng_ren_ji__-_converted.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          1,
+          1.4,
+          1
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/feng_ren_ji__-_converted.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          1,
+          1,
+          1
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/feng_ren_ji__-_converted.animation.json",
+    "frame": {
+      "pre": {
+        "vector": [
+          25,
+          0,
+          0
+        ]
+      },
+      "post": {
+        "vector": [
+          25,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/feng_ren_ji__-_converted.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -210.88,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/feng_ren_ji__-_converted.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          105,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/feng_ren_ji__-_converted.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -27.5,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/feng_ren_ji__-_converted.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          25,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/feng_ren_ji__-_converted.animation.json",
+    "frame": {
+      "pre": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/feng_ren_ji__-_converted.animation.json",
+    "frame": {
+      "pre": {
+        "vector": [
+          1,
+          1,
+          1
+        ]
+      },
+      "post": {
+        "vector": [
+          1,
+          1,
+          1
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/feng_ren_ji__-_converted.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/feng_ren_ji__-_converted.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          -32.5,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/feng_ren_ji__-_converted.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/feng_ren_ji__-_converted.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          1915,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/feng_ren_ji__-_converted.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          1865,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "elegant_countryside-2025-forge-1.20.1.jar!/assets/elegant_countryside/animations/feng_ren_ji__-_converted.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          1840,
+          0
+        ],
+        "easing": "easeInBack"
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/imp_tail.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/imp_tail.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          12.5,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/imp_tail.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/imp_tail.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          -12.5,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/imp_tail.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/imp_tail.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/imp_tail.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          12.5,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/imp_tail.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/imp_tail.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          -12.5,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/imp_tail.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/imp_tail.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/imp_tail.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          12.5,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/imp_tail.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/imp_tail.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          -12.5,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/imp_tail.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/imp_tail.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          17.5,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/imp_tail.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          -17.5,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/imp_tail.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          17.5,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/imp_tail.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/imp_tail.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          12.5,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/imp_tail.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/imp_tail.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          -12.5,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/imp_tail.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lesser_spirit_cosmetic.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          "math.sin(query.anim_time * 120) * 6",
+          0,
+          "math.cos(query.anim_time * 100) * 4"
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lesser_spirit_cosmetic.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -2.78723,
+          -5.65749,
+          -8.09719
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lesser_spirit_cosmetic.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -2.77827,
+          -0.94172,
+          6.26289
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lesser_spirit_cosmetic.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -1.1442,
+          -4.54143,
+          18.06994
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lesser_spirit_cosmetic.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -2.14376,
+          7.08588,
+          5.00949
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lesser_spirit_cosmetic.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          4.26447,
+          6.67262,
+          -5.87907
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lesser_spirit_cosmetic.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lesser_spirit_cosmetic.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          "math.sin(query.anim_time * 90) * 1",
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lesser_spirit_cosmetic.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -3,
+          1.9,
+          2
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lesser_spirit_cosmetic.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -0.56,
+          3.83,
+          1.26
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lesser_spirit_cosmetic.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          4.33,
+          1.69,
+          -0.22
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lesser_spirit_cosmetic.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          "math.sin(query.anim_time * 90) * 1",
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lesser_spirit_cosmetic.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lesser_spirit_cosmetic.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          1,
+          1,
+          1
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lesser_spirit_cosmetic.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          1,
+          1,
+          1
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          "math.sin(query.anim_time * 360) * 0.5",
+          0,
+          "math.sin(query.anim_time * 180) * 2"
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          "math.sin(query.anim_time * 360) * 0.1",
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          "math.sin(query.anim_time * 60) * 3",
+          0,
+          "math.sin(query.anim_time * 120) * 5"
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          "math.sin(query.anim_time * 60) * 5",
+          0,
+          "math.sin(query.anim_time * 120) * 3"
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          "math.sin(query.anim_time * 60) * 5",
+          0,
+          "math.sin(query.anim_time * 120) * 3"
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -10,
+          0,
+          10
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          5,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -10,
+          0,
+          -10
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          5,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -10,
+          0,
+          10
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          -0.5,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          -1,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          10,
+          0,
+          -10
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          2.60855,
+          -0.99864,
+          2.52592
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          "math.sin(query.anim_time * 60) * 3",
+          0,
+          "math.sin(query.anim_time * 120) * 15"
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          9.47444,
+          0.4287,
+          -8.42223
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          10,
+          0,
+          -10
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -17.46271,
+          -0.86717,
+          12.57558
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          12.5,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -17.46271,
+          -0.86717,
+          12.57558
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0.25,
+          0.5,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0.25,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0.25,
+          0.5,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          12.5,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -17.46271,
+          -0.86717,
+          -12.57558
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0.25,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -0.25,
+          0.5,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/lush_golem_entity.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/tail_animated.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          12.5,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/tail_animated.animation.json",
+    "frame": {
+      "pre": {
+        "vector": [
+          0,
+          12.5,
+          0
+        ]
+      },
+      "post": {
+        "vector": [
+          0,
+          12.5,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/tail_animated.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          -7.5
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/tail_animated.animation.json",
+    "frame": {
+      "pre": {
+        "vector": [
+          0,
+          0,
+          7.5
+        ]
+      },
+      "post": {
+        "vector": [
+          0,
+          0,
+          7.5
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/tail_animated.animation.json",
+    "frame": {
+      "pre": {
+        "vector": [
+          0,
+          0,
+          -7.5
+        ]
+      },
+      "post": {
+        "vector": [
+          0,
+          0,
+          -7.5
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          "2.5+math.sin(query.anim_time * 60) * 1",
+          0,
+          "math.sin(query.anim_time * 120) * 3"
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0.01133,
+          0.24971,
+          -0.00378
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          5.75,
+          0,
+          2.16506
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          "math.sin(query.anim_time * 60) * 3",
+          0,
+          "math.sin(query.anim_time * 120) * 5"
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -3.5,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -4.25,
+          0,
+          2.16506
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          "math.sin(query.anim_time * 60) * 3",
+          0,
+          "math.sin(query.anim_time * 120) * 5"
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          1.5,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0.25,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -5,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -10,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -10.23772,
+          -12.3071,
+          2.20462
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -10,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -10.23772,
+          12.3071,
+          -2.20462
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -10,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          10,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          9.59287,
+          -5.61367,
+          4.4201
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          10.08453,
+          -7.38542,
+          -1.30962
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          10.01886,
+          1.39322,
+          -4.83082
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          10.09517,
+          8.3086,
+          1.47486
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          10,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          10,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          10.03742,
+          -4.92385,
+          -0.87038
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          10.04212,
+          5.53933,
+          0.97964
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          10,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -10,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -10.08453,
+          -7.38542,
+          1.30962
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -10.08453,
+          7.38542,
+          -1.30962
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -10,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0.125,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          -0.125,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -2.5,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          2.5,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0.06226,
+          0.00545
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          -0.06244,
+          0.00273
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          -2.5,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          2.5,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0.06226,
+          0.00545
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          -0.06244,
+          0.00273
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  },
+  {
+    "source": "textiles_and_trinkets-1.1.3-forge-1.20.1.jar!/assets/textiles_and_trinkets/animations/vigil_descender.animation.json",
+    "frame": {
+      "post": {
+        "vector": [
+          0,
+          0,
+          0
+        ]
+      },
+      "lerp_mode": "catmullrom"
+    }
+  }
+]
