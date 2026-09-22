@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "aquaculturedelight:crispy_fried_perch",
+      "required": false
+    }
+  ]
+}
