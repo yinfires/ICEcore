@@ -1,0 +1,8 @@
+{
+  "filled": "minecraft:milk_bucket",
+  "empty": "minecraft:bucket",
+  "category": "bucket",
+  "behavior": "fluid",
+  "fluid": "minecraft:milk",
+  "amount": 1000
+}

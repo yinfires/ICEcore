@@ -1,0 +1,6 @@
+{
+  "filled": "minecraft:honey_bottle",
+  "empty": "minecraft:glass_bottle",
+  "category": "bottle",
+  "behavior": "ingredient"
+}

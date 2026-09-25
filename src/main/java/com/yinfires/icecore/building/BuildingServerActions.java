@@ -2,9 +2,11 @@ package com.yinfires.icecore.building;
 
 import com.yinfires.icecore.feedback.PlayerFeedback;
 import com.yinfires.icecore.item.ModItems;
+import com.yinfires.icecore.mixing.ContainerContentAccess;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
@@ -21,12 +23,19 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /** Server-authoritative handling for building interaction hooks. */
 public final class BuildingServerActions {
+    private static final long FORCE_CONFIRM_TICKS = 60L;
+    private static final Map<UUID, RemovalConfirmation> REMOVAL_CONFIRMATIONS = new ConcurrentHashMap<>();
+    private record RemovalConfirmation(net.minecraft.resources.ResourceKey<Level> dimension, BlockPos position,
+                                       BlockState state, int fingerprint, long expiresAt) {}
     private BuildingServerActions() {
     }
 
@@ -97,12 +106,30 @@ public final class BuildingServerActions {
         if (blockStack.isEmpty()) {
             return false;
         }
-        List<ItemStack> returns = new ArrayList<>();
-        returns.add(blockStack);
-        BlockEntity blockEntity = level.getBlockEntity(keyPosition);
-        if (blockEntity != null) {
-            collectContainerItems(blockEntity, returns);
+        int contentFingerprint = structureContentFingerprint(level, state, keyPosition);
+        boolean hasContent = structureHasContent(level, state, keyPosition);
+        if (hasContent) {
+            if (!player.isShiftKeyDown()) {
+                clearRemovalConfirmation(player);
+                PlayerFeedback.show(player, net.minecraft.network.chat.Component.translatable("icecore.build.container_not_empty"));
+                return false;
+            }
+            RemovalConfirmation confirmation = REMOVAL_CONFIRMATIONS.get(player.getUUID());
+            boolean confirmed = confirmation != null
+                    && confirmation.dimension().equals(level.dimension())
+                    && confirmation.position().equals(keyPosition)
+                    && confirmation.state().equals(state)
+                    && confirmation.fingerprint() == contentFingerprint
+                    && level.getGameTime() <= confirmation.expiresAt();
+            if (!confirmed) {
+                REMOVAL_CONFIRMATIONS.put(player.getUUID(), new RemovalConfirmation(level.dimension(), keyPosition,
+                        state, contentFingerprint, level.getGameTime() + FORCE_CONFIRM_TICKS));
+                PlayerFeedback.show(player, net.minecraft.network.chat.Component.translatable("icecore.build.force_remove_confirm"));
+                return false;
+            }
         }
+        clearRemovalConfirmation(player);
+        List<ItemStack> returns = List.of(blockStack);
         List<BlockPos> structure = BuildingStructure.positions(state, keyPosition);
         if (!canFit(player.getInventory(), returns)) {
             PlayerFeedback.show(player, net.minecraft.network.chat.Component.translatable("icecore.build.inventory_full"));
@@ -122,6 +149,10 @@ public final class BuildingServerActions {
         }
         player.getInventory().setChanged();
         return true;
+    }
+
+    public static void clearRemovalConfirmation(ServerPlayer player) {
+        REMOVAL_CONFIRMATIONS.remove(player.getUUID());
     }
 
     public static boolean isWrench(ItemStack stack) {
@@ -176,39 +207,55 @@ public final class BuildingServerActions {
                 && level.isUnobstructed(state, position, CollisionContext.of(player));
     }
 
-    private static void collectContainerItems(BlockEntity entity, List<ItemStack> output) {
-        List<ItemStack> containerItems = new ArrayList<>();
-        if (entity instanceof Container container) {
-            for (int i = 0; i < container.getContainerSize(); i++) {
-                ItemStack item = container.getItem(i);
-                if (!item.isEmpty()) {
-                    output.add(item.copy());
-                    containerItems.add(item.copy());
-                }
-            }
+    private static boolean structureHasContent(ServerLevel level, BlockState state, BlockPos primary) {
+        for (BlockPos part : BuildingStructure.positions(state, primary)) {
+            BlockEntity entity = level.getBlockEntity(part);
+            if (entity != null && hasContent(entity)) return true;
         }
-        entity.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(handler -> {
-            for (int i = 0; i < handler.getSlots(); i++) {
-                ItemStack item = handler.getStackInSlot(i);
-                if (item.isEmpty()) {
-                    continue;
-                }
-                int remaining = item.getCount();
-                for (int j = 0; j < containerItems.size() && remaining > 0; j++) {
-                    ItemStack existing = containerItems.get(j);
-                    if (!ItemStack.isSameItemSameTags(existing, item)) {
-                        continue;
-                    }
-                    int consumed = Math.min(existing.getCount(), remaining);
-                    existing.shrink(consumed);
-                    remaining -= consumed;
-                }
-                containerItems.removeIf(ItemStack::isEmpty);
-                if (remaining > 0) {
-                    output.add(item.copyWithCount(remaining));
-                }
+        return false;
+    }
+
+    private static boolean hasContent(BlockEntity entity) {
+        if (entity instanceof ContainerContentAccess access && access.icecore$hasContainerContent()) return true;
+        if (entity instanceof Container container) {
+            for (int i = 0; i < container.getContainerSize(); i++) if (!container.getItem(i).isEmpty()) return true;
+        }
+        if (entity.getCapability(ForgeCapabilities.ITEM_HANDLER).map(BuildingServerActions::hasItems).orElse(false)) return true;
+        return entity.getCapability(ForgeCapabilities.FLUID_HANDLER).map(BuildingServerActions::hasFluids).orElse(false);
+    }
+
+    private static boolean hasItems(IItemHandler handler) {
+        for (int i = 0; i < handler.getSlots(); i++) if (!handler.getStackInSlot(i).isEmpty()) return true;
+        return false;
+    }
+
+    private static boolean hasFluids(IFluidHandler handler) {
+        for (int i = 0; i < handler.getTanks(); i++) if (!handler.getFluidInTank(i).isEmpty()) return true;
+        return false;
+    }
+
+    private static int structureContentFingerprint(ServerLevel level, BlockState state, BlockPos primary) {
+        int hash = 1;
+        for (BlockPos part : BuildingStructure.positions(state, primary)) {
+            BlockEntity entity = level.getBlockEntity(part);
+            if (entity == null) continue;
+            if (entity instanceof ContainerContentAccess access) {
+                hash = 31 * hash + access.icecore$contentFingerprint();
+                continue;
             }
-        });
+            if (entity instanceof Container container) {
+                for (int i = 0; i < container.getContainerSize(); i++) hash = 31 * hash + stackFingerprint(container.getItem(i));
+            }
+            IItemHandler items = entity.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
+            if (items != null) for (int i = 0; i < items.getSlots(); i++) hash = 31 * hash + stackFingerprint(items.getStackInSlot(i));
+            IFluidHandler fluids = entity.getCapability(ForgeCapabilities.FLUID_HANDLER).orElse(null);
+            if (fluids != null) for (int i = 0; i < fluids.getTanks(); i++) hash = 31 * hash + fluids.getFluidInTank(i).hashCode();
+        }
+        return hash;
+    }
+
+    private static int stackFingerprint(ItemStack stack) {
+        return stack.isEmpty() ? 0 : stack.save(new CompoundTag()).hashCode();
     }
 
     private static boolean canFit(Inventory inventory, List<ItemStack> stacks) {

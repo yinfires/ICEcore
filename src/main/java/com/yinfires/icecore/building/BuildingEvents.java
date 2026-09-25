@@ -43,14 +43,17 @@ public final class BuildingEvents {
 
     @SubscribeEvent
     public static void onLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) AdjustmentModeManager.exit(player);
+        if (event.getEntity() instanceof ServerPlayer player) {
+            AdjustmentModeManager.exit(player);
+            BuildingServerActions.clearRemovalConfirmation(player);
+        }
     }
 
     @SubscribeEvent
     public static void onPlayerChangedDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player
-                && AdjustmentModeManager.isActiveInAnyHand(player)) {
-            AdjustmentModeManager.exit(player);
+        if (event.getEntity() instanceof ServerPlayer player) {
+            BuildingServerActions.clearRemovalConfirmation(player);
+            if (AdjustmentModeManager.isActiveInAnyHand(player)) AdjustmentModeManager.exit(player);
         }
     }
 

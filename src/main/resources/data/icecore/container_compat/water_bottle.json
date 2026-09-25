@@ -1,0 +1,11 @@
+{
+  "filled": {
+    "item": "minecraft:potion",
+    "nbt": "{Potion:\"minecraft:water\"}"
+  },
+  "empty": "minecraft:glass_bottle",
+  "category": "bottle",
+  "behavior": "fluid",
+  "fluid": "minecraft:water",
+  "amount": 250
+}

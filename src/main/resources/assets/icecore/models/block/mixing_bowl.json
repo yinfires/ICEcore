@@ -1,0 +1,6 @@
+{
+  "parent": "farm_and_charm:block/crafting_bowl",
+  "textures": {
+    "particle": "farm_and_charm:block/crafting_bowl"
+  }
+}

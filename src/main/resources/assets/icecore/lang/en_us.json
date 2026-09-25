@@ -108,5 +108,12 @@
   "icecore.recipe.not_ready": "Recipe hide service is not ready",
   "icecore.recipe.exempt.on": "Exempt mode on: JEI shows all recipes and items",
   "icecore.recipe.exempt.off": "Exempt mode off: hiding restored",
-  "icecore.recipe.exempt.player_only": "This command must be run by a player"
+  "icecore.recipe.exempt.player_only": "This command must be run by a player",
+  "block.icecore.mixing_bowl": "Mixing Bowl",
+  "block.icecore.oven": "Oven",
+  "icecore.oven.batch_supported": "Supports batch processing",
+  "icecore.mixing.need_input_container": "Use %s to retrieve the ingredient",
+  "icecore.mixing.need_output_container": "Use %s to collect the result",
+  "icecore.build.container_not_empty": "Remove all contents before dismantling",
+  "icecore.build.force_remove_confirm": "Forced dismantling clears all contents; Shift-right-click again to confirm"
 }

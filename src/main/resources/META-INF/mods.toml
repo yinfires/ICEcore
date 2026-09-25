@@ -27,9 +27,23 @@ ordering="NONE"
 side="BOTH"
 
 [[dependencies.${mod_id}]]
+modId="farm_and_charm"
+mandatory=true
+versionRange="[1.0.14]"
+ordering="AFTER"
+side="BOTH"
+
+[[dependencies.${mod_id}]]
+modId="youkaisfeasts"
+mandatory=true
+versionRange="[0.5.0]"
+ordering="AFTER"
+side="BOTH"
+
+[[dependencies.${mod_id}]]
 modId="chatbox"
 mandatory=true
-versionRange="[1.1.4]"
+versionRange="[1.1.4,)"
 ordering="AFTER"
 side="BOTH"
 

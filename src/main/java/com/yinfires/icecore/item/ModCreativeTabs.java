@@ -15,7 +15,11 @@ public final class ModCreativeTabs {
     public static final RegistryObject<CreativeModeTab> MAIN = TABS.register("main", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.icecore.main"))
             .icon(() -> new ItemStack(ModItems.WRENCH.get()))
-            .displayItems((parameters, output) -> output.accept(ModItems.WRENCH.get()))
+            .displayItems((parameters, output) -> {
+                output.accept(ModItems.WRENCH.get());
+                output.accept(com.yinfires.icecore.mixing.ModMixing.MIXING_BOWL_ITEM.get());
+                output.accept(com.yinfires.icecore.oven.ModOven.OVEN_ITEM.get());
+            })
             .build());
 
     private ModCreativeTabs() {
