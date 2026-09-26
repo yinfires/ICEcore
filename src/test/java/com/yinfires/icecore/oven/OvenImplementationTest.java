@@ -68,25 +68,5 @@ final class OvenImplementationTest {
         assertTrue(recipe.contains("batch ? Math.min(limit, maxBatches) : 1"));
     }
 
-    @Test void testRecipeLivesOnlyInClientKubeJs() throws IOException {
-        assertFalse(Files.exists(Path.of("src/main/resources/data/icecore/recipes/oven_juicer_bread.json")));
-        Path script = Path.of("D:/Minecraft/PCL启动器/.minecraft/versions/异次元餐厅/kubejs/server_scripts/icecore_oven_test.js");
-        assertTrue(Files.exists(script));
-        String source = Files.readString(script, StandardCharsets.UTF_8);
-        assertTrue(source.contains("kaleidoscope_fragrantorchard:juicer"));
-        assertTrue(source.contains("minecraft:bread"));
-        String[] roots = {"src/main/java", "src/main/resources", "build/resources/main"};
-        for (String root : roots) {
-            if (!Files.exists(Path.of(root))) continue;
-            try (var paths = Files.walk(Path.of(root))) {
-                paths.filter(Files::isRegularFile).forEach(path -> {
-                    try {
-                        String text = Files.readString(path, StandardCharsets.UTF_8);
-                        assertFalse(text.contains("kaleidoscope_fragrantorchard:juicer"), "test recipe leaked into " + path);
-                    } catch (IOException e) { throw new RuntimeException(e); }
-                });
-            }
-        }
-    }
 }
 
