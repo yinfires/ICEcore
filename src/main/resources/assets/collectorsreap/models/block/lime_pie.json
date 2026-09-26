@@ -1,0 +1,9 @@
+{
+  "parent": "farmersdelight:block/template_pie",
+  "textures": {
+    "bottom": "collectorsreap:block/lime_pie_bottom",
+    "particle": "collectorsreap:block/lime_pie_top",
+    "side": "collectorsreap:block/lime_pie_side",
+    "top": "collectorsreap:block/lime_pie_top"
+  }
+}
