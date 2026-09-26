@@ -176,7 +176,10 @@ public final class MixingBowlBlockEntity extends BlockEntity implements Containe
             carriers.clear();
             for (int i = 0; i < 9; i++) carriers.add(Ingredient.EMPTY);
             List<MixingBowlRecipe.Result> results = recipe.get().results();
-            for (int i = 0; i < results.size(); i++) { outputs.set(i, results.get(i).stack().copy()); carriers.set(i, results.get(i).carrier()); }
+            for (int i = 0; i < results.size(); i++) {
+                outputs.set(i, results.get(i).stack().copy());
+                carriers.set(i, results.get(i).effectiveCarrier());
+            }
             stage = Stage.OUTPUT;
         } else stage = Stage.INPUT;
         changed();
@@ -243,7 +246,13 @@ public final class MixingBowlBlockEntity extends BlockEntity implements Containe
             if(tag.contains("Outputs")) ContainerHelper.loadAllItems(tag.getCompound("Outputs"),outputs);
             try { stage=Stage.valueOf(tag.getString("Stage")); } catch(Exception ignored){stage=Stage.INPUT;}
             stirringTicks=tag.getInt("Stirring"); progress=tag.getInt("Progress"); carriers.clear();
-            ListTag list=tag.getList("Carriers",8); for(int i=0;i<9;i++) carriers.add(i<list.size()?Ingredient.fromJson(com.google.gson.JsonParser.parseString(list.getString(i))):Ingredient.EMPTY);
+            ListTag list=tag.getList("Carriers",8);
+            for(int i=0;i<9;i++) {
+                Ingredient saved = i < list.size()
+                        ? Ingredient.fromJson(com.google.gson.JsonParser.parseString(list.getString(i)))
+                        : Ingredient.EMPTY;
+                carriers.add(WorkstationContainerCompat.resolveOutputCarrier(outputs.get(i), saved));
+            }
         } finally {
             loading = false;
         }

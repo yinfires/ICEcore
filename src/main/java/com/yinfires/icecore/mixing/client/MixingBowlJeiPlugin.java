@@ -76,8 +76,8 @@ public final class MixingBowlJeiPlugin implements IModPlugin {
                 int x = 91 + (i % 3) * 18, y = 1 + (i / 3) * 18;
                 layout.addSlot(RecipeIngredientRole.OUTPUT, x, y)
                         .addItemStack(recipe.results().get(i).stack());
-                if (!recipe.results().get(i).carrier().isEmpty()) {
-                    carrierItems.addAll(java.util.List.of(recipe.results().get(i).carrier().getItems()));
+                if (!recipe.results().get(i).effectiveCarrier().isEmpty()) {
+                    carrierItems.addAll(java.util.List.of(recipe.results().get(i).effectiveCarrier().getItems()));
                 }
             }
             if (!carrierItems.isEmpty()) {

@@ -2,6 +2,7 @@ package com.yinfires.icecore.compat.kaleidoscopecookery;
 
 import com.github.ysbbbbbb.kaleidoscopecookery.crafting.soupbase.FluidSoupBase;
 import com.github.ysbbbbbb.kaleidoscopecookery.crafting.soupbase.SoupBaseManager;
+import com.github.ysbbbbbb.kaleidoscopecookery.api.item.IHasContainer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -19,6 +20,8 @@ import net.minecraftforge.common.SoundActions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
+
 public final class KaleidoscopeCookeryCompat {
     private static final Logger LOGGER = LoggerFactory.getLogger(KaleidoscopeCookeryCompat.class);
     private static final ResourceLocation CANOLA_OIL_BUCKET = ResourceLocation.fromNamespaceAndPath("kaleidoscope_grilling", "canola_oil_bucket");
@@ -26,6 +29,12 @@ public final class KaleidoscopeCookeryCompat {
     private static final int CANOLA_OIL_TINT = 0xFFC08A24;
 
     private KaleidoscopeCookeryCompat() {
+    }
+
+    public static Optional<ItemStack> resolveContainerItem(ItemStack filled) {
+        if (filled.isEmpty() || !(filled.getItem() instanceof IHasContainer container)) return Optional.empty();
+        Item item = container.getContainerItem();
+        return item == null || item == Items.AIR ? Optional.empty() : Optional.of(item.getDefaultInstance());
     }
 
     public static void onCommonSetup(FMLCommonSetupEvent event) {

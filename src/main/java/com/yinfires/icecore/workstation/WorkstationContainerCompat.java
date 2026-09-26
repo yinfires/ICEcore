@@ -4,37 +4,66 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.yinfires.icecore.ICECore;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.item.BowlFoodItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.common.crafting.CraftingHelper;
+import net.minecraftforge.common.crafting.StrictNBTIngredient;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Mod.EventBusSubscriber(modid = ICECore.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class WorkstationContainerCompat {
     public enum Behavior { FLUID, INGREDIENT }
     public record Entry(ItemStack filled, ItemStack empty, String category, Behavior behavior, FluidStack fluid) {}
     public record FilledContainer(ItemStack stack, int amount, String category) {}
-    private static volatile List<Entry> configured = List.of();
+    private record ConfiguredEntry(Ingredient matcher, ItemStack template, Entry entry, int priority) {}
+
+    private static final TagKey<net.minecraft.world.item.Item> ICECORE_INGREDIENT_CONTAINER = itemTag("icecore", "ingredient_container");
+    private static final TagKey<net.minecraft.world.item.Item> ICECORE_BOWL_CONTAINER = itemTag("icecore", "bowl_container");
+    private static final TagKey<net.minecraft.world.item.Item> ICECORE_BOTTLE_CONTAINER = itemTag("icecore", "glass_bottle_container");
+    private static final TagKey<net.minecraft.world.item.Item> ICECORE_BUCKET_CONTAINER = itemTag("icecore", "bucket_container");
+    private static final TagKey<net.minecraft.world.item.Item> COOKERY_INGREDIENT_CONTAINER = itemTag("kaleidoscope_cookery", "ingredient_container");
+    private static final TagKey<net.minecraft.world.item.Item> COOKERY_BOWL_CONTAINER = itemTag("kaleidoscope_cookery", "bowl_container");
+    private static final TagKey<net.minecraft.world.item.Item> COOKERY_BOTTLE_CONTAINER = itemTag("kaleidoscope_cookery", "glass_bottle_container");
+    private static final TagKey<net.minecraft.world.item.Item> COOKERY_BUCKET_CONTAINER = itemTag("kaleidoscope_cookery", "bucket_container");
+    private static final int EMPTY_CONTAINER_CACHE_LIMIT = 512;
+    private static final int DISCOVERED_CONTAINER_LIMIT = 256;
+    private static volatile List<ConfiguredEntry> configured = List.of();
+    private static final List<ItemStack> discoveredEmptyContainers = new CopyOnWriteArrayList<>();
+    private static final Map<String, Optional<ItemStack>> emptyContainerCache = Collections.synchronizedMap(
+            new LinkedHashMap<>(64, 0.75f, true) {
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<String, Optional<ItemStack>> eldest) {
+                    return size() > EMPTY_CONTAINER_CACHE_LIMIT;
+                }
+            });
 
     private WorkstationContainerCompat() {}
 
@@ -44,8 +73,8 @@ public final class WorkstationContainerCompat {
 
     public static Optional<Entry> describe(ItemStack stack) {
         if (stack.isEmpty()) return Optional.empty();
-        for (Entry entry : configured) {
-            if (matchesTemplate(entry.filled(), stack)) return Optional.of(copyEntry(entry, stack));
+        for (ConfiguredEntry configuredEntry : configured) {
+            if (matches(configuredEntry, stack)) return Optional.of(copyEntry(configuredEntry.entry(), stack));
         }
         LazyOptional<net.minecraftforge.fluids.capability.IFluidHandlerItem> capability = FluidUtil.getFluidHandler(stack.copyWithCount(1));
         if (capability.isPresent()) {
@@ -63,26 +92,40 @@ public final class WorkstationContainerCompat {
                 }
             }
         }
-        ItemStack remainder = stack.getCraftingRemainingItem();
-        if (!remainder.isEmpty()) {
-            return Optional.of(new Entry(stack.copyWithCount(1), remainder.copyWithCount(1), categoryFor(remainder, 0),
-                    Behavior.INGREDIENT, FluidStack.EMPTY));
-        }
-        return Optional.empty();
+        return resolveEmptyContainer(stack).map(empty -> new Entry(stack.copyWithCount(1), empty,
+                categoryFor(empty, 0), Behavior.INGREDIENT, FluidStack.EMPTY));
+    }
+
+    public static Optional<ItemStack> resolveEmptyContainer(ItemStack filled) {
+        if (filled.isEmpty()) return Optional.empty();
+        String key = cacheKey(filled);
+        Optional<ItemStack> cached = emptyContainerCache.get(key);
+        if (cached != null) return cached.map(ItemStack::copy);
+        Optional<ItemStack> resolved = resolveEmptyContainerUncached(filled).map(stack -> stack.copyWithCount(1));
+        resolved.ifPresent(WorkstationContainerCompat::rememberEmptyContainer);
+        emptyContainerCache.put(key, resolved.map(ItemStack::copy));
+        return resolved.map(ItemStack::copy);
+    }
+
+    public static Ingredient resolveOutputCarrier(ItemStack result, Ingredient explicitCarrier) {
+        if (explicitCarrier != null && !explicitCarrier.isEmpty()) return explicitCarrier;
+        return resolveEmptyContainer(result).map(WorkstationContainerCompat::exactIngredient).orElse(Ingredient.EMPTY);
     }
 
     public static boolean isKnownEmptyContainer(ItemStack stack) {
         if (stack.isEmpty()) return false;
         if (stack.is(Items.BUCKET) || stack.is(Items.GLASS_BOTTLE) || stack.is(Items.BOWL)) return true;
-        for (Entry entry : configured) if (matchesTemplate(entry.empty(), stack)) return true;
+        if (stack.is(ICECORE_INGREDIENT_CONTAINER) || stack.is(COOKERY_INGREDIENT_CONTAINER)) return true;
+        for (ItemStack empty : discoveredEmptyContainers) if (matchesTemplate(empty, stack)) return true;
         return FluidUtil.getFluidHandler(stack.copyWithCount(1)).isPresent();
     }
 
     public static boolean isFluidContainer(ItemStack stack) {
         if (stack.isEmpty()) return false;
-        for (Entry entry : configured) {
+        for (ConfiguredEntry configuredEntry : configured) {
+            Entry entry = configuredEntry.entry();
             if (entry.behavior() == Behavior.FLUID
-                    && (matchesTemplate(entry.filled(), stack) || matchesTemplate(entry.empty(), stack))) return true;
+                    && (matches(configuredEntry, stack) || matchesTemplate(entry.empty(), stack))) return true;
         }
         return FluidUtil.getFluidHandler(stack.copyWithCount(1)).isPresent();
     }
@@ -93,7 +136,8 @@ public final class WorkstationContainerCompat {
 
     public static Optional<FilledContainer> fillContainer(ItemStack empty, FluidStack available) {
         if (empty.isEmpty() || available.isEmpty()) return Optional.empty();
-        for (Entry entry : configured) {
+        for (ConfiguredEntry configuredEntry : configured) {
+            Entry entry = configuredEntry.entry();
             if (entry.behavior() == Behavior.FLUID && matchesTemplate(entry.empty(), empty)
                     && entry.fluid().isFluidEqual(available) && available.getAmount() >= entry.fluid().getAmount()) {
                 return Optional.of(new FilledContainer(entry.filled().copy(), entry.fluid().getAmount(), entry.category()));
@@ -123,6 +167,52 @@ public final class WorkstationContainerCompat {
         return new Entry(actual.copyWithCount(1), entry.empty().copy(), entry.category(), entry.behavior(), entry.fluid().copy());
     }
 
+    private static Optional<ItemStack> resolveEmptyContainerUncached(ItemStack filled) {
+        for (ConfiguredEntry configuredEntry : configured) {
+            if (matches(configuredEntry, filled)) return Optional.of(configuredEntry.entry().empty().copy());
+        }
+        ItemStack remainder = filled.getCraftingRemainingItem();
+        if (!remainder.isEmpty()) return Optional.of(remainder);
+        Optional<ItemStack> fluidContainer = drainFluidContainer(filled);
+        if (fluidContainer.isPresent()) return fluidContainer;
+        if (ModList.get().isLoaded("kaleidoscope_cookery")) {
+            Optional<ItemStack> cookery = com.yinfires.icecore.compat.kaleidoscopecookery.KaleidoscopeCookeryCompat
+                    .resolveContainerItem(filled);
+            if (cookery.isPresent()) return cookery;
+        }
+        if (filled.getItem() instanceof BowlFoodItem || filled.is(ICECORE_BOWL_CONTAINER) || filled.is(COOKERY_BOWL_CONTAINER)) {
+            return Optional.of(Items.BOWL.getDefaultInstance());
+        }
+        if (filled.is(ICECORE_BOTTLE_CONTAINER) || filled.is(COOKERY_BOTTLE_CONTAINER) || filled.is(Items.POTION)) {
+            return Optional.of(Items.GLASS_BOTTLE.getDefaultInstance());
+        }
+        if (filled.is(ICECORE_BUCKET_CONTAINER) || filled.is(COOKERY_BUCKET_CONTAINER)) {
+            return Optional.of(Items.BUCKET.getDefaultInstance());
+        }
+        return Optional.empty();
+    }
+
+    private static Optional<ItemStack> drainFluidContainer(ItemStack filled) {
+        LazyOptional<net.minecraftforge.fluids.capability.IFluidHandlerItem> capability =
+                FluidUtil.getFluidHandler(filled.copyWithCount(1));
+        if (!capability.isPresent()) return Optional.empty();
+        var handler = capability.orElseThrow(IllegalStateException::new);
+        for (int tank = 0; tank < handler.getTanks(); tank++) {
+            FluidStack stored = handler.getFluidInTank(tank);
+            if (stored.isEmpty()) continue;
+            FluidStack drained = handler.drain(stored.getAmount(), IFluidHandler.FluidAction.EXECUTE);
+            ItemStack empty = handler.getContainer();
+            if (drained.getAmount() == stored.getAmount() && !empty.isEmpty()) {
+                return Optional.of(empty.copyWithCount(1));
+            }
+        }
+        return Optional.empty();
+    }
+
+    private static boolean matches(ConfiguredEntry entry, ItemStack actual) {
+        return !entry.template().isEmpty() ? matchesTemplate(entry.template(), actual) : entry.matcher().test(actual);
+    }
+
     private static boolean matchesTemplate(ItemStack template, ItemStack actual) {
         if (!template.is(actual.getItem())) return false;
         return !template.hasTag() || ItemStack.isSameItemSameTags(template, actual);
@@ -135,22 +225,46 @@ public final class WorkstationContainerCompat {
         return "container";
     }
 
+    private static void rememberEmptyContainer(ItemStack stack) {
+        ItemStack copy = stack.copyWithCount(1);
+        for (ItemStack known : discoveredEmptyContainers) if (matchesTemplate(known, copy)) return;
+        while (discoveredEmptyContainers.size() >= DISCOVERED_CONTAINER_LIMIT) discoveredEmptyContainers.remove(0);
+        discoveredEmptyContainers.add(copy);
+    }
+
+    private static String cacheKey(ItemStack stack) {
+        ResourceLocation id = BuiltInRegistries.ITEM.getKey(stack.getItem());
+        return id + "|" + (stack.hasTag() ? stack.getTag().toString() : "");
+    }
+
+    private static Ingredient exactIngredient(ItemStack stack) {
+        ItemStack exact = stack.copyWithCount(1);
+        return exact.hasTag() ? StrictNBTIngredient.of(exact) : Ingredient.of(exact);
+    }
+
+    private static TagKey<net.minecraft.world.item.Item> itemTag(String namespace, String path) {
+        return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(namespace, path));
+    }
+
     private static final class Loader extends SimpleJsonResourceReloadListener {
         private Loader() { super(new Gson(), "icecore/container_compat"); }
 
         @Override protected void apply(Map<ResourceLocation, JsonElement> objects, ResourceManager manager, ProfilerFiller profiler) {
-            List<Entry> next = new ArrayList<>();
+            List<ConfiguredEntry> next = new ArrayList<>();
             objects.entrySet().stream().sorted(Map.Entry.comparingByKey())
                     .forEach(value -> next.add(parse(value.getKey(), value.getValue().getAsJsonObject())));
-            next.sort(Comparator.comparing((Entry value) -> value.filled().hasTag()).reversed()
-                    .thenComparing(value -> BuiltInRegistries.ITEM.getKey(value.filled().getItem()).toString())
-                    .thenComparing(value -> value.filled().hasTag() ? value.filled().getTag().toString() : "")
-                    .thenComparing(value -> BuiltInRegistries.ITEM.getKey(value.empty().getItem()).toString()));
+            next.sort(Comparator.comparingInt(ConfiguredEntry::priority).reversed()
+                    .thenComparing(value -> value.template().isEmpty() ? value.matcher().toJson().toString()
+                            : BuiltInRegistries.ITEM.getKey(value.template().getItem()).toString())
+                    .thenComparing(value -> BuiltInRegistries.ITEM.getKey(value.entry().empty().getItem()).toString()));
             configured = List.copyOf(next);
+            discoveredEmptyContainers.clear();
+            next.forEach(value -> rememberEmptyContainer(value.entry().empty()));
+            emptyContainerCache.clear();
         }
 
-        private static Entry parse(ResourceLocation id, JsonObject json) {
-            ItemStack filled = parseStack(json.get("filled"), id);
+        private static ConfiguredEntry parse(ResourceLocation id, JsonObject json) {
+            ParsedMatcher filled = parseMatcher(json.get("filled"), id);
             ItemStack empty = parseStack(json.get("empty"), id);
             String category = json.has("category") ? json.get("category").getAsString() : categoryFor(empty, 0);
             Behavior behavior = json.has("behavior")
@@ -165,7 +279,18 @@ public final class WorkstationContainerCompat {
                     throw new IllegalArgumentException("Invalid fluid container entry " + id);
                 fluid = new FluidStack(registeredFluid, amount);
             }
-            return new Entry(filled, empty, category, behavior, fluid);
+            Entry entry = new Entry(filled.template(), empty, category, behavior, fluid);
+            return new ConfiguredEntry(filled.matcher(), filled.template(), entry, filled.priority());
+        }
+
+        private static ParsedMatcher parseMatcher(JsonElement element, ResourceLocation id) {
+            if (element.isJsonObject() && element.getAsJsonObject().has("tag")) {
+                Ingredient ingredient = Ingredient.fromJson(element);
+                if (ingredient.isEmpty()) throw new IllegalArgumentException("Empty container tag matcher in " + id);
+                return new ParsedMatcher(ingredient, ItemStack.EMPTY, 0);
+            }
+            ItemStack stack = parseStack(element, id);
+            return new ParsedMatcher(Ingredient.of(stack), stack, stack.hasTag() ? 2 : 1);
         }
 
         private static ItemStack parseStack(JsonElement element, ResourceLocation id) {
@@ -179,5 +304,7 @@ public final class WorkstationContainerCompat {
             }
             throw new IllegalArgumentException("Invalid container item in " + id);
         }
+
+        private record ParsedMatcher(Ingredient matcher, ItemStack template, int priority) {}
     }
 }

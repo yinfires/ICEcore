@@ -24,7 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class MixingBowlRecipe implements Recipe<Container> {
-    public record Result(ItemStack stack, Ingredient carrier) {}
+    public record Result(ItemStack stack, Ingredient carrier) {
+        public Ingredient effectiveCarrier() {
+            return WorkstationContainerCompat.resolveOutputCarrier(stack, carrier);
+        }
+    }
     public record FluidInput(FluidStack stack, ItemStack display) {
         public static final FluidInput EMPTY = new FluidInput(FluidStack.EMPTY, ItemStack.EMPTY);
         public boolean isEmpty() { return stack.isEmpty(); }

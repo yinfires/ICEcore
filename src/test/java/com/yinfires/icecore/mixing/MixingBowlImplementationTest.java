@@ -101,10 +101,40 @@ final class MixingBowlImplementationTest {
         assertTrue(block.contains("icecore.mixing.need_input_container"));
         assertTrue(compat.contains("Behavior.FLUID"));
         assertTrue(compat.contains("Behavior.INGREDIENT"));
-        assertTrue(compat.contains("stack.getCraftingRemainingItem()"));
+        assertTrue(compat.contains("filled.getCraftingRemainingItem()"));
+        assertTrue(compat.contains("instanceof BowlFoodItem"));
+        assertTrue(compat.contains("drainFluidContainer(filled)"));
+        assertTrue(compat.contains("kaleidoscope_cookery\", \"bowl_container"));
+        assertTrue(compat.contains("resolveContainerItem(filled)"));
+        assertTrue(compat.contains("StrictNBTIngredient.of(exact)"));
+        assertFalse(compat.contains("contains(\"bowl\")"));
+        assertFalse(compat.contains("contains(\"plate\")"));
+        assertFalse(compat.contains("contains(\"pot\")"));
         assertTrue(compat.contains("objects.entrySet().stream().sorted(Map.Entry.comparingByKey())"));
-        assertTrue(compat.contains("value.filled().hasTag()).reversed()"));
-        assertTrue(compat.contains("BuiltInRegistries.ITEM.getKey(value.filled().getItem()).toString()"));
+        assertTrue(compat.contains("Comparator.comparingInt(ConfiguredEntry::priority).reversed()"));
+        assertTrue(compat.contains("element.getAsJsonObject().has(\"tag\")"));
+        assertTrue(compat.contains("emptyContainerCache.clear()"));
+    }
+
+    @Test void outputCarriersPreferRecipeDeclarationsAndOtherwiseResolveSafely() throws IOException {
+        String recipe = read("src/main/java/com/yinfires/icecore/mixing/MixingBowlRecipe.java");
+        String entity = read("src/main/java/com/yinfires/icecore/mixing/MixingBowlBlockEntity.java");
+        String jei = read("src/main/java/com/yinfires/icecore/mixing/client/MixingBowlJeiPlugin.java");
+        String compat = read("src/main/java/com/yinfires/icecore/workstation/WorkstationContainerCompat.java");
+        assertTrue(recipe.contains("resolveOutputCarrier(stack, carrier)"));
+        assertTrue(compat.contains("if (explicitCarrier != null && !explicitCarrier.isEmpty()) return explicitCarrier"));
+        assertTrue(compat.contains("resolveEmptyContainer(result).map(WorkstationContainerCompat::exactIngredient)"));
+        assertTrue(entity.contains("carriers.set(i, results.get(i).effectiveCarrier())"));
+        assertTrue(entity.contains("resolveOutputCarrier(outputs.get(i), saved)"));
+        assertTrue(jei.contains("effectiveCarrier().getItems()"));
+    }
+
+    @Test void optionalCookeryContainerInterfaceIsGuardedByModPresence() throws IOException {
+        String compat = read("src/main/java/com/yinfires/icecore/workstation/WorkstationContainerCompat.java");
+        String cookery = read("src/main/java/com/yinfires/icecore/compat/kaleidoscopecookery/KaleidoscopeCookeryCompat.java");
+        assertTrue(compat.contains("ModList.get().isLoaded(\"kaleidoscope_cookery\")"));
+        assertTrue(cookery.contains("instanceof IHasContainer container"));
+        assertTrue(cookery.contains("container.getContainerItem()"));
     }
 
     @Test void heldItemsInsertUnlessTheyAreExplicitRetrievalContainers() throws IOException {
