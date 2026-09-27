@@ -1,5 +1,7 @@
 package com.yinfires.icecore;
 
+import com.yinfires.icecore.config.ICECoreConfig;
+import com.yinfires.icecore.config.ICECoreClientConfig;
 import com.yinfires.icecore.network.ICECoreNetwork;
 import com.yinfires.icecore.item.ModCreativeTabs;
 import com.yinfires.icecore.item.ModItems;
@@ -9,6 +11,8 @@ import com.yinfires.icecore.oven.ModOven;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 @Mod(ICECore.MOD_ID)
@@ -17,6 +21,8 @@ public final class ICECore {
 
     @SuppressWarnings("removal")
     public ICECore() {
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ICECoreConfig.SPEC, "icecore-common.toml");
+        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ICECoreClientConfig.SPEC, "icecore-client.toml");
         net.minecraftforge.common.ForgeMod.enableMilkFluid();
         ICECoreNetwork.register();
         com.yinfires.icecore.quest.objective.ObjectiveRegistry.bootstrap();

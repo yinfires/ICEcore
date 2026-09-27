@@ -115,5 +115,15 @@
   "icecore.mixing.need_input_container": "Use %s to retrieve the ingredient",
   "icecore.mixing.need_output_container": "Use %s to collect the result",
   "icecore.build.container_not_empty": "Remove all contents before dismantling",
-  "icecore.build.force_remove_confirm": "Forced dismantling clears all contents; Shift-right-click again to confirm"
+  "icecore.build.force_remove_confirm": "Forced dismantling clears all contents; Shift-right-click again to confirm",
+  "modmenu.nameTranslation.icecore": "ICEcore",
+  "modmenu.descriptionTranslation.icecore": "Core mod providing original content and mod compatibility for a custom map.",
+  "config.icecore.title": "ICEcore Configuration",
+  "config.icecore.food.category": "Food",
+  "config.icecore.food.disable_consumption": "Disable All Food Consumption",
+  "config.icecore.food.disable_consumption.tooltip": "Prevents players from consuming items that declare food properties without affecting potions, milk, tools, or other right-click uses.",
+  "config.icecore.food.disable_consumption.server_controlled": "This setting is controlled by the dedicated server. Ask the server owner to edit its configuration file.",
+  "config.icecore.food.enable_mod_compatibility": "Enable drink and skewer compatibility",
+  "config.icecore.interface.show_compatibility_details": "Show compatibility details",
+  "config.icecore.interface.show_compatibility_details.tooltip": "Shows the compatibility category in the ICEcore configuration screen."
 }

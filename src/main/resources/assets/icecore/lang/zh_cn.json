@@ -115,5 +115,15 @@
   "icecore.mixing.need_input_container": "请使用%s取出食材",
   "icecore.mixing.need_output_container": "请使用%s盛出成品",
   "icecore.build.container_not_empty": "有内容未取出，禁止拆除",
-  "icecore.build.force_remove_confirm": "强制拆除会清空容器内容，再次 Shift+右键确认拆除"
+  "icecore.build.force_remove_confirm": "强制拆除会清空容器内容，再次 Shift+右键确认拆除",
+  "modmenu.nameTranslation.icecore": "ICEcore",
+  "modmenu.descriptionTranslation.icecore": "为自定义地图提供原创内容与模组兼容功能的核心模组。",
+  "config.icecore.title": "ICEcore 配置",
+  "config.icecore.food.category": "食物",
+  "config.icecore.food.disable_consumption": "禁止食用所有食物",
+  "config.icecore.food.disable_consumption.tooltip": "阻止玩家食用所有声明了食物属性的物品，不影响药水、牛奶、工具或物品的其它右键用途。",
+  "config.icecore.food.disable_consumption.server_controlled": "当前状态由专用服务器控制，请由服主修改服务器配置文件。",
+  "config.icecore.food.enable_mod_compatibility": "启用饮料与烤串兼容识别",
+  "config.icecore.interface.show_compatibility_details": "显示兼容识别详情",
+  "config.icecore.interface.show_compatibility_details.tooltip": "在 ICEcore 配置界面显示饮料与烤串兼容识别说明。"
 }

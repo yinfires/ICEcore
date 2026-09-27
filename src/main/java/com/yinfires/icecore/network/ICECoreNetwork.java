@@ -4,6 +4,7 @@ import com.yinfires.icecore.ICECore;
 import com.yinfires.icecore.building.ClientBoundBuildingRulesPacket;
 import com.yinfires.icecore.compat.cozycafe.range.ClientBoundCozyCafeRangesPacket;
 import com.yinfires.icecore.currency.ClientBoundCurrencyPacket;
+import com.yinfires.icecore.food.ClientBoundFoodConsumptionConfigPacket;
 import com.yinfires.icecore.time.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -13,7 +14,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class ICECoreNetwork {
-    private static final String PROTOCOL_VERSION = "8";
+    private static final String PROTOCOL_VERSION = "9";
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             ResourceLocation.fromNamespaceAndPath(ICECore.MOD_ID, "main"),
             () -> PROTOCOL_VERSION,
@@ -97,6 +98,10 @@ public final class ICECoreNetwork {
         CHANNEL.messageBuilder(ClientBoundRecipeExemptPacket.class, 20, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(ClientBoundRecipeExemptPacket::encode).decoder(ClientBoundRecipeExemptPacket::new)
                 .consumerMainThread(ClientBoundRecipeExemptPacket::handle).add();
+        CHANNEL.messageBuilder(ClientBoundFoodConsumptionConfigPacket.class, 21, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(ClientBoundFoodConsumptionConfigPacket::encode)
+                .decoder(ClientBoundFoodConsumptionConfigPacket::new)
+                .consumerMainThread(ClientBoundFoodConsumptionConfigPacket::handle).add();
     }
 
     public static void sendToServer(ServerBoundAddMenuItemPacket packet) {
@@ -129,6 +134,7 @@ public final class ICECoreNetwork {
     public static void sendToPlayer(ClientBoundTutorialSyncPacket packet, ServerPlayer player){CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);}
     public static void sendToPlayer(ClientBoundRecipeHidePacket packet, ServerPlayer player){CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);}
     public static void sendToPlayer(ClientBoundRecipeExemptPacket packet, ServerPlayer player){CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);}
+    public static void sendToPlayer(ClientBoundFoodConsumptionConfigPacket packet, ServerPlayer player){CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);}
     public static void sendToServer(ServerBoundSetMarkPacket packet){CHANNEL.sendToServer(packet);}
     public static void sendToServer(ServerBoundMarkTutorialReadPacket packet){CHANNEL.sendToServer(packet);}
     public static void sendToServer(ServerBoundJournalClosedPacket packet){CHANNEL.sendToServer(packet);}
