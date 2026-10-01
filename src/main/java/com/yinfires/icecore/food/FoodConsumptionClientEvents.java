@@ -14,5 +14,6 @@ public final class FoodConsumptionClientEvents {
     @SubscribeEvent
     public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
         FoodConsumptionClientState.reset();
+        BlockedFoodUse.clear();
     }
 }

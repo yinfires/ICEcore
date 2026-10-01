@@ -35,4 +35,5 @@ public final class FoodConsumptionRules {
                 || className.endsWith("JuiceBucketItem")
                 || className.endsWith("BaseJuiceBucketItem");
     }
+
 }

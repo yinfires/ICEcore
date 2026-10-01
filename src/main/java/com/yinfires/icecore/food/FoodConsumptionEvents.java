@@ -28,6 +28,9 @@ public final class FoodConsumptionEvents {
         }
         if (FoodConsumptionRules.isFood(event.getItem(), player)) {
             event.setCanceled(true);
+            if (player.level().isClientSide) {
+                BlockedFoodUse.record(player, event.getItem());
+            }
         }
     }
 

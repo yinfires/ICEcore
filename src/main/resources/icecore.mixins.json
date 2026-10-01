@@ -44,6 +44,8 @@
     "ChunkRebuildTaskMixin",
     "BlockEntityRenderDispatcherMixin",
     "MultiPlayerGameModeMixin",
+    "FoodUseFeedbackMixin",
+    "FoodUseLocalPlayerMixin",
     "ClientBlockStateUseMixin",
     "PaladinFurnitureSpriteLoaderMixin",
     "EmbeddiumWorldSliceMixin",
