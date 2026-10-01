@@ -94,10 +94,10 @@ final class MixingBowlImplementationTest {
         String compat = read("src/main/java/com/yinfires/icecore/workstation/WorkstationContainerCompat.java");
         assertTrue(entity.contains("NonNullList.withSize(9, ItemStack.EMPTY)"));
         assertTrue(entity.contains("inputContainers.set(i, requiredContainer.copyWithCount(1))"));
-        assertTrue(entity.contains("WorkstationContainerCompat.emptyMatches(inputContainers.get(i), held)"));
+        assertTrue(entity.contains("WorkstationContainerInteraction.canTake(inputContainers.get(slot), held)"));
         assertTrue(entity.contains("tag.put(\"InputContainers\""));
         assertTrue(entity.contains("tag.putLongArray(\"InputSequence\""));
-        assertTrue(entity.contains("lastInputSlot(ItemStack held, boolean requireMatch)"));
+        assertTrue(entity.contains("lastInputSlot()"));
         assertTrue(block.contains("icecore.mixing.need_input_container"));
         assertTrue(compat.contains("Behavior.FLUID"));
         assertTrue(compat.contains("Behavior.INGREDIENT"));

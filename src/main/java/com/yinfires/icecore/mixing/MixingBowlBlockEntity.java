@@ -1,6 +1,8 @@
 package com.yinfires.icecore.mixing;
 
 import com.yinfires.icecore.workstation.WorkstationContainerCompat;
+import com.yinfires.icecore.workstation.WorkstationContainerInteraction;
+import com.yinfires.icecore.workstation.WorkstationItemOrder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -82,22 +84,22 @@ public final class MixingBowlBlockEntity extends BlockEntity implements Containe
 
     public ItemStack takeLastPlainInput() {
         if (stage != Stage.INPUT) return ItemStack.EMPTY;
-        int slot = lastInputSlot(ItemStack.EMPTY, false);
-        if (slot < 0 || !inputContainers.get(slot).isEmpty()) return ItemStack.EMPTY;
+        int slot = lastInputSlot();
+        if (slot < 0 || !WorkstationContainerInteraction.canTake(inputContainers.get(slot), ItemStack.EMPTY)) return ItemStack.EMPTY;
         ItemStack stack = inputs.get(slot);
         clearInputSlot(slot); changed(); return stack;
     }
 
     public ItemStack requiredLastInputContainer() {
         if (stage != Stage.INPUT) return ItemStack.EMPTY;
-        int slot = lastInputSlot(ItemStack.EMPTY, false);
+        int slot = lastInputSlot();
         return slot < 0 ? ItemStack.EMPTY : inputContainers.get(slot).copy();
     }
 
     public ItemStack takeContainerizedInput(ItemStack held) {
         if (stage != Stage.INPUT || held.isEmpty()) return ItemStack.EMPTY;
-        int slot = lastInputSlot(held, true);
-        if (slot >= 0) {
+        int slot = lastInputSlot();
+        if (slot >= 0 && WorkstationContainerInteraction.canTake(inputContainers.get(slot), held)) {
             ItemStack stack = inputs.get(slot);
             clearInputSlot(slot);
             changed();
@@ -193,14 +195,8 @@ public final class MixingBowlBlockEntity extends BlockEntity implements Containe
     private static void clear(NonNullList<ItemStack> stacks) { for(int i=0;i<stacks.size();i++) stacks.set(i,ItemStack.EMPTY); }
     private void clearInputSlot(int slot) { inputs.set(slot, ItemStack.EMPTY); inputContainers.set(slot, ItemStack.EMPTY); inputSequence[slot] = 0L; }
     private void clearInputSequence() { java.util.Arrays.fill(inputSequence, 0L); nextInputSequence = 1L; }
-    private int lastInputSlot(ItemStack held, boolean requireMatch) {
-        int found = -1; long newest = Long.MIN_VALUE;
-        for (int i = 0; i < inputs.size(); i++) {
-            if (inputs.get(i).isEmpty() || inputSequence[i] <= newest) continue;
-            if (requireMatch && !WorkstationContainerCompat.emptyMatches(inputContainers.get(i), held)) continue;
-            found = i; newest = inputSequence[i];
-        }
-        return found;
+    private int lastInputSlot() {
+        return WorkstationItemOrder.lastSlot(inputSequence, i -> !inputs.get(i).isEmpty());
     }
     @Override protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag); ContainerHelper.saveAllItems(tag, inputs);
@@ -233,16 +229,9 @@ public final class MixingBowlBlockEntity extends BlockEntity implements Containe
                     }
                 }
             }
-            long[] savedSequence = tag.getLongArray("InputSequence");
-            if (savedSequence.length == inputSequence.length) {
-                System.arraycopy(savedSequence, 0, inputSequence, 0, inputSequence.length);
-                nextInputSequence = Math.max(tag.getLong("NextInputSequence"),
-                        java.util.Arrays.stream(inputSequence).max().orElse(0L) + 1L);
-            } else {
-                long sequence = 1L;
-                for (int i = 0; i < inputs.size(); i++) if (!inputs.get(i).isEmpty()) inputSequence[i] = sequence++;
-                nextInputSequence = sequence;
-            }
+            nextInputSequence = WorkstationItemOrder.restore(inputSequence,
+                    tag.getLongArray("InputSequence"), tag.getLong("NextInputSequence"),
+                    i -> !inputs.get(i).isEmpty());
             if(tag.contains("Outputs")) ContainerHelper.loadAllItems(tag.getCompound("Outputs"),outputs);
             try { stage=Stage.valueOf(tag.getString("Stage")); } catch(Exception ignored){stage=Stage.INPUT;}
             stirringTicks=tag.getInt("Stirring"); progress=tag.getInt("Progress"); carriers.clear();

@@ -10,6 +10,11 @@ public final class WorkstationContainerInteraction {
 
     private WorkstationContainerInteraction() {}
 
+    public static boolean canTake(ItemStack required, ItemStack held) {
+        return WorkstationItemOrder.canTake(!required.isEmpty(), held.isEmpty(),
+                !required.isEmpty() && WorkstationContainerCompat.emptyMatches(required, held));
+    }
+
     public static ItemStack requiredEmptyContainer(ItemStack filled, FluidContainerMode mode) {
         return WorkstationContainerCompat.describe(filled)
                 .filter(entry -> mode == FluidContainerMode.STORED_AS_ITEM

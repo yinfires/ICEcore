@@ -33,7 +33,9 @@ final class OvenImplementationTest {
         assertFalse(block.contains("farmersdelight:stove"));
         assertTrue(block.contains("FluidContainerMode.STORED_AS_ITEM"));
         assertTrue(entity.contains("t.put(\"Containers\""));
-        assertTrue(entity.contains("containers.get(i).isEmpty()"));
+        assertTrue(entity.contains("WorkstationContainerInteraction.canTake(containers.get(i),held)"));
+        assertTrue(entity.contains("WorkstationItemOrder.lastSlot"));
+        assertFalse(entity.contains("takeLast(ItemStack held,boolean container)"));
         assertTrue(entity.contains("!OvenHeatSourceCompat.isHeatSource"));
         assertTrue(entity.contains("items.set(i,ItemStack.EMPTY);containers.set(i,ItemStack.EMPTY)"));
         assertTrue(entity.contains("Arrays.fill(sequence,0)"));
