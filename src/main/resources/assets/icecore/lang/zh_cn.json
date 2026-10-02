@@ -1,5 +1,7 @@
 {
   "item.icecore.wrench": "扳手",
+  "item.icecore.wheat_seed_bag": "小麦种子袋",
+  "item.icecore.carrot_seed_bag": "胡萝卜种子袋",
   "item.icecore.wrench.tooltip": "右键拆除物体",
   "itemGroup.icecore.main": "ICEcore",
   "pack.icecore.starcatcher_tide_compat": "ICEcore：捕星者 Tide 兼容修正",

@@ -1,5 +1,7 @@
 {
   "item.icecore.wrench": "Wrench",
+  "item.icecore.wheat_seed_bag": "Wheat Seed Bag",
+  "item.icecore.carrot_seed_bag": "Carrot Seed Bag",
   "item.icecore.wrench.tooltip": "Right-click to dismantle a block",
   "itemGroup.icecore.main": "ICEcore",
   "pack.icecore.starcatcher_tide_compat": "ICEcore: Starcatcher Tide Compatibility",
