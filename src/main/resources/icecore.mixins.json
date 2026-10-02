@@ -30,6 +30,7 @@
     ,"AdventureCarriedStackMixin"
     ,"AdventureMenuCloseMixin"
     ,"ServerLevelTimeMixin"
+    ,"ServerLevelRandomTickMixin"
     ,"TimeCommandMixin"
     ,"RecipeManagerMixin"
   ],
