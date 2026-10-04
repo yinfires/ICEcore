@@ -130,12 +130,16 @@ public final class QuestService {
         }
         markDirty(def);
         // Acquiring a new quest always becomes the tracked quest, per design.
-        playerData.setMarked(player.getUUID(), questId);
+        if (def.scope() == QuestScope.GLOBAL) {
+            for (ServerPlayer target : server.getPlayerList().getPlayers()) playerData.setMarked(target.getUUID(), questId);
+        } else {
+            playerData.setMarked(player.getUUID(), questId);
+        }
         runCommands(player, def.onAccept());
         if (def.autoComplete() && !def.hasObjectives()) {
             complete(player, questId);
         } else {
-            sync(player);
+            syncProgress(player, def);
         }
         return true;
     }
@@ -169,7 +173,7 @@ public final class QuestService {
         if (def.autoComplete() && allObjectivesMet(def, progress)) {
             complete(player, questId);
         } else {
-            sync(player);
+            syncProgress(player, def);
         }
         return true;
     }
@@ -211,8 +215,9 @@ public final class QuestService {
         if (questId.equals(playerData.marked(player.getUUID()))) {
             playerData.setMarked(player.getUUID(), null);
         }
+        if (def.scope() == QuestScope.GLOBAL) playerData.clearMarks(questId);
         runCommands(player, def.onComplete());
-        sync(player);
+        syncProgress(player, def);
         return true;
     }
 
@@ -266,8 +271,9 @@ public final class QuestService {
         if (removed) {
             markDirty(def);
         }
+        if (def.scope() == QuestScope.GLOBAL) unmarked |= playerData.clearMarks(questId);
         if (removed || unmarked) {
-            sync(player);
+            syncProgress(player, def);
         }
         return removed || unmarked;
     }
@@ -308,7 +314,7 @@ public final class QuestService {
                 continue;
             }
             QuestDefinition def = QuestDefinitionManager.INSTANCE.get(questId);
-            if (def == null) {
+            if (def == null || (def.scope() == QuestScope.GLOBAL) != (map == globalData.progress())) {
                 continue;
             }
             List<QuestObjective> objectives = def.objectives();
@@ -337,5 +343,27 @@ public final class QuestService {
 
     private static void sync(ServerPlayer player) {
         syncHook.syncPlayer(player);
+    }
+
+    private static void syncProgress(ServerPlayer player, QuestDefinition def) {
+        if (def.scope() == QuestScope.GLOBAL) {
+            for (ServerPlayer target : server.getPlayerList().getPlayers()) sync(target);
+        } else sync(player);
+    }
+
+    public static void reconcile() {
+        if (!isReady()) return;
+        QuestDefinitionManager.INSTANCE.all().values().forEach(def -> globalData.migrate(def, playerData));
+    }
+
+    public static void prepareLogin(ServerPlayer player) {
+        if (!isReady()) return;
+        ResourceLocation current = marked(player);
+        if (current != null && isActive(player, current)) return;
+        ResourceLocation fallback = QuestDefinitionManager.INSTANCE.all().values().stream()
+                .filter(def -> def.scope() == QuestScope.GLOBAL && isActive(player, def.id()))
+                .min(java.util.Comparator.comparingInt(QuestDefinition::order).thenComparing(def -> def.id().toString()))
+                .map(QuestDefinition::id).orElse(null);
+        playerData.setMarked(player.getUUID(), fallback);
     }
 }

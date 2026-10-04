@@ -63,7 +63,8 @@ public final class TutorialDefinitionManager extends SimpleJsonResourceReloadLis
                 images.add(com.yinfires.icecore.journal.JournalImage.parse(element));
             }
         }
-        return new TutorialDefinition(id, title, content, category, icon, order, images);
+        var scope = com.yinfires.icecore.quest.QuestScope.fromString(GsonHelper.getAsString(json, "scope", "global"));
+        return new TutorialDefinition(id, title, content, category, icon, order, scope, images);
     }
 
     @Nullable

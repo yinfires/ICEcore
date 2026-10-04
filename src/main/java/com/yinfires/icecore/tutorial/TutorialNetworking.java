@@ -2,11 +2,8 @@ package com.yinfires.icecore.tutorial;
 
 import com.yinfires.icecore.network.ClientBoundTutorialSyncPacket;
 import com.yinfires.icecore.network.ICECoreNetwork;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 
-import java.util.HashMap;
-import java.util.Map;
 
 /** Builds and sends the client tutorial snapshot (unlocked states). Installed as sync hook. */
 public final class TutorialNetworking {
@@ -21,7 +18,6 @@ public final class TutorialNetworking {
         if (!TutorialService.isReady()) {
             return;
         }
-        Map<ResourceLocation, TutorialState> states = new HashMap<>(TutorialService.data().statesFor(player.getUUID()));
-        ICECoreNetwork.sendToPlayer(new ClientBoundTutorialSyncPacket(states), player);
+        ICECoreNetwork.sendToPlayer(new ClientBoundTutorialSyncPacket(TutorialService.snapshot(player)), player);
     }
 }

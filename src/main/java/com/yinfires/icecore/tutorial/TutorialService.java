@@ -9,11 +9,12 @@ import java.util.UUID;
 /**
  * Server-authoritative tutorial API: unlock (LOCKED -> UNLOCKED_UNREAD) and mark read
  * (UNLOCKED_UNREAD -> UNLOCKED_READ). Opening a tutorial's detail in the UI marks it read.
- * State is per-player; pushes a client sync via the installed {@link TutorialSyncHook}.
+ * Unlocks follow definition scope; read state is always per-player.
  */
 public final class TutorialService {
     private static MinecraftServer server;
     private static TutorialPlayerData data;
+    private static TutorialGlobalData global;
     private static TutorialSyncHook syncHook = TutorialSyncHook.NOOP;
 
     private TutorialService() {
@@ -27,15 +28,18 @@ public final class TutorialService {
         server = value;
         data = value.overworld().getDataStorage()
                 .computeIfAbsent(TutorialPlayerData::load, TutorialPlayerData::new, TutorialPlayerData.ID);
+        global = value.overworld().getDataStorage()
+                .computeIfAbsent(TutorialGlobalData::load, TutorialGlobalData::new, TutorialGlobalData.ID);
     }
 
     public static void stop() {
         server = null;
         data = null;
+        global = null;
     }
 
     public static boolean isReady() {
-        return server != null && data != null;
+        return server != null && data != null && global != null;
     }
 
     public static TutorialPlayerData data() {
@@ -43,7 +47,11 @@ public final class TutorialService {
     }
 
     public static TutorialState state(ServerPlayer player, ResourceLocation tutorial) {
-        return isReady() ? data.state(player.getUUID(), tutorial) : TutorialState.LOCKED;
+        if (!isReady()) return TutorialState.LOCKED;
+        TutorialDefinition def = TutorialDefinitionManager.INSTANCE.get(tutorial);
+        if (def == null) return TutorialState.LOCKED;
+        return def.scope() == com.yinfires.icecore.quest.QuestScope.GLOBAL
+                ? global.state(data, player.getUUID(), tutorial) : data.state(player.getUUID(), tutorial);
     }
 
     /** Unlocks a tutorial with a NEW badge if it is currently LOCKED. */
@@ -52,6 +60,11 @@ public final class TutorialService {
             return false;
         }
         UUID id = player.getUUID();
+        if (isGlobal(tutorial)) {
+            boolean changed = global.unlock(tutorial);
+            if (changed) syncAll();
+            return changed;
+        }
         if (data.state(id, tutorial) != TutorialState.LOCKED) {
             return false;
         }
@@ -66,10 +79,11 @@ public final class TutorialService {
             return false;
         }
         UUID id = player.getUUID();
-        if (data.state(id, tutorial) != TutorialState.UNLOCKED_UNREAD) {
+        if (state(player, tutorial) != TutorialState.UNLOCKED_UNREAD) {
             return false;
         }
-        data.setState(id, tutorial, TutorialState.UNLOCKED_READ);
+        if (isGlobal(tutorial)) data.markGlobalRead(id, tutorial, global.generation(tutorial));
+        else data.setState(id, tutorial, TutorialState.UNLOCKED_READ);
         sync(player);
         return true;
     }
@@ -78,6 +92,11 @@ public final class TutorialService {
     public static boolean reset(ServerPlayer player, ResourceLocation tutorial) {
         if (!isReady()) {
             return false;
+        }
+        if (isGlobal(tutorial)) {
+            boolean changed = global.reset(tutorial);
+            if (changed) syncAll();
+            return changed;
         }
         boolean changed = data.setState(player.getUUID(), tutorial, TutorialState.LOCKED);
         if (changed) {
@@ -91,11 +110,34 @@ public final class TutorialService {
             return;
         }
         data.statesFor(player.getUUID()).clear();
+        data.clearGlobalReads(player.getUUID());
         data.setDirty();
         sync(player);
     }
 
     private static void sync(ServerPlayer player) {
         syncHook.syncPlayer(player);
+    }
+
+    private static boolean isGlobal(ResourceLocation id) {
+        TutorialDefinition def = TutorialDefinitionManager.INSTANCE.get(id);
+        return def != null && def.scope() == com.yinfires.icecore.quest.QuestScope.GLOBAL;
+    }
+
+    private static void syncAll() {
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) sync(player);
+    }
+
+    public static void reconcile() {
+        if (isReady()) TutorialDefinitionManager.INSTANCE.all().values().forEach(def -> global.migrate(def, data));
+    }
+
+    public static java.util.Map<ResourceLocation, TutorialState> snapshot(ServerPlayer player) {
+        java.util.Map<ResourceLocation, TutorialState> result = new java.util.HashMap<>();
+        for (ResourceLocation id : TutorialDefinitionManager.INSTANCE.ids()) {
+            TutorialState state = state(player, id);
+            if (state != TutorialState.LOCKED) result.put(id, state);
+        }
+        return result;
     }
 }

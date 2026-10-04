@@ -14,6 +14,23 @@ public final class TutorialPlayerData extends SavedData {
     public static final String ID = "icecore_tutorial_players";
 
     private final Map<UUID, Map<ResourceLocation, TutorialState>> states = new HashMap<>();
+    private final Map<UUID, Map<ResourceLocation, Long>> readGenerations = new HashMap<>();
+
+    public Map<UUID, Map<ResourceLocation, TutorialState>> allStates() { return states; }
+
+    public boolean isRead(UUID player, ResourceLocation tutorial, long generation) {
+        return readGenerations.getOrDefault(player, Map.of()).getOrDefault(tutorial, 0L) == generation;
+    }
+
+    public void markGlobalRead(UUID player, ResourceLocation tutorial, long generation) {
+        readGenerations.computeIfAbsent(player, key -> new HashMap<>()).put(tutorial, generation);
+        statesFor(player); // Ensure readers without personal tutorials are serialized too.
+        setDirty();
+    }
+
+    public void clearGlobalReads(UUID player) {
+        if (readGenerations.remove(player) != null) setDirty();
+    }
 
     public Map<ResourceLocation, TutorialState> statesFor(UUID player) {
         return states.computeIfAbsent(player, key -> new HashMap<>());
@@ -59,6 +76,14 @@ public final class TutorialPlayerData extends SavedData {
                 }
             }
             data.states.put(id, map);
+            Map<ResourceLocation, Long> reads = new HashMap<>();
+            ListTag readTags = entry.getList("GlobalReads", 10);
+            for (int r = 0; r < readTags.size(); r++) {
+                CompoundTag read = readTags.getCompound(r);
+                ResourceLocation tutorial = ResourceLocation.tryParse(read.getString("Id"));
+                if (tutorial != null) reads.put(tutorial, read.getLong("Generation"));
+            }
+            data.readGenerations.put(id, reads);
         }
         return data;
     }
@@ -77,6 +102,14 @@ public final class TutorialPlayerData extends SavedData {
                 tutorials.add(tutorialTag);
             });
             entry.put("Tutorials", tutorials);
+            ListTag reads = new ListTag();
+            readGenerations.getOrDefault(playerId, Map.of()).forEach((id, generation) -> {
+                CompoundTag read = new CompoundTag();
+                read.putString("Id", id.toString());
+                read.putLong("Generation", generation);
+                reads.add(read);
+            });
+            entry.put("GlobalReads", reads);
             players.add(entry);
         });
         tag.put("Players", players);

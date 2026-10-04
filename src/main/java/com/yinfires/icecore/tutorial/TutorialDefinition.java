@@ -14,7 +14,7 @@ import java.util.List;
  */
 public record TutorialDefinition(ResourceLocation id, JournalText title, JournalText content,
                                  @Nullable ResourceLocation category, @Nullable ResourceLocation icon,
-                                 int order, List<JournalImage> images) {
+                                 int order, com.yinfires.icecore.quest.QuestScope scope, List<JournalImage> images) {
 
     public TutorialDefinition {
         images = List.copyOf(images);

@@ -25,11 +25,11 @@ public final class QuestCommands {
     public static void attach(LiteralArgumentBuilder<CommandSourceStack> root) {
         var quest = literal("quest");
         quest.then(literal("acquire").then(questArg().executes(ctx -> forEach(ctx, (player, id) -> QuestService.acquire(player, id)))
-                .then(targetsArg(ctx -> forEachTarget(ctx, (player, id) -> QuestService.acquire(player, id))))));
+                .then(targetsArg(ctx -> forEachTarget(ctx, (player, id) -> QuestService.acquire(player, id), true)))));
         quest.then(literal("complete").then(questArg().executes(ctx -> forEach(ctx, (player, id) -> QuestService.complete(player, id)))
-                .then(targetsArg(ctx -> forEachTarget(ctx, (player, id) -> QuestService.complete(player, id))))));
+                .then(targetsArg(ctx -> forEachTarget(ctx, (player, id) -> QuestService.complete(player, id), true)))));
         quest.then(literal("mark").then(questArg().executes(ctx -> forEach(ctx, (player, id) -> QuestService.setMarked(player, id)))
-                .then(targetsArg(ctx -> forEachTarget(ctx, (player, id) -> QuestService.setMarked(player, id))))));
+                .then(targetsArg(ctx -> forEachTarget(ctx, (player, id) -> QuestService.setMarked(player, id), false)))));
         quest.then(literal("unmark").executes(ctx -> {
             ServerPlayer self = ctx.getSource().getPlayerOrException();
             return QuestService.setMarked(self, null) ? 1 : 0;
@@ -46,7 +46,7 @@ public final class QuestCommands {
                 .then(argument("index", IntegerArgumentType.integer(0))
                         .then(argument("count", IntegerArgumentType.integer(0)).executes(QuestCommands::progressSelf)))));
         quest.then(literal("reset").then(questArg().executes(ctx -> forEach(ctx, (player, id) -> QuestService.reset(player, id)))
-                .then(targetsArg(ctx -> forEachTarget(ctx, (player, id) -> QuestService.reset(player, id))))));
+                .then(targetsArg(ctx -> forEachTarget(ctx, (player, id) -> QuestService.reset(player, id), true)))));
         root.then(quest);
     }
 
@@ -70,7 +70,7 @@ public final class QuestCommands {
         return action.run(self, id) ? 1 : 0;
     }
 
-    private static int forEachTarget(CommandContext<CommandSourceStack> ctx, QuestAction action) throws CommandSyntaxException {
+    private static int forEachTarget(CommandContext<CommandSourceStack> ctx, QuestAction action, boolean shared) throws CommandSyntaxException {
         ResourceLocation id = ResourceLocationArgument.getId(ctx, "quest");
         Collection<ServerPlayer> targets = EntityArgument.getPlayers(ctx, "targets");
         int success = 0;
@@ -78,6 +78,8 @@ public final class QuestCommands {
             if (action.run(player, id)) {
                 success++;
             }
+            QuestDefinition def = QuestDefinitionManager.INSTANCE.get(id);
+            if (def != null && def.scope() == QuestScope.GLOBAL && shared) break;
         }
         return success;
     }

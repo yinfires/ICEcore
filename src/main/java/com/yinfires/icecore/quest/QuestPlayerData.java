@@ -22,6 +22,14 @@ public final class QuestPlayerData extends SavedData {
     private final Map<UUID, Map<ResourceLocation, QuestProgress>> progress = new HashMap<>();
     private final Map<UUID, ResourceLocation> marked = new HashMap<>();
 
+    public Map<UUID, Map<ResourceLocation, QuestProgress>> allProgress() { return progress; }
+
+    public boolean clearMarks(ResourceLocation quest) {
+        boolean changed = marked.entrySet().removeIf(entry -> quest.equals(entry.getValue()));
+        if (changed) setDirty();
+        return changed;
+    }
+
     public Map<ResourceLocation, QuestProgress> progressFor(UUID player) {
         return progress.computeIfAbsent(player, key -> new HashMap<>());
     }
@@ -41,6 +49,7 @@ public final class QuestPlayerData extends SavedData {
             marked.remove(player);
         } else {
             marked.put(player, questId);
+            progressFor(player); // A player tracking only global quests still needs a saved entry.
         }
         setDirty();
         return true;

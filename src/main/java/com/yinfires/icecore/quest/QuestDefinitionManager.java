@@ -60,7 +60,7 @@ public final class QuestDefinitionManager extends SimpleJsonResourceReloadListen
         ResourceLocation category = optionalId(json, "category");
         ResourceLocation icon = optionalId(json, "icon");
         int order = GsonHelper.getAsInt(json, "order", 0);
-        QuestScope scope = QuestScope.fromString(GsonHelper.getAsString(json, "scope", "player"));
+        QuestScope scope = QuestScope.fromString(GsonHelper.getAsString(json, "scope", "global"));
         boolean repeatable = GsonHelper.getAsBoolean(json, "repeatable", false);
         boolean autoUnlock = GsonHelper.getAsBoolean(json, "auto_unlock_on_prereq", false);
         boolean autoComplete = GsonHelper.getAsBoolean(json, "auto_complete", true);

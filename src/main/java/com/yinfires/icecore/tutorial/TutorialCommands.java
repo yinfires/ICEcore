@@ -25,15 +25,15 @@ public final class TutorialCommands {
         tutorial.then(literal("unlock").then(tutorialArg()
                 .executes(ctx -> forEach(ctx, TutorialService::unlock))
                 .then(argument("targets", EntityArgument.players())
-                        .executes(ctx -> forEachTarget(ctx, TutorialService::unlock)))));
+                        .executes(ctx -> forEachTarget(ctx, TutorialService::unlock, true)))));
         tutorial.then(literal("read").then(tutorialArg()
                 .executes(ctx -> forEach(ctx, TutorialService::markRead))
                 .then(argument("targets", EntityArgument.players())
-                        .executes(ctx -> forEachTarget(ctx, TutorialService::markRead)))));
+                        .executes(ctx -> forEachTarget(ctx, TutorialService::markRead, false)))));
         tutorial.then(literal("reset").then(tutorialArg()
                 .executes(ctx -> forEach(ctx, TutorialService::reset))
                 .then(argument("targets", EntityArgument.players())
-                        .executes(ctx -> forEachTarget(ctx, TutorialService::reset)))));
+                        .executes(ctx -> forEachTarget(ctx, TutorialService::reset, true)))));
         root.then(tutorial);
     }
 
@@ -52,7 +52,7 @@ public final class TutorialCommands {
         return action.run(self, id) ? 1 : 0;
     }
 
-    private static int forEachTarget(CommandContext<CommandSourceStack> ctx, TutorialAction action) throws CommandSyntaxException {
+    private static int forEachTarget(CommandContext<CommandSourceStack> ctx, TutorialAction action, boolean shared) throws CommandSyntaxException {
         ResourceLocation id = ResourceLocationArgument.getId(ctx, "tutorial");
         Collection<ServerPlayer> targets = EntityArgument.getPlayers(ctx, "targets");
         int success = 0;
@@ -60,6 +60,9 @@ public final class TutorialCommands {
             if (action.run(player, id)) {
                 success++;
             }
+            TutorialDefinition def = TutorialDefinitionManager.INSTANCE.get(id);
+            if (def != null && def.scope() == com.yinfires.icecore.quest.QuestScope.GLOBAL
+                    && shared) break;
         }
         return success;
     }

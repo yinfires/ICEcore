@@ -32,6 +32,7 @@ public final class JournalEvents {
     public static void onServerStarting(ServerStartingEvent event) {
         QuestService.start(event.getServer());
         TutorialService.start(event.getServer());
+        reconcileAndSync(event.getServer());
     }
 
     @SubscribeEvent
@@ -43,6 +44,22 @@ public final class JournalEvents {
     @SubscribeEvent
     public static void onLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
+            QuestService.prepareLogin(player);
+            QuestNetworking.syncPlayer(player);
+            TutorialNetworking.syncPlayer(player);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onDatapackSync(net.minecraftforge.event.OnDatapackSyncEvent event) {
+        if (event.getPlayer() == null) reconcileAndSync(event.getPlayerList().getServer());
+    }
+
+    private static void reconcileAndSync(net.minecraft.server.MinecraftServer server) {
+        QuestService.reconcile();
+        TutorialService.reconcile();
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+            QuestService.prepareLogin(player);
             QuestNetworking.syncPlayer(player);
             TutorialNetworking.syncPlayer(player);
         }
