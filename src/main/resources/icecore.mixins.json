@@ -33,6 +33,14 @@
     ,"ServerLevelRandomTickMixin"
     ,"TimeCommandMixin"
     ,"RecipeManagerMixin"
+    ,"BushBlockSeedBagFarmlandMixin"
+    ,"FarmBlockUntilledDirtMixin"
+    ,"BlockStateSoilRemovedMixin"
+    ,"SeedBagCompatDewFarmlandMixin"
+    ,"SeedBagCompatDewGrowthMixin"
+    ,"SeedBagCompatRiceMixin"
+    ,"SeedBagCompatTeaMixin"
+    ,"SeedBagCompatEggplantMixin"
   ],
   "client": [
     "GeckoLibKeyframeMixin",

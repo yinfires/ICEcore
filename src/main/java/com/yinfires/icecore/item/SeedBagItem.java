@@ -1,15 +1,11 @@
 package com.yinfires.icecore.item;
 
-import net.minecraft.core.BlockPos;
+import com.yinfires.icecore.farming.SeedBagCrops;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.FarmBlock;
-import net.minecraft.world.level.block.state.BlockState;
 
-/** A crop-specific replacement for direct vanilla seed planting. */
+/** A crop-specific replacement for direct seed planting. Players plant through SeedBagFarmingEvents. */
 public final class SeedBagItem extends Item {
     private final SeedBagDefinition definition;
 
@@ -24,17 +20,7 @@ public final class SeedBagItem extends Item {
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
-        Level level = context.getLevel();
-        BlockPos farmlandPos = context.getClickedPos();
-        BlockState farmland = level.getBlockState(farmlandPos);
-        BlockPos cropPos = farmlandPos.above();
-        if (!(farmland.getBlock() instanceof FarmBlock) || !level.getBlockState(cropPos).isAir()) {
-            return InteractionResult.PASS;
-        }
-        if (!level.isClientSide) {
-            level.setBlock(cropPos, definition.cropBlock().defaultBlockState(), 3);
-            context.getItemInHand().shrink(1);
-        }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return SeedBagCrops.plant(context.getLevel(), context.getPlayer(), context.getHand(),
+                context.getClickedPos(), definition, context.getItemInHand());
     }
 }

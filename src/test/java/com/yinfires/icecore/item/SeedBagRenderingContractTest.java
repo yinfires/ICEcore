@@ -19,6 +19,22 @@ final class SeedBagRenderingContractTest {
     void itemModelsTemporarilyUseTheirProduceTextures() throws IOException {
         assertGeneratedModel("wheat_seed_bag.json", "minecraft:item/wheat");
         assertGeneratedModel("carrot_seed_bag.json", "minecraft:item/carrot");
+        assertGeneratedModel("potato_seed_bag.json", "minecraft:item/potato");
+        assertGeneratedModel("beetroot_seed_bag.json", "minecraft:item/beetroot");
+        assertGeneratedModel("soybean_seed_bag.json", "youkaisfeasts:item/crops/soybean");
+        assertGeneratedModel("redbean_seed_bag.json", "youkaisfeasts:item/crops/redbean");
+        assertGeneratedModel("strawberry_seed_bag.json", "farm_and_charm:item/strawberry");
+        assertGeneratedModel("corn_seed_bag.json", "farm_and_charm:item/corn");
+        assertGeneratedModel("sweet_potato_seed_bag.json", "kaleidoscope_grilling:item/sweet_potato");
+        assertGeneratedModel("houttuynia_seed_bag.json", "kaleidoscope_grilling:item/houttuynia");
+        assertGeneratedModel("tomato_seed_bag.json", "kaleidoscope_cookery:item/tomato");
+        assertGeneratedModel("chili_seed_bag.json", "kaleidoscope_cookery:item/red_chili");
+        assertGeneratedModel("eggplant_seed_bag.json", "kaleidoscope_chinesefood:item/eggplant");
+        assertGeneratedModel("onion_seed_bag.json", "farmersdelight:item/onion");
+        assertGeneratedModel("cucumber_seed_bag.json", "youkaisfeasts:item/crops/cucumber");
+        assertGeneratedModel("rice_seed_bag.json", "farmersdelight:item/rice");
+        assertGeneratedModel("tea_seed_bag.json", "youkaisfeasts:item/crops/tea_leaves");
+        assertGeneratedModel("lime_seed_bag.json", "collectorsreap:item/lime");
         assertFalse(Files.exists(TEXTURE_ROOT.resolve("seed_bag.png")));
     }
 

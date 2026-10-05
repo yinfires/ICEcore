@@ -17,8 +17,8 @@ public final class ModCreativeTabs {
             .icon(() -> new ItemStack(ModItems.WRENCH.get()))
             .displayItems((parameters, output) -> {
                 output.accept(ModItems.WRENCH.get());
-                output.accept(ModItems.WHEAT_SEED_BAG.get());
-                output.accept(ModItems.CARROT_SEED_BAG.get());
+                ModItems.SEED_BAGS.values().forEach(bag -> output.accept(bag.get()));
+                output.accept(com.yinfires.icecore.farming.ModFarming.UNTILLED_DIRT_ITEM.get());
                 output.accept(com.yinfires.icecore.mixing.ModMixing.MIXING_BOWL_ITEM.get());
                 output.accept(com.yinfires.icecore.oven.ModOven.OVEN_ITEM.get());
             })

@@ -14,7 +14,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class ICECoreNetwork {
-    private static final String PROTOCOL_VERSION = "9";
+    private static final String PROTOCOL_VERSION = "10";
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             ResourceLocation.fromNamespaceAndPath(ICECore.MOD_ID, "main"),
             () -> PROTOCOL_VERSION,
@@ -102,6 +102,9 @@ public final class ICECoreNetwork {
                 .encoder(ClientBoundFoodConsumptionConfigPacket::encode)
                 .decoder(ClientBoundFoodConsumptionConfigPacket::new)
                 .consumerMainThread(ClientBoundFoodConsumptionConfigPacket::handle).add();
+        CHANNEL.messageBuilder(ServerBoundHoeBreakCropPacket.class, 22, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(ServerBoundHoeBreakCropPacket::encode).decoder(ServerBoundHoeBreakCropPacket::new)
+                .consumerMainThread(ServerBoundHoeBreakCropPacket::handle).add();
     }
 
     public static void sendToServer(ServerBoundAddMenuItemPacket packet) {
@@ -138,6 +141,7 @@ public final class ICECoreNetwork {
     public static void sendToServer(ServerBoundSetMarkPacket packet){CHANNEL.sendToServer(packet);}
     public static void sendToServer(ServerBoundMarkTutorialReadPacket packet){CHANNEL.sendToServer(packet);}
     public static void sendToServer(ServerBoundJournalClosedPacket packet){CHANNEL.sendToServer(packet);}
+    public static void sendToServer(ServerBoundHoeBreakCropPacket packet){CHANNEL.sendToServer(packet);}
 
     /** Broadcasts an island entrance cutscene to every player in the given dimension. */
     public static void sendToDimension(com.yinfires.icecore.island.ClientBoundIslandEntrancePacket packet,
