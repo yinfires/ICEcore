@@ -31,6 +31,7 @@ final class SeedBagRenderingContractTest {
         assertGeneratedModel("chili_seed_bag.json", "kaleidoscope_cookery:item/red_chili");
         assertGeneratedModel("eggplant_seed_bag.json", "kaleidoscope_chinesefood:item/eggplant");
         assertGeneratedModel("onion_seed_bag.json", "farmersdelight:item/onion");
+        assertGeneratedModel("cabbage_seed_bag.json", "farmersdelight:item/cabbage");
         assertGeneratedModel("cucumber_seed_bag.json", "youkaisfeasts:item/crops/cucumber");
         assertGeneratedModel("rice_seed_bag.json", "farmersdelight:item/rice");
         assertGeneratedModel("tea_seed_bag.json", "youkaisfeasts:item/crops/tea_leaves");

@@ -34,6 +34,7 @@ final class SeedBagFarmingContractTest {
             new String[]{"houttuynia", "kaleidoscope_grilling:houttuynia_crop"},
             new String[]{"tomato", "kaleidoscope_cookery:tomato_crop"}, new String[]{"chili", "kaleidoscope_cookery:chili_crop"},
             new String[]{"eggplant", "kaleidoscope_chinesefood:eggplant_crop"}, new String[]{"onion", "farmersdelight:onions"},
+            new String[]{"cabbage", "farmersdelight:cabbages"},
             new String[]{"cucumber", "youkaisfeasts:cucumber"}, new String[]{"rice", "farmersdelight:rice"},
             new String[]{"tea", "youkaisfeasts:tea"}, new String[]{"lime", "collectorsreap:lime_bush"});
 

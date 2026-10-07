@@ -14,6 +14,7 @@
   "item.icecore.chili_seed_bag": "辣椒种子袋",
   "item.icecore.eggplant_seed_bag": "茄子种子袋",
   "item.icecore.onion_seed_bag": "洋葱种子袋",
+  "item.icecore.cabbage_seed_bag": "卷心菜种子袋",
   "item.icecore.cucumber_seed_bag": "黄瓜种子袋",
   "item.icecore.rice_seed_bag": "稻米种子袋",
   "item.icecore.tea_seed_bag": "茶树种子袋",
@@ -147,3 +148,5 @@
   "config.icecore.interface.show_compatibility_details": "显示兼容识别详情",
   "config.icecore.interface.show_compatibility_details.tooltip": "在 ICEcore 配置界面显示饮料与烤串兼容识别说明。"
 }
+
+

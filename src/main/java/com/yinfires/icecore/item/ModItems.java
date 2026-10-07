@@ -37,6 +37,7 @@ public final class ModItems {
                     "kaleidoscope_cookery:red_chili", "kaleidoscope_cookery:green_chili"),
             single("eggplant", "kaleidoscope_chinesefood:eggplant_crop", 7, "kaleidoscope_chinesefood:eggplant"),
             single("onion", "farmersdelight:onions", 7, "farmersdelight:onion"),
+            single("cabbage", "farmersdelight:cabbages", 7, "farmersdelight:cabbage"),
             new SeedBagDefinition("cucumber", id("youkaisfeasts:cucumber"), null,
                     List.of(id("youkaisfeasts:cucumber")), Shape.CLIMBING, 7, false),
             new SeedBagDefinition("rice", id("farmersdelight:rice"), id("farmersdelight:rice_panicles"),

@@ -14,6 +14,7 @@
   "item.icecore.chili_seed_bag": "Chili Seed Bag",
   "item.icecore.eggplant_seed_bag": "Eggplant Seed Bag",
   "item.icecore.onion_seed_bag": "Onion Seed Bag",
+  "item.icecore.cabbage_seed_bag": "Cabbage Seed Bag",
   "item.icecore.cucumber_seed_bag": "Cucumber Seed Bag",
   "item.icecore.rice_seed_bag": "Rice Seed Bag",
   "item.icecore.tea_seed_bag": "Tea Seed Bag",
@@ -147,3 +148,5 @@
   "config.icecore.interface.show_compatibility_details": "Show compatibility details",
   "config.icecore.interface.show_compatibility_details.tooltip": "Shows the compatibility category in the ICEcore configuration screen."
 }
+
+
