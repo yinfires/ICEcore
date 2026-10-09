@@ -1,1 +1,1 @@
-{"parent":"minecraft:item/generated","textures":{"layer0":"minecraft:item/potato"}}
+{"parent":"minecraft:item/generated","textures":{"layer0":"icecore:item/potato_seed_bag"}}

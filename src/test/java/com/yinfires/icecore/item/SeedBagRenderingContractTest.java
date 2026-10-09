@@ -16,26 +16,26 @@ final class SeedBagRenderingContractTest {
     private static final Path TEXTURE_ROOT = Path.of("src/main/resources/assets/icecore/textures/item");
 
     @Test
-    void itemModelsTemporarilyUseTheirProduceTextures() throws IOException {
-        assertGeneratedModel("wheat_seed_bag.json", "minecraft:item/wheat");
-        assertGeneratedModel("carrot_seed_bag.json", "minecraft:item/carrot");
-        assertGeneratedModel("potato_seed_bag.json", "minecraft:item/potato");
-        assertGeneratedModel("beetroot_seed_bag.json", "minecraft:item/beetroot");
-        assertGeneratedModel("soybean_seed_bag.json", "youkaisfeasts:item/crops/soybean");
-        assertGeneratedModel("redbean_seed_bag.json", "youkaisfeasts:item/crops/redbean");
-        assertGeneratedModel("strawberry_seed_bag.json", "farm_and_charm:item/strawberry");
-        assertGeneratedModel("corn_seed_bag.json", "farm_and_charm:item/corn");
-        assertGeneratedModel("sweet_potato_seed_bag.json", "kaleidoscope_grilling:item/sweet_potato");
-        assertGeneratedModel("houttuynia_seed_bag.json", "kaleidoscope_grilling:item/houttuynia");
-        assertGeneratedModel("tomato_seed_bag.json", "kaleidoscope_cookery:item/tomato");
-        assertGeneratedModel("chili_seed_bag.json", "kaleidoscope_cookery:item/red_chili");
-        assertGeneratedModel("eggplant_seed_bag.json", "kaleidoscope_chinesefood:item/eggplant");
-        assertGeneratedModel("onion_seed_bag.json", "farmersdelight:item/onion");
-        assertGeneratedModel("cabbage_seed_bag.json", "farmersdelight:item/cabbage");
-        assertGeneratedModel("cucumber_seed_bag.json", "youkaisfeasts:item/crops/cucumber");
-        assertGeneratedModel("rice_seed_bag.json", "farmersdelight:item/rice");
-        assertGeneratedModel("tea_seed_bag.json", "youkaisfeasts:item/crops/tea_leaves");
-        assertGeneratedModel("lime_seed_bag.json", "collectorsreap:item/lime");
+    void itemModelsUseTheirDedicatedSeedBagTextures() throws IOException {
+        assertGeneratedModel("wheat_seed_bag.json", "icecore:item/wheat_seed_bag");
+        assertGeneratedModel("carrot_seed_bag.json", "icecore:item/carrot_seed_bag");
+        assertGeneratedModel("potato_seed_bag.json", "icecore:item/potato_seed_bag");
+        assertGeneratedModel("beetroot_seed_bag.json", "icecore:item/beetroot_seed_bag");
+        assertGeneratedModel("soybean_seed_bag.json", "icecore:item/soybean_seed_bag");
+        assertGeneratedModel("redbean_seed_bag.json", "icecore:item/redbean_seed_bag");
+        assertGeneratedModel("strawberry_seed_bag.json", "icecore:item/strawberry_seed_bag");
+        assertGeneratedModel("corn_seed_bag.json", "icecore:item/corn_seed_bag");
+        assertGeneratedModel("sweet_potato_seed_bag.json", "icecore:item/sweet_potato_seed_bag");
+        assertGeneratedModel("houttuynia_seed_bag.json", "icecore:item/houttuynia_seed_bag");
+        assertGeneratedModel("tomato_seed_bag.json", "icecore:item/tomato_seed_bag");
+        assertGeneratedModel("chili_seed_bag.json", "icecore:item/chili_seed_bag");
+        assertGeneratedModel("eggplant_seed_bag.json", "icecore:item/eggplant_seed_bag");
+        assertGeneratedModel("onion_seed_bag.json", "icecore:item/onion_seed_bag");
+        assertGeneratedModel("cabbage_seed_bag.json", "icecore:item/cabbage_seed_bag");
+        assertGeneratedModel("cucumber_seed_bag.json", "icecore:item/cucumber_seed_bag");
+        assertGeneratedModel("rice_seed_bag.json", "icecore:item/rice_seed_bag");
+        assertGeneratedModel("tea_seed_bag.json", "icecore:item/tea_seed_bag");
+        assertGeneratedModel("lime_seed_bag.json", "icecore:item/lime_seed_bag");
         assertFalse(Files.exists(TEXTURE_ROOT.resolve("seed_bag.png")));
     }
 
@@ -59,7 +59,7 @@ final class SeedBagRenderingContractTest {
         String json = read(MODEL_ROOT.resolve(fileName));
         assertTrue(json.contains("\"parent\":\"minecraft:item/generated\""));
         assertTrue(json.contains("\"layer0\":\"" + texture + "\""));
-        assertFalse(json.contains("icecore:item/seed_bag"));
+        assertTrue(Files.exists(TEXTURE_ROOT.resolve(fileName.replace(".json", ".png"))));
         assertFalse(json.contains("builtin/entity"));
     }
 
