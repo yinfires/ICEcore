@@ -58,13 +58,13 @@ public final class SeedBagFarmingEvents {
 
     private static InteractionResult tillInAdventure(PlayerInteractEvent.RightClickBlock event) {
         Player player = event.getEntity();
-        if (player.level().isClientSide) return InteractionResult.SUCCESS;
         // ItemStack#useOn rejects adventure players before HoeItem runs; lift mayBuild only for this call.
+        boolean previousMayBuild = player.getAbilities().mayBuild;
         player.getAbilities().mayBuild = true;
         try {
             return event.getItemStack().useOn(new UseOnContext(player, event.getHand(), event.getHitVec()));
         } finally {
-            player.getAbilities().mayBuild = false;
+            player.getAbilities().mayBuild = previousMayBuild;
         }
     }
 

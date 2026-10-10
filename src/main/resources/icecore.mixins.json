@@ -41,6 +41,9 @@
     ,"SeedBagCompatRiceMixin"
     ,"SeedBagCompatTeaMixin"
     ,"SeedBagCompatEggplantMixin"
+    ,"DewDropIrrigationWateringCanMixin"
+    ,"DewDropIrrigationFarmlandEventsMixin"
+    ,"DewDropIrrigationSprinklerMixin"
   ],
   "client": [
     "GeckoLibKeyframeMixin",

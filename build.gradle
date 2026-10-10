@@ -55,6 +55,9 @@ repositories {
 }
 
 dependencies {
+    compileOnly fg.deobf('local:dew_drop_farmland_growth:9.0')
+    compileOnly fg.deobf('local:dew_drop_watering_cans:1.0.2')
+    compileOnly fg.deobf('local:bots_lib:4.1.1')
     compileOnly files('libs/smartkeyprompts-forge-1.20.1-1.1.3-hotfix-all.jar')
     testRuntimeOnly files('libs/smartkeyprompts-forge-1.20.1-1.1.3-hotfix-all.jar')
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
