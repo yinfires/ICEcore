@@ -12,6 +12,7 @@ public final class ICECoreMixinPlugin implements IMixinConfigPlugin {
     @Override public void onLoad(String mixinPackage) {}
     @Override public String getRefMapperConfig() { return null; }
     @Override public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
+        if (mixinClassName.contains("GrillingOilPress")) return present(targetClassName);
         if (mixinClassName.contains("GeckoLib")) return present(targetClassName);
         if (mixinClassName.contains("SeedBagCompat")) return present(targetClassName);
         if (mixinClassName.contains("DewDropIrrigationSprinkler"))

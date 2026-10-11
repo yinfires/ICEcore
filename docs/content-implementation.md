@@ -497,6 +497,18 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 - 转化与接待：正常街客需处于需求时间窗，第二需求窗以 30% 身份散列条件启用；同一需求已服务或尝试两店即停止。基础进店概率 `clamp(0.65*吸引设施倍率+(美观*(方案22?2:1)+氛围)/3000,0.35,0.95)`，再叠加方案/节气，有目的顾客通过概率关仍需需求及有效订单。新客允许尝试已知菜品；非试吃客的菜品预测评分需≥40。营业、在线、区块、岗位、菜单、座位/候位、路径等也会限制实际接待。
 - 验证边界：上述为目标 JAR 静态字节码事实及默认值，未读取存档实际配置，未执行游戏观察；ICEcore 当前 CozyCafe 声望、客流与菜单规则未改变。
 
+### 森罗物语烟火菜籽油副产物移除
+
+| 字段 | 内容 |
+| --- | --- |
+| 玩家行为 | 制作菜籽油不再生成油渣，压榨输入、进度、产油量与容器规则保持上游行为；已有油渣不删除。 |
+| 核对来源 | 客户端 `mods/kaleidoscope_grilling-1.1.1-forge1.20.1.jar`，mod ID `kaleidoscope_grilling`，Forge `[47.3.0,48)` / Minecraft `[1.20.1,1.20.2)`；字节码 `oil.OilPressBlockEntity.tryFinish()Z` 成功插入 4 桶油后构造 4 个 `ModItems.OIL_RESIDUE`，优先向 Create 输送带插入，剩余调用 `ejectResidue(int)`。 |
+| 代码入口 | `mixin.GrillingOilPressMixin`；`ICECoreMixinPlugin` 只通过 class 资源探测可选目标，不加载目标类。 |
+| 实现链路 | 精确重定向 `tryFinish()Z` 内唯一的 `ItemStack(ItemLike,int)` 构造为 `ItemStack.EMPTY`，在输送带插入和掉落实体之前阻止副产物生成；Create 空栈路径立即返回，无新增 tick 扫描、对象分配、网络或日志。外部方法未混淆，`remap=false`；默认 require=1，避免上游变化后静默失效。 |
+| 资源位置 | `assets/kaleidoscope_grilling/lang/{zh_cn,en_us}.json` 覆盖真实 `hud.kaleidoscope_grilling.press.output` 键，只显示菜籽油产量；JEI 原类别不含油渣槽，无需修改。 |
+| 验证方法 | `GrillingOilPressMixinTest` 检查完整生产选择器、空栈输出、配置注册及不提前定义目标类；基线 Forge 47.4.10 窄测试通过，单独 `clean` 后完整 `build` 通过，生产 JAR 注解描述符、SRG 空栈字段及语言资源检查通过，无打包上游类。ForgeGradle 6.0.54 连通性检查停在 TLS 握手，离线验证命令临时使用 `-Dnet.minecraftforge.gradle.check.certs=false --offline --no-daemon`，不修改持久设置。未启动客户端，手动/铁砧/Create 压榨及 HUD 实机回归待验证。 |
+| 最后修改 | 2026-10-11。 |
+
 ### 森罗物语厨房菜籽油汤底兼容
 
 | 字段 | 内容 |
