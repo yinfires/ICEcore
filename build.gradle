@@ -55,6 +55,7 @@ repositories {
 }
 
 dependencies {
+    compileOnly files('libs/kaleidoscope_grilling-1.1.1-forge1.20.1.jar')
     compileOnly fg.deobf('local:dew_drop_farmland_growth:9.0')
     compileOnly fg.deobf('local:dew_drop_watering_cans:1.0.2')
     compileOnly fg.deobf('local:bots_lib:4.1.1')

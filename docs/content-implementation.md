@@ -520,6 +520,19 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 | 验证方法 | Forge 47.4.10 执行 `gradlew.bat compileJava test --offline --no-daemon` 与 `gradlew.bat clean build --offline --no-daemon`；检查生产 JAR 仅包含兼容类，不包含厨房/烧烤类与流体贴图资源；未启动客户端，液面表现需实机验证。 |
 | 最后修改 | 2026-09-25，新增菜籽油汤底兼容并确认复用烧烤流体 still/flowing 纹理与 tint；补充倒入和取出时的原版桶音效回退。 |
 
+### 森罗物语油壶拾取与菜籽油装桶
+
+| 字段 | 内容 |
+| --- | --- |
+| 玩家行为 | 放置的 `kaleidoscope_cookery:oil_pot`：蹲下、主手空手右键拾取整个油壶，空壶也可取回；普通空手取油及投油沿用上游。主手空桶右键菜籽油壶，每次消耗 8 点油与 1 个桶，获得 `kaleidoscope_grilling:canola_oil_bucket`；不足 8 点无变化，创造模式同样扣除。其它油种不扩展装桶。 |
+| 核对来源 | Cookery 1.4.1 的 `OilPotBlock.getCloneItemStack` 保存油量，Grilling 1.1.1 的同入口 RETURN 注入保存油种；`TypedOilPotAccess` 提供油种/油量读写，菜籽油标识为 `canola`。`grilling$setOilCount` 调用上游 setOilCount 更新 HAS_OIL 并同步方块实体。参考烟火 JAR 位于 libs，SHA256 为 `8F13C33B0982E6D61344888B663E3FF7C949C0B7AF3BC63AF9257220F23A0D38`。 |
+| 代码入口 | `compat.kaleidoscopecookery.OilPotInteractions`、`GrillingOilPotBuckets`，由 ICECore 在厨房存在时注册；烟火装桶类仅在烟火存在且持空桶时调用。编译依赖为 libs 中烟火 1.1.1 JAR，仅 compileOnly，不打包上游。 |
+| 实现链路 | RightClickBlock LOWEST、不接收已取消事件，同时尊重 useBlock/useItem DENY、主手、旁观者和 mayInteract 限制。拾取在服务端先复制完整上游 ItemStack，再无掉落替换为空气/水，成功后交到主手；装桶在服务端检查油种/余量/注册物品，扣油、扣桶、交付成品；堆叠空桶的成品优先入背包，满背包则掉落。不足 8 点的菜籽油点击也被消费，防止副手重试。 |
+| 性能 | 仅右键事件触发，非目标快速返回；油种与余量检查 O(1)，无 tick 扫描、反射、同步 I/O 或日志。仅成功拾取创建油壶栈，成功装桶创建成品栈；入背包最多扫描固定玩家槽位，网络沿用方块和背包同步，无新增数据包。 |
+| 验证方法 | `OilPotInteractionsTest` 的四项源码契约测试通过，覆盖可取消事件、权限/单手门禁、服务端结算、含水恢复、先移除再交付、扣除及满背包回退、可选依赖隔离。Forge 47.4.10 单独 clean 后完整 build 通过，128 项测试无失败；生产 JAR 包含交互类、setBlock 为 SRG `m_7731_`，未打包厨房/烟火上游类。当前最新 Forge 47.4.28 compileJava 通过，日志确认实际解析该版本的映射依赖，随后逐字节恢复 gradle.properties 的 47.4.10 基线并重新 build。CodeGraph 已更新，UTF-8 与 Git 忽略边界检查通过。源码测试不构造未引导的 Minecraft 注册表，不代替真实交互测试。 |
+| 实机待验证 | 空壶、普通油与各烟火油取回再放置；菜籽油 0/7/8/9/16 点、单桶/堆叠/满背包/创造模式、副手与连续点击、多人竞争；普通取油/投油和权限拦截；缺厨房、仅厨房、厨房加烟火的启动。未启动或部署客户端。 |
+| 最后修改 | 2026-10-14；稳定使用说明同步 Wiki 内容页。 |
+
 ### 冒险模式建造系统
 
 | 字段 | 内容 |

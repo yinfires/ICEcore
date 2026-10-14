@@ -51,6 +51,9 @@ public final class ICECore {
             com.yinfires.icecore.compat.youkaisfeasts.YoukaisFeastsEvents.register();
             modBus.addListener(com.yinfires.icecore.compat.youkaisfeasts.YoukaisFeastsEvents::onCommonSetup);
         }
+        if (ModList.get().isLoaded("kaleidoscope_cookery")) {
+            com.yinfires.icecore.compat.kaleidoscopecookery.OilPotInteractions.register();
+        }
         if (ModList.get().isLoaded("kaleidoscope_cookery") && ModList.get().isLoaded("kaleidoscope_grilling")) {
             modBus.addListener(com.yinfires.icecore.compat.kaleidoscopecookery.KaleidoscopeCookeryCompat::onCommonSetup);
         }
