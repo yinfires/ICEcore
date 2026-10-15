@@ -1,0 +1,50 @@
+package com.yinfires.icecore.building;
+
+import org.junit.jupiter.api.Test;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import static org.junit.jupiter.api.Assertions.*;
+
+class BuildingInteractionContractTest {
+    private String source(String name) throws Exception {
+        return Files.readString(Path.of("src/main/java/com/yinfires/icecore/" + name + ".java"));
+    }
+
+    @Test
+    void placementIsClaimedBeforeMutationAndReassertedAfterwards() throws Exception {
+        String events = source("building/BuildingEvents");
+        int claim = events.indexOf("PLACEMENT_CLAIMS.add(event)");
+        assertTrue(claim > events.indexOf("if (context != null)"));
+        assertTrue(claim < events.indexOf("BuildingServerActions.executePlacement(player, context)"));
+        assertTrue(events.contains("PLACEMENT_CLAIMS.remove(event)"));
+        assertTrue(events.contains("setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS)"));
+    }
+
+    @Test
+    void clientConsumesPlacementInsidePredictionWithoutSwallowingOuterPacket() throws Exception {
+        String mixin = source("mixin/MultiPlayerGameModeMixin");
+        assertTrue(mixin.contains("m_233746_(Lnet/minecraft/client/player/LocalPlayer;"));
+        assertTrue(mixin.contains("BuildingClientEvents.claimPlacement(player, hand, hit)"));
+        assertTrue(mixin.contains("callback.setReturnValue(InteractionResult.SUCCESS)"));
+        assertFalse(mixin.contains("m_233732_("));
+        assertTrue(mixin.contains(".isWrench(player.getItemInHand(hand)) ? InteractionResult.SUCCESS : InteractionResult.PASS"));
+        String client = source("building/BuildingClientEvents");
+        assertTrue(client.contains("placement == null || !placement.allowed()"));
+        assertTrue(client.contains("!player.canReach(hit.getBlockPos(), 1.5D)"));
+    }
+
+    @Test
+    void wrenchUsesRegionPermissionRatherThanManagedIdentity() throws Exception {
+        String server = source("building/BuildingServerActions");
+        String target = server.substring(server.indexOf("public static boolean isManagedTarget"),
+                server.indexOf("private static boolean canOccupy"));
+        assertTrue(target.contains("BuildingRules.canBreak(level, keyPosition, state)"));
+        assertFalse(target.contains("BuildingRuntimeCache.isManaged"));
+        String client = source("building/BuildingClientEvents");
+        String clientTarget = client.substring(client.indexOf("private static WrenchPreview wrenchInteractionTarget"),
+                client.indexOf("public static boolean shouldBlockWrenchBlockUse"));
+        assertTrue(clientTarget.contains("BuildingClientRules.canBreak(minecraft.level, position, state)"));
+        assertFalse(clientTarget.contains("BuildingClientRules.isManaged"));
+        assertTrue(source("building/BuildingEvents").contains("BuildingServerActions.isWrench(stack)\n                && BuildingServerActions.isManagedTarget"));
+    }
+}
