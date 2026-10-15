@@ -88,7 +88,6 @@ public final class BuildingClientEvents {
             return;
         }
         if (stack.getItem() instanceof BlockItem bi && BuildingClientRules.isManaged(bi.getBlock().defaultBlockState())) {
-            event.setUseBlock(net.minecraftforge.eventbus.api.Event.Result.DENY);
             // Only arm the anti-phantom suppression when the placement is
             // actually valid.  The suppression blanks the preview for a few
             // ticks to hide the stale ghost that lingers at the just-placed
@@ -101,6 +100,7 @@ public final class BuildingClientEvents {
             PlacementPreview placement = computePlacementPreview(
                     minecraft, stack, event.getHand(), event.getHitVec());
             if (placement != null && placement.allowed()) {
+                event.setUseBlock(net.minecraftforge.eventbus.api.Event.Result.DENY);
                 suppressPlacementPreviewHand = event.getHand();
                 suppressPlacementPreviewStack = stack.copy();
                 suppressPlacementPreviewTicks = 3;
@@ -373,9 +373,8 @@ public final class BuildingClientEvents {
 
     /**
      * Finds the managed target whose interaction must be locked on the client.
-     * This deliberately does not call canBreak: inventory capacity, server-side
-     * reach validation, and other final removal checks must never allow vanilla
-     * block use to run while a wrench target is under the cursor.
+     * Region/list permission selects dismantling intent. Inventory capacity and
+     * content confirmation must not release that intent into ordinary block use.
      */
     private static WrenchPreview wrenchInteractionTarget(Minecraft minecraft, BlockHitResult hit) {
         if (minecraft.level == null || hit == null) {
@@ -383,7 +382,7 @@ public final class BuildingClientEvents {
         }
         BlockPos position = BuildingStructure.primaryPosition(minecraft.level, hit.getBlockPos());
         BlockState state = minecraft.level.getBlockState(position);
-        if (state.isAir() || !BuildingClientRules.isManaged(state)) {
+        if (state.isAir() || !BuildingClientRules.canBreak(minecraft.level, position, state)) {
             return null;
         }
         return new WrenchPreview(position, state);
@@ -406,6 +405,24 @@ public final class BuildingClientEvents {
                 && (player.getMainHandItem().is(ModItems.WRENCH.get())
                 || player.getOffhandItem().is(ModItems.WRENCH.get()))
                 && wrenchInteractionTarget(minecraft, hit) != null;
+    }
+
+    /** Called inside prediction; the surrounding useItemOn still sends its packet. */
+    public static boolean claimPlacement(net.minecraft.client.player.LocalPlayer player,
+                                         InteractionHand hand, BlockHitResult hit) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (player != minecraft.player || minecraft.gameMode == null
+                || minecraft.gameMode.getPlayerMode() != GameType.ADVENTURE
+                || isAdjustmentStick(player.getMainHandItem())
+                || isAdjustmentStick(player.getOffhandItem())
+                || shouldBlockWrenchBlockUse(player, hand, hit)) return false;
+        PlacementPreview placement = computePlacementPreview(minecraft, player.getItemInHand(hand), hand, hit);
+        if (placement == null || !placement.allowed() || !player.canReach(hit.getBlockPos(), 1.5D)) return false;
+        suppressPlacementPreviewHand = hand;
+        suppressPlacementPreviewStack = player.getItemInHand(hand).copy();
+        suppressPlacementPreviewTicks = 3;
+        BuildingClientRenderState.clear();
+        return true;
     }
 
     private record WrenchPreview(BlockPos position, BlockState state) {
@@ -441,7 +458,7 @@ public final class BuildingClientEvents {
             state = blockItem.getBlock().defaultBlockState();
             placementStateValid = false;
         }
-        if (updatedContext == null || !updatedContext.canPlace()) {
+        if (!context.canPlace() || updatedContext == null || !updatedContext.canPlace()) {
             placementStateValid = false;
         }
         BlockPos normalized = BuildingStructure.primaryPosition(state, pos);

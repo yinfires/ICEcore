@@ -21,6 +21,11 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = ICECore.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class BuildingEvents {
+    // Identity of the current event, not world coordinates: placement changes the
+    // world and held stack before the final subscriber reasserts the claim.
+    private static final java.util.Set<PlayerInteractEvent.RightClickBlock> PLACEMENT_CLAIMS =
+            java.util.Collections.synchronizedSet(
+                    java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>()));
     private BuildingEvents() {
     }
 
@@ -80,8 +85,10 @@ public final class BuildingEvents {
         if (player.gameMode.getGameModeForPlayer() != GameType.ADVENTURE) {
             return;
         }
-        if (BuildingServerActions.isWrench(stack)) {
+        if (BuildingServerActions.isWrench(stack)
+                && BuildingServerActions.isManagedTarget(player.level(), event.getPos())) {
             event.setCanceled(true);
+            event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
             BuildingServerActions.remove((net.minecraft.server.level.ServerLevel) player.level(), player,
                     event.getPos(), event.getFace(), hand);
             return;
@@ -94,20 +101,31 @@ public final class BuildingEvents {
         if (BuildingServerActions.holdsWrench(player)
                 && BuildingServerActions.isManagedTarget(player.level(), event.getPos())) {
             event.setCanceled(true);
+            event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
             return;
         }
         if (stack.getItem() instanceof BlockItem) {
             BlockState placing = ((BlockItem) stack.getItem()).getBlock().defaultBlockState();
             if (BuildingRuntimeCache.isManaged(placing)) {
-                event.setCanceled(true);
-                BuildingServerActions.place((net.minecraft.server.level.ServerLevel) player.level(), player,
-                        event.getHitVec(), hand);
+                var context = BuildingServerActions.preparePlacement(
+                        (net.minecraft.server.level.ServerLevel) player.level(), player, event.getHitVec(), hand);
+                if (context != null) {
+                    PLACEMENT_CLAIMS.add(event);
+                    event.setCanceled(true);
+                    event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
+                    BuildingServerActions.executePlacement(player, context);
+                }
             }
         }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
     public static void onRightClickFinal(PlayerInteractEvent.RightClickBlock event) {
+        if (PLACEMENT_CLAIMS.remove(event)) {
+            event.setCanceled(true);
+            event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
+            return;
+        }
         if (!(event.getEntity() instanceof ServerPlayer player)
                 || player.level().isClientSide
                 || player.gameMode.getGameModeForPlayer() != GameType.ADVENTURE) {

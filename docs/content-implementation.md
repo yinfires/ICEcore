@@ -605,3 +605,10 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 - 混合碗真实流体优先，其后顶端食材、流体失败拦截和默认投料不变；烤炉没有流体槽。
 - 性能：交互扫描最多九格，加载最多九格两层校验，无新增 tick 扫描、网络包或配方字段。
 - 验证：共享纯逻辑回归、两个交互入口源码契约及 Forge 47.4.10 独立 clean 后 test/build 全部通过；客户端流体不足、不兼容、输入/成品混存、音效与保存重载实测待执行。
+
+### 建造右键归属修正（2026-10-15）
+
+- BuildingServerActions.preparePlacement 返回原始放置上下文或 null，无世界修改；executePlacement 保留 Forge 事务及 mayBuild 的 finally 恢复。BuildingEvents 在执行前用弱引用事件集合记录归属，LOWEST 移除并重新取消，避免状态/栈变化使放置锁失效。
+- MultiPlayerGameModeMixin 在生产 m_233746_ 内部预测入口返回 SUCCESS，停止双手重试，外层仍创建请求包；claimPlacement 复用预览合法性、距离和调整模式排除，仅有效时启动预览抑制。无新增协议、tick 扫描或日志。
+- 扳手客户端与服务端统一按归一化主位置 canBreak 判定交互归属，非列表/区域外放行；背包和容器确认失败继续独占。
+- 验证：BuildingInteractionContractTest 固定先声明再修改、末尾重申、内部预测选择器与 SUCCESS、区域权限边界及副手扳手推进；Forge 47.4.10 定向测试、生产命名测试及独立 clean 后完整 build 通过。实机熔炉/箱子/门、双手、多格与事务拒绝仍需用户授权。

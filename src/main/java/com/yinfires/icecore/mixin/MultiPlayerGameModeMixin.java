@@ -22,8 +22,12 @@ public abstract class MultiPlayerGameModeMixin {
     private void icecore$blockWrenchVanillaUse(LocalPlayer player, InteractionHand hand,
                                                 BlockHitResult hit,
                                                 CallbackInfoReturnable<InteractionResult> callback) {
-        if (BuildingClientEvents.shouldBlockWrenchBlockUse(player, hand, hit)) {
-            callback.setReturnValue(InteractionResult.PASS);
+        if (BuildingClientEvents.claimPlacement(player, hand, hit)) {
+            callback.setReturnValue(InteractionResult.SUCCESS);
+        } else if (BuildingClientEvents.shouldBlockWrenchBlockUse(player, hand, hit)) {
+            // Let an empty main hand advance to the actual offhand wrench.
+            callback.setReturnValue(com.yinfires.icecore.building.BuildingServerActions
+                    .isWrench(player.getItemInHand(hand)) ? InteractionResult.SUCCESS : InteractionResult.PASS);
         }
     }
 }

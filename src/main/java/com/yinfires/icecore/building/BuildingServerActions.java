@@ -39,42 +39,48 @@ public final class BuildingServerActions {
     private BuildingServerActions() {
     }
 
-    public static void place(ServerLevel level, ServerPlayer player, BlockHitResult hit,
-                             InteractionHand hand) {
+    /** Null means ordinary interaction may proceed; a context claims this click. */
+    public static net.minecraft.world.item.context.BlockPlaceContext preparePlacement(
+            ServerLevel level, ServerPlayer player, BlockHitResult hit, InteractionHand hand) {
         BlockPos clickedPos = hit.getBlockPos();
         Direction face = hit.getDirection();
         ItemStack stack = player.getItemInHand(hand);
         if (!(stack.getItem() instanceof BlockItem)) {
-            return;
+            return null;
         }
         net.minecraft.world.item.context.BlockPlaceContext placementContext = new net.minecraft.world.item.context.BlockPlaceContext(
                 level, player, hand, stack, hit);
         if (!player.canReach(clickedPos, 1.5D)
                 || !BuildingRuntimeCache.isManaged(((BlockItem) stack.getItem()).getBlock().defaultBlockState())) {
-            return;
+            return null;
         }
         if (!placementContext.canPlace()) {
-            return;
+            return null;
         }
         BlockItem blockItem = (BlockItem) stack.getItem();
         net.minecraft.world.item.context.BlockPlaceContext updatedContext = blockItem.updatePlacementContext(placementContext);
         if (updatedContext == null || !updatedContext.canPlace()) {
-            return;
+            return null;
         }
         BlockPos target = updatedContext.getClickedPos();
         BlockState support = level.getBlockState(clickedPos);
         BlockState placementState = blockItem.getBlock().getStateForPlacement(updatedContext);
-        if (placementState == null) {
-            return;
+        if (placementState == null || !placementState.canSurvive(level, target)) {
+            return null;
         }
         if (!BuildingRules.canPlace(level, target, placementState, support, face)) {
-            return;
+            return null;
         }
         if (!BuildingStructure.positions(placementState, target).stream().allMatch(part ->
                 canOccupy(level, player, placementContext, part,
                         BuildingStructure.stateAt(placementState, target, part)))) {
-            return;
+            return null;
         }
+        return placementContext;
+    }
+
+    public static void executePlacement(ServerPlayer player,
+            net.minecraft.world.item.context.BlockPlaceContext placementContext) {
         boolean oldMayBuild = player.getAbilities().mayBuild;
         player.getAbilities().mayBuild = true;
         try {
@@ -188,14 +194,13 @@ public final class BuildingServerActions {
 
     /**
      * True when the block under the cursor (normalised to its structure key)
-     * belongs to a managed list.  Deliberately independent of canBreak: the
-     * interaction lock must hold even when a removal would fail on inventory,
-     * reach or region.
+     * has dismantling permission here. Inventory and content confirmation are
+     * execution checks and must not release an already claimed dismantle click.
      */
     public static boolean isManagedTarget(Level level, BlockPos pos) {
         BlockPos keyPosition = BuildingStructure.primaryPosition(level, pos);
         BlockState state = level.getBlockState(keyPosition);
-        return !state.isAir() && BuildingRuntimeCache.isManaged(state);
+        return !state.isAir() && BuildingRules.canBreak(level, keyPosition, state);
     }
 
     private static boolean canOccupy(ServerLevel level, ServerPlayer player,
