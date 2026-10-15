@@ -14,6 +14,18 @@ Last updated: 2026-10-05
 
 ## 当前状态
 
+### 物品提示与客户端描述覆盖
+
+- `icecore-client.toml`：`tooltip.hideOriginalDetails=true`、`tooltip.hideFoodEffects=true`，Forge 标准配置入口双语说明。原始提示过滤在 `ItemStack.m_41651_` 调用 `ForgeEventFactory.onItemTooltip` 之前执行，保留名称组件原对象；不清空最终 GatherComponents，因此 JEI 烤炉批量/时间、咖啡馆价格和其它事件附加信息保留。效果开关独立过滤物品效果段，不改变玩法。
+- `tooltip.ItemDescriptions` 加载客户端 `config/icecore/item_descriptions.json` 的 `items` 映射；完整物品 ID → 字符串/文本组件数组。存在条目替换原正文，空数组只保留名称，删除恢复开关行为。`ItemTooltipEvents.Registration` 在启动/F3+T 重载，缺文件清空，错误保留上一快照；无模组内置示例。外部文件在指定客户端配置目录，不要求服务端同步。
+- 客户端可选 Mixin：`GrillingFoodTooltipMixin` 阻止烟火 FoodTooltip 两个效果入口；`FarmersFoodTooltipMixin` 阻止农夫乐事 TextUtils 效果入口；国味真实注册复用 Cookery `BowlFoodOnlyItem`→`FoodWithEffectsItem`，`CookeryFoodTooltipMixin` 只拦截其 PotionUtils 效果构建调用。依据烟火 1.1.1、农夫乐事 1.3.4、国味 1.1.14、厨房 1.4.1 实际 JAR 核验。结构兜底递归识别 effect/potion 翻译组件及关联属性段，不按语言或颜色猜测。
+- `PonderItemTooltipMixin` 阻止 Create 6.0.8 内嵌 Ponder 1.0.91 的 addToTooltip；`CreateItemDescriptionTooltipMixin` 阻止 Create ClientEvents.addToItemTooltip 的 Shift/Ctrl 概要；`LibItemDescriptionTooltipMixin` 阻止 CozyCafe 1.10 内嵌 LibTooltips 2.3 的 modifyItemTooltip（常驻介绍、Shift 提示与展开正文），不影响另外添加的价格。`JeiItemModNameTooltipMixin` 拦截 JEI 15.49 的两种添加模组名入口和 getModNameForTooltip，覆盖物品、流体等全部 ingredient 类型，保留其余原列表。所有外部目标以 class 资源门禁，均在 client 列表，无可选目标提前类加载。
+- 2026-10-15 用户截图回归：实际食品效果的图标、时长、概率由 Quality Food 2.4.3 `events.ForgeEvents.addEffectTooltip(GatherComponents)` 追加 `core.EffectComponent`，不属于文本列表。`QualityFoodTooltipMixin` 在该方法 HEAD 按 hideFoodEffects 取消，覆盖静态效果、动态食物属性与品质修改效果，不取消其另一个 addTooltip 品质说明入口，不改变食用效果。厨房现用 1.5.1 已额外核验原 Cookery 拦截目标不变。
+- 性能：仅悬停构建提示时 O(当前提示组件数)；覆盖按物品 ID 哈希查询。无 tick、注册表遍历、反射、网络或文件轮询。文件只在资源重载读取；不可变快照整体替换，内存随当前配置规模有界，复制描述组件防止外部修改污染缓存。
+- 验证：TooltipRulesTest 覆盖开关组合、附加配方/价格保留、名称样式、效果结构、多行/翻译/空数组、坏配置原子保留及删除恢复；ItemTooltipMixinTest 核对真实 Forge 调用及可选客户端门禁。客户端三款食品、JEI/咖啡馆和思索显示仍待授权实机验收；未启动客户端。
+- 2026-10-15 验证结果：Forge 47.4.10 独立 clean 后完整 build 通过（151 项测试），Forge 官方 promotions 当前最新 47.4.28 完整 build 同样通过，并以 dependencies 输出确认实际坐标为 1.20.1-47.4.28_mapped_official_1.20.1；最终恢复基线构建。生产 JAR 已核对原始提示 SRG 选择器、Forge 调用、Cookery PotionUtils 调用及不打包外部类；双语键一致，CodeGraph 已更新，Git 无生成文件。已在指定客户端创建空 item_descriptions.json，未部署 JAR。
+- 残留修正验证：实际 Create 6.0.8、LibTooltips 2.3、Quality Food 2.4.3 JAR 的 ASM 回归验证真实方法描述符、Shift/Ctrl 字段及图形 EffectComponent 分配；模组名回归禁止 ItemStack 类型限制，确保流体覆盖且不清空其它提示。Forge 47.4.10 独立 clean 后 build 通过（154 项），47.4.28 完整 build 通过，最终恢复基线构建。新增三处拦截仅在原有悬停入口 O(1) 读取配置，提前省去文本/效果组件分配，无 tick、I/O、网络或日志。未启动客户端，四张截图对应场景仍待用户复测。
+
 ### Dew Drop 灌溉与 Bakery 水槽兼容
 
 - 目标：Farmland Growth 9.0、Watering Cans 1.0.2、Bots Lib 4.1.1、Bakery 2.0.6。厨房水槽真实类为 Farm & Charm 1.0.14 的 SinkBlock。

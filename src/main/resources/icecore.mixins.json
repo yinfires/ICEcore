@@ -52,6 +52,15 @@
     ,"DewDropIrrigationSprinklerMixin"
   ],
   "client": [
+    "CreateItemDescriptionTooltipMixin",
+    "LibItemDescriptionTooltipMixin",
+    "QualityFoodTooltipMixin",
+    "CookeryFoodTooltipMixin",
+    "PonderItemTooltipMixin",
+    "JeiItemModNameTooltipMixin",
+    "ItemOriginalTooltipMixin",
+    "GrillingFoodTooltipMixin",
+    "FarmersFoodTooltipMixin",
     "GrillingJadeGrillMixin",
     "GeckoLibKeyframeMixin",
     "CozyCafeManagerScreenErrorMixin",

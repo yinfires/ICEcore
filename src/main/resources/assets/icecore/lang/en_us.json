@@ -146,6 +146,11 @@
   "config.icecore.food.disable_consumption.tooltip": "Prevents players from consuming items that declare food properties without affecting potions, milk, tools, or other right-click uses.",
   "config.icecore.food.disable_consumption.server_controlled": "This setting is controlled by the dedicated server. Ask the server owner to edit its configuration file.",
   "config.icecore.food.enable_mod_compatibility": "Enable drink and skewer compatibility",
+  "config.icecore.tooltip": "Item tooltips",
+  "config.icecore.tooltip.hide_original_details": "Hide original item details",
+  "config.icecore.tooltip.hide_original_details.tooltip": "Hides original item details, JEI mod names and Ponder prompts. Keeps ICEcore descriptions and added recipe or menu information.",
+  "config.icecore.tooltip.hide_food_effects": "Hide item effect tooltips",
+  "config.icecore.tooltip.hide_food_effects.tooltip": "Hides effect names, duration, chance and related attribute descriptions without changing actual effects.",
   "config.icecore.interface.show_compatibility_details": "Show compatibility details",
   "config.icecore.interface.show_compatibility_details.tooltip": "Shows the compatibility category in the ICEcore configuration screen."
 }
