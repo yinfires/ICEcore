@@ -14,6 +14,7 @@ public final class ICECoreMixinPlugin implements IMixinConfigPlugin {
     @Override public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         if (mixinClassName.contains("GrillingOilPress")) return present(targetClassName);
         if (mixinClassName.contains("GeckoLib")) return present(targetClassName);
+        if (mixinClassName.contains("SeedBagCompatDewRandomTick")) return present("cool.bot.dewdropfarmland.Config");
         if (mixinClassName.contains("SeedBagCompat")) return present(targetClassName);
         if (mixinClassName.contains("DewDropIrrigationSprinkler"))
             return present("cool.bot.dewdropfarmland.Config") && present(targetClassName);

@@ -20,6 +20,7 @@
   "item.icecore.tea_seed_bag": "Tea Seed Bag",
   "item.icecore.lime_seed_bag": "Lime Seed Bag",
   "block.icecore.untilled_dirt": "Untilled Dirt",
+  "config.jade.plugin_icecore.rice_progress": "Rice Growth Progress",
   "config.jade.plugin_icecore.seed_bag_icon": "Seed Bag Crop Icon",
   "item.icecore.wrench.tooltip": "Right-click to dismantle a block",
   "itemGroup.icecore.main": "ICEcore",

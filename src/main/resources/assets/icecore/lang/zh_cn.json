@@ -20,6 +20,7 @@
   "item.icecore.tea_seed_bag": "茶树种子袋",
   "item.icecore.lime_seed_bag": "青柠种子袋",
   "block.icecore.untilled_dirt": "未开垦的泥土",
+  "config.jade.plugin_icecore.rice_progress": "稻米生长进度",
   "config.jade.plugin_icecore.seed_bag_icon": "种子袋作物图标",
   "item.icecore.wrench.tooltip": "右键拆除物体",
   "itemGroup.icecore.main": "ICEcore",

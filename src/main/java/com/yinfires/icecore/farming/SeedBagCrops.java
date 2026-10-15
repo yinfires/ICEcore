@@ -20,8 +20,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.BonemealableBlock;
-import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.FarmBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -254,16 +252,6 @@ public final class SeedBagCrops {
         Crop crop = find(state.getBlock());
         if (crop == null || !isRootState(crop, state)) return;
         removeParts(level, partsOf(crop, level, above));
-    }
-
-    /** Called by dew's daily growth for tea-like double crops so the upper half is kept in sync. */
-    public static boolean growDoubleCrop(ServerLevel level, BlockPos pos, BlockState state, RandomSource random) {
-        Crop crop = find(state.getBlock());
-        if (crop == null || crop.definition().shape() != Shape.DOUBLE
-                || !(state.getBlock() instanceof CropBlock cropBlock)
-                || !(state.getBlock() instanceof BonemealableBlock growable)) return false;
-        if (!cropBlock.isMaxAge(state)) growable.performBonemeal(level, random, pos, state);
-        return true;
     }
 
     /** Seed bag use on farmland; also the adventure-mode path since it bypasses ItemStack#useOn. */

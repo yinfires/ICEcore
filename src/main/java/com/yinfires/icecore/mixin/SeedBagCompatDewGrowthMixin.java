@@ -1,6 +1,6 @@
 package com.yinfires.icecore.mixin;
 
-import com.yinfires.icecore.farming.SeedBagCrops;
+import com.yinfires.icecore.compat.dewdrop.SeedBagDailyGrowth;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
@@ -12,8 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * Dew Drop's daily CropBlock growth writes getStateForAge directly, which never creates the upper
- * half of two-block seed-bag crops (tea). Route those through the crop's own bonemeal growth.
+ * Adapt seed-bag structures after Dew's daily soil and season checks.
  */
 @Pseudo
 @Mixin(targets = "cool.bot.dewdropfarmland.utils.CropHandlerUtils", remap = false)
@@ -22,6 +21,6 @@ public abstract class SeedBagCompatDewGrowthMixin {
             at = @At("HEAD"), cancellable = true, remap = false)
     private static void icecore$growDoubleCrop(BlockState crop, ServerLevel level, BlockPos pos, BlockState soil,
                                                RandomSource random, CallbackInfo callback) {
-        if (SeedBagCrops.growDoubleCrop(level, pos, crop, random)) callback.cancel();
+        if (SeedBagDailyGrowth.grow(crop, level, pos, soil, random)) callback.cancel();
     }
 }
