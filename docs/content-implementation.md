@@ -498,6 +498,20 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 - 转化与接待：正常街客需处于需求时间窗，第二需求窗以 30% 身份散列条件启用；同一需求已服务或尝试两店即停止。基础进店概率 `clamp(0.65*吸引设施倍率+(美观*(方案22?2:1)+氛围)/3000,0.35,0.95)`，再叠加方案/节气，有目的顾客通过概率关仍需需求及有效订单。新客允许尝试已知菜品；非试吃客的菜品预测评分需≥40。营业、在线、区块、岗位、菜单、座位/候位、路径等也会限制实际接待。
 - 验证边界：上述为目标 JAR 静态字节码事实及默认值，未读取存档实际配置，未执行游戏观察；ICEcore 当前 CozyCafe 声望、客流与菜单规则未改变。
 
+### 森罗物语烟火烤串放置与烟火气移除
+
+2026-10-15 Jade 烧烤架标题精简：`GrillingJadeGrillMixin` 仅在客户端重定向烟火 1.1.1 的 `GrillProvider.appendTooltip` 中 `JadeElements.appendItems(ITooltip,Iterable)` 调用为空操作。该方法用 `ITooltip.append` 将逐槽小图标追加到名称行；下方状态文本仍由原方法添加，Jade 自身物品汇总不变。目标与 Jade API 均通过 class 资源检测，不提前加载可选类。每次提示省去图标复制、元素创建和布局，无新增遍历、缓存、网络或日志。`GrillingSkewerRulesTest` 核对上游唯一图标调用、完整描述符、状态入口保留、客户端注册和可选门禁；Forge 47.4.10 编译、定向测试、独立 clean 后完整 build 通过（139 项测试），生产 JAR 描述符与未打包上游类检查通过，CodeGraph 已更新。实际空/满架、混合烤串和各烤制状态的 HUD 待实机验收；未启动客户端。纯展示精简不写更新日志或 Wiki。
+
+| 字段 | 内容 |
+| --- | --- |
+| 玩家行为 | 单根烤串 Shift 右键不再放置；独立烤串盘、已有摆盘、双手拆串、串制、烧烤和调味保持上游入口。新旧烤串均不显示烟火气及倒计时，不享受热食饱和度或效果时长加成；非烤串食品不变。 |
+| 核对来源 | `libs/kaleidoscope_grilling-1.1.1-forge1.20.1.jar`；`SkewerPlatePlacement.onRightClickBlock` 只有一处单串 `place` 调用，副手分支为拆串；独立盘子调用 `placePacked`。`SkewerPlateItem.isSkewer` 统一识别 SkewerItem、秘制串、生串和 grilled_skewers 标签，覆盖脚本及自定义烤串。 |
+| 代码入口 | `mixin.GrillingSkewerPlacementMixin`、`mixin.GrillingSkewerHeatMixin`、`ICECoreMixinPlugin`；配置位于 `icecore.mixins.json` 通用侧列表。 |
+| 实现链路 | 仅重定向事件中的单串 place 调用为 PASS，不取消整个右键事件。FoodState.setHot 对烤串提前返回，isHot 返回 false、remainingHeat 返回 0；已有 HotUntil 数据保留但失效，仍由上游过期清理。HotFoodHandler 唯一直接读取 HotUntil 的提示分支位于 isHot 门禁之后；GUI 徽标和食用结算也使用该门禁。无新增资源、配置、tick 扫描、背包遍历、网络或日志；热度路径每次仅执行上游有界类型/标签判断。 |
+| 验证方法 | `GrillingSkewerRulesTest` 直接用 ASM 读取目标 JAR 核对描述符、唯一放置调用、两手拆串与独立盘子入口；源码契约覆盖烤串条件、旧热度查询、非烤串落回原方法、可选缺失门禁和禁止目标提前类加载。Forge 47.4.10 定向编译及测试通过，独立 clean 后完整 build 通过；生产 JAR 检查包含两个通用侧 Mixin、完整目标描述符及上游 isSkewer 调用，未打包上游类。CodeGraph 索引和 Git 忽略边界已核对。测试及构建不代替缺模组启动或真实交互验证。 |
+| 实机待验证 | 主副手与连续 Shift 右键、独立盘子放置及已有摆盘取回；固定/自定义/脚本烤串烧烤完成及带旧热度存档；非烤串热食显示与加成、串制/调味/拆串、缺烟火模组启动。未部署或启动客户端。 |
+| 最后修改 | 2026-10-15。 |
+
 ### 森罗物语烟火菜籽油副产物移除
 
 | 字段 | 内容 |

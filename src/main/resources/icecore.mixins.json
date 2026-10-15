@@ -6,6 +6,8 @@
   "plugin": "com.yinfires.icecore.mixin.ICECoreMixinPlugin",
   "mixins": [
     "GrillingOilPressMixin",
+    "GrillingSkewerPlacementMixin",
+    "GrillingSkewerHeatMixin",
     "BlockStateUseMixin",
     "CozyCafeManagerRangeMixin",
     "CozyCafeSpawnRegionManagerMixin",
@@ -50,6 +52,7 @@
     ,"DewDropIrrigationSprinklerMixin"
   ],
   "client": [
+    "GrillingJadeGrillMixin",
     "GeckoLibKeyframeMixin",
     "CozyCafeManagerScreenErrorMixin",
     "TavernTextRendererMixin",
