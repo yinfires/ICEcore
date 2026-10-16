@@ -53,6 +53,7 @@ Last updated: 2026-10-10
 ## 构建、部署与调试
 
 - 使用项目 `gradlew.bat` 和 Java 17 工具链；当前 `build.gradle` 明确 `JavaLanguageVersion.of(17)`。基线 Forge 47.4.10，其它 47.x 验证须核对实际解析坐标并恢复基线。
+- 交付仅使用完整 `build` 完成且 `verifyProductionJar` 通过的 `build/libs` 成品；不能交付重混淆完成前的JAR或IDE开发包。检查已有客户端包时可执行 `verifyProductionJar -PproductionJar=<绝对路径>`，并比较SHA-256；该任务只读目标包，拒绝仍含映射表中Minecraft开发方法名的生产包。
 - PowerShell 调用 Gradle 时，将 `-D` JVM 系统属性作为完整单引号参数传递，例如 `'-Dnet.minecraftforge.gradle.check.certs=false'`；避免点号参数被拆分为任务名。先核对日志中的任务图，再判断编译结果。
 - 窄验证优先，按风险扩大到完整构建；`clean` 单独执行成功后，再以新的 Gradle 进程执行 `test` 或 `build`，禁止合并在同一命令。纯文档修改使用 UTF-8、内容、引用与 Git 边界检查。
 - IDEA 与命令行使用同一个 Gradle user home；同步反复下载时核对用户 `GRADLE_USER_HOME` 与 IDEA 设置中的 Gradle user home（`gradle.settings.xml` 的 `serviceDirectoryPath`）。不一致时通过 IDEA 设置修改，不直接编辑运行中的配置 XML；版本更新或首次依赖下载属于正常现象，不把历史缓存位置硬编码成项目要求。

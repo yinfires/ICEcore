@@ -95,9 +95,9 @@
   "icecore.time.vote.required": "所有人均确认后才能跳过时间",
   "icecore.time.summary.title": "新的一天",
   "icecore.time.summary.income": "昨日净收入: %s$",
-  "icecore.time.summary.encourage": "继续努力吧"
-  ,"icecore.adventure_give.hud": "给予"
-  ,"icecore.adventure_give.full": "无法给予，对方物品栏已满",
+  "icecore.time.summary.encourage": "继续努力吧",
+  "icecore.adventure_give.hud": "给予",
+  "icecore.adventure_give.full": "无法给予，对方物品栏已满",
   "entity.icecore.npc": "NPC",
   "icecore.npc.summon.success": "已创建 NPC：%s",
   "icecore.npc.remove.success": "已移除 NPC：%s",
@@ -152,7 +152,12 @@
   "config.icecore.tooltip.hide_food_effects": "隐藏物品效果提示",
   "config.icecore.tooltip.hide_food_effects.tooltip": "隐藏效果名称、时长、概率及相关属性说明，不改变物品实际效果。",
   "config.icecore.interface.show_compatibility_details": "显示兼容识别详情",
-  "config.icecore.interface.show_compatibility_details.tooltip": "在 ICEcore 配置界面显示饮料与烤串兼容识别说明。"
+  "config.icecore.interface.show_compatibility_details.tooltip": "在 ICEcore 配置界面显示饮料与烤串兼容识别说明。",
+  "icecore.workstation.need_container": "请使用%s盛取",
+  "icecore.workstation.freezing": "冷冻中：%s",
+  "icecore.workstation.fermenting": "发酵中：%s",
+  "icecore.workstation.cooking": "烹饪中：%s",
+  "icecore.workstation.steaming": "蒸制中：%s",
+  "icecore.workstation.boiling": "烹煮中：%s",
+  "icecore.workstation.baking": "烤制中：%s"
 }
-
-

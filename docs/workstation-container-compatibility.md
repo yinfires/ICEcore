@@ -4,6 +4,12 @@
 
 ## 共用入口
 
+2026-10-16：外部工作方块通过 `WorkstationAdapter`、`WorkstationInteractionService`、`ExternalWorkstationAdapters` 接入。冰柜、发酵桶、汤锅和炒锅共用逐件取放；料理台只在原生工具动作之后统一单件投入，空手及成品取出仍走上游入口。外部槽位顺序与精确空容器栈由 `WorkstationSlotState` 保存在 `ICEcoreSlots`，旧数据在首次交互恢复；原生配方结算替换物品时重新推导容器要求。
+
+汤锅普通与灵活配方省略容器字段时从结果物品可靠元数据推导；显式 `carrier` 保留，`empty_carrier=true` 强制空手。成品每次领取一件；无容器成品采用物品显示，有容器成品保留汤底显示。真实汤底仍由上游独立入口处理。
+
+Jade物品只使用标准ItemStorage容器内容；非标准槽通过只读ViewGroup适配，禁止另加物品名称/数量行。真实流体使用标准FluidStorage/FluidView，排列为物品、流体、状态。茶壶成品替换茶底和展示流体槽；其它独立真实流体保留。成功取出物品、成品或流体不显示底部提示，声音保留；容器要求及其它失败通过PlayerFeedback，茶壶烹煮中持桶取液禁止且静默。
+
 `workstation.WorkstationContainerCompat` 是统一解析入口：
 
 - `describe` 将已装物品解析为 `FLUID` 或 `INGREDIENT`。

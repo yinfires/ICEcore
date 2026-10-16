@@ -95,9 +95,9 @@
   "icecore.time.vote.required": "Everyone must confirm to skip time",
   "icecore.time.summary.title": "A New Day",
   "icecore.time.summary.income": "Yesterday's net income: %s$",
-  "icecore.time.summary.encourage": "Keep it up"
-  ,"icecore.adventure_give.hud": "Give"
-  ,"icecore.adventure_give.full": "Cannot give: the recipient's inventory is full",
+  "icecore.time.summary.encourage": "Keep it up",
+  "icecore.adventure_give.hud": "Give",
+  "icecore.adventure_give.full": "Cannot give: the recipient's inventory is full",
   "entity.icecore.npc": "NPC",
   "icecore.npc.summon.success": "Created NPC: %s",
   "icecore.npc.remove.success": "Removed NPC: %s",
@@ -152,7 +152,12 @@
   "config.icecore.tooltip.hide_food_effects": "Hide item effect tooltips",
   "config.icecore.tooltip.hide_food_effects.tooltip": "Hides effect names, duration, chance and related attribute descriptions without changing actual effects.",
   "config.icecore.interface.show_compatibility_details": "Show compatibility details",
-  "config.icecore.interface.show_compatibility_details.tooltip": "Shows the compatibility category in the ICEcore configuration screen."
+  "config.icecore.interface.show_compatibility_details.tooltip": "Shows the compatibility category in the ICEcore configuration screen.",
+  "icecore.workstation.need_container": "Use %s to collect",
+  "icecore.workstation.freezing": "Freezing: %s",
+  "icecore.workstation.fermenting": "Fermenting: %s",
+  "icecore.workstation.cooking": "Cooking: %s",
+  "icecore.workstation.steaming": "Steaming: %s",
+  "icecore.workstation.boiling": "Boiling: %s",
+  "icecore.workstation.baking": "Baking: %s"
 }
-
-

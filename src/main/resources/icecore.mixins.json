@@ -5,6 +5,22 @@
   "compatibilityLevel": "JAVA_17",
   "plugin": "com.yinfires.icecore.mixin.ICECoreMixinPlugin",
   "mixins": [
+    "WorkstationStateMixin",
+    "WorkstationMetadataMixin",
+    "WorkstationPotMixin",
+    "WorkstationCuisineMixin",
+    "WorkstationTeapotItemMixin",
+    "WorkstationTeaMixin",
+    "WorkstationSteamerMixin",
+    "WorkstationSteamerRecipeMixin",
+    "WorkstationSteamerBlockMixin",
+    "WorkstationStockpotRecipeMixin",
+    "WorkstationFlexStockpotRecipeMixin",
+    "WorkstationProductInteractionMixin",
+    "WorkstationFreezerFeedbackMixin",
+    "WorkstationCookeryFeedbackMixin",
+    "WorkstationPotFeedbackMixin",
+    "WorkstationGrillFeedbackMixin",
     "CookeryStockpotLidMixin",
     "CookeryStockpotEntityMixin",
     "CookeryStockpotDropsMixin",
@@ -27,34 +43,40 @@
     "CozyCafeClearCafeMixin",
     "CozyCafeManagerMenuStateMixin",
     "CozyCafeOrphanedMenuMixin",
-    "CozyCafePaymentMixin"
-    ,"SDMShopEconomyMixin"
-    ,"SDMShopMoneyFormatMixin"
-    ,"SDMShopSaveMixin"
-    ,"SDMShopNotifyMixin"
-    ,"AdventureDropPacketMixin"
-    ,"AdventureCarriedStackMixin"
-    ,"AdventureMenuCloseMixin"
-    ,"ServerLevelTimeMixin"
-    ,"ServerLevelRandomTickMixin"
-    ,"TimeCommandMixin"
-    ,"RecipeManagerMixin"
-    ,"BushBlockSeedBagFarmlandMixin"
-    ,"FarmBlockUntilledDirtMixin"
-    ,"BlockStateSoilRemovedMixin"
-    ,"SeedBagCompatDewFarmlandMixin"
-    ,"SeedBagCompatDewGrowthMixin"
-    ,"SeedBagCompatDewRandomTickMixin"
-    ,"SeedBagCompatDoubleGrowthMixin"
-    ,"SeedBagCompatClimbingGrowthMixin"
-    ,"SeedBagCompatRiceMixin"
-    ,"SeedBagCompatTeaMixin"
-    ,"SeedBagCompatEggplantMixin"
-    ,"DewDropIrrigationWateringCanMixin"
-    ,"DewDropIrrigationFarmlandEventsMixin"
-    ,"DewDropIrrigationSprinklerMixin"
+    "CozyCafePaymentMixin",
+    "SDMShopEconomyMixin",
+    "SDMShopMoneyFormatMixin",
+    "SDMShopSaveMixin",
+    "SDMShopNotifyMixin",
+    "AdventureDropPacketMixin",
+    "AdventureCarriedStackMixin",
+    "AdventureMenuCloseMixin",
+    "ServerLevelTimeMixin",
+    "ServerLevelRandomTickMixin",
+    "TimeCommandMixin",
+    "RecipeManagerMixin",
+    "BushBlockSeedBagFarmlandMixin",
+    "FarmBlockUntilledDirtMixin",
+    "BlockStateSoilRemovedMixin",
+    "SeedBagCompatDewFarmlandMixin",
+    "SeedBagCompatDewGrowthMixin",
+    "SeedBagCompatDewRandomTickMixin",
+    "SeedBagCompatDoubleGrowthMixin",
+    "SeedBagCompatClimbingGrowthMixin",
+    "SeedBagCompatRiceMixin",
+    "SeedBagCompatTeaMixin",
+    "SeedBagCompatEggplantMixin",
+    "DewDropIrrigationWateringCanMixin",
+    "DewDropIrrigationFarmlandEventsMixin",
+    "DewDropIrrigationSprinklerMixin",
+    "WorkstationTeapotStartMixin",
+    "WorkstationJadeStorageMixin",
+    "WorkstationStockpotProductSyncMixin"
   ],
   "client": [
+    "WorkstationOverlayMixin",
+    "WorkstationStockpotRenderMixin",
+    "WorkstationFreezerJadeMixin",
     "CreateItemDescriptionTooltipMixin",
     "LibItemDescriptionTooltipMixin",
     "QualityFoodTooltipMixin",
@@ -82,15 +104,18 @@
     "EmbeddiumWorldSliceMixin",
     "EmbeddiumChunkBuildOutputMixin",
     "EmbeddiumRenderSectionMixin",
-    "EmbeddiumRenderRegionManagerMixin"
-    ,"JadeOverlayRendererMixin"
-    ,"ClientLevelTimeMixin"
-    ,"AdventureLocalPlayerDropMixin"
-    ,"AdventureKeyDropMixin"
-    ,"AdventureContainerScreenMixin"
-    ,"SDMShopClientMixin"
-    ,"PostChainAccessor"
-    ,"JeiRecipeManagerInternalMixin"
+    "EmbeddiumRenderRegionManagerMixin",
+    "JadeOverlayRendererMixin",
+    "ClientLevelTimeMixin",
+    "AdventureLocalPlayerDropMixin",
+    "AdventureKeyDropMixin",
+    "AdventureContainerScreenMixin",
+    "SDMShopClientMixin",
+    "PostChainAccessor",
+    "JeiRecipeManagerInternalMixin",
+    "WorkstationCookeryOverlayMixin",
+    "WorkstationJadeFluidOrderMixin",
+    "WorkstationBarrelJadeMixin"
   ],
   "injectors": {
     "defaultRequire": 1

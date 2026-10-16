@@ -24,8 +24,16 @@ import snownee.jade.api.ui.IElementHelper;
 /** Jade is only discovered through this annotation, so nothing here loads without Jade installed. */
 @WailaPlugin(ICECore.MOD_ID)
 public final class ICECoreJadePlugin implements IWailaPlugin {
+    @Override public void register(snownee.jade.api.IWailaCommonRegistration registration) {
+        registration.registerItemStorage(WorkstationItemStorage.INSTANCE, net.minecraft.world.level.block.entity.BlockEntity.class);
+        registration.registerFluidStorage(WorkstationFluidStorage.INSTANCE, net.minecraft.world.level.block.entity.BlockEntity.class);
+        registration.registerBlockDataProvider(WorkstationJadeProvider.INSTANCE, net.minecraft.world.level.block.entity.BlockEntity.class);
+    }
     @Override
     public void registerClient(IWailaClientRegistration registration) {
+        registration.registerItemStorageClient(WorkstationItemStorage.INSTANCE);
+        registration.registerFluidStorageClient(WorkstationFluidStorage.INSTANCE);
+        registration.registerBlockComponent(WorkstationJadeProvider.INSTANCE, net.minecraft.world.level.block.Block.class);
         // Every seed-bag crop part (CropBlock, FD rice, Collector's Reap bushes) is a BushBlock.
         registration.registerBlockIcon(SeedBagIconProvider.INSTANCE, BushBlock.class);
         registration.registerBlockComponent(RiceProgressProvider.INSTANCE, BushBlock.class);
