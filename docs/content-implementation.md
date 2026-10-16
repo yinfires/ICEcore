@@ -57,6 +57,13 @@ Last updated: 2026-10-05
 | 性能 | 全部事件驱动：右键/左键事件与包按玩家操作触发；`onRemove` 钩子常态只有一次 `instanceof`；`BushBlock.canSurvive` 钩子为一次 IdentityHashMap 查找；无 tick 扫描、无反射、无日志。 |
 | 验证方法 | 2026-10-15 新增 `RiceGrowthTest`（7 次生命周期、抽穗、肥料与收获重置）和 `SeedBagGrowthContractTest`（随机刻/补偿同入口、生产描述符、可选门控、各结构与提示契约）；编译、窄测试及 Forge 47.4.10 单独 clean 后完整 build 通过，全量 135 项测试通过；成品 JAR 的生产 SRG 调用、Mixin 入口和包外桥接已核对，未打包第三方依赖。这里是纯逻辑/源码契约与构建验证，不是游戏环境行为测试；随机刻拦截、所有作物每日推进、Jade 画面与可选模组缺失的运行验收仍待授权。`SeedBagFarmingContractTest`（定义↔模型↔语言↔战利品表、辣椒等分、无原种子掉落、mixin 注册与可选门控、未开垦泥土资源）、`SeedBagRenderingContractTest`；2026-10-08 两项种子袋窄测试及 Forge 47.4.10 `gradlew.bat clean build` 全量测试通过，成品 JAR 的 19 个模型、19 张 PNG 与正式源资源逐张 SHA-256 一致，中文名称已核对；源图接触表为最近邻静态预览，非游戏截图，Jade 实际画面待用户授权验证。mixin 目标签名均以客户端 mods 目录 JAR 的 javap 与 Forge 47.4.10 映射核对。实机待用户授权验证：各作物种植/收获/左键破坏、dew 每日干涸后作物消失与未开垦泥土生成、茶树上半格与 Jade 成熟、稻米无水显示、青柠长满。 |
 
+### 标准配置保存与运行时刷新
+
+- `config.ICECoreClientConfigEvents` 监听 Forge `ScreenEvent.Closing`，通过客户端任务队列在 `Screen.removed()` 保存完成后刷新本模组 COMMON/CLIENT 规格缓存；只处理五个布尔配置值，不加载文件、不扫描注册表、不依赖编辑器类名，无 tick 或渲染轮询。客户端提示开关下一次悬停即读取新值。
+- 单人游戏通过 `getSingleplayerServer()` 调度 `ICECoreConfigEvents.synchronize`；远程客户端仅刷新本地配置，不覆盖服务器权威快照。COMMON 重载事件与界面关闭共用服务端刷新入口，所有缓存读取、玩家列表访问和发包在服务端线程执行；只在禁食/兼容值变化时广播两个布尔值，重复保存去重，旧服务器已退出时丢弃任务。每次界面关闭固定 O(5)，变化时 O(在线玩家数)，快照内存 O(1)。
+- 事实来源：Forge 47.4.10 `ForgeConfigSpec.save/afterReload`、`ConfigFileTypeHandler.ConfigWatcher.run` 和 `ModConfigEvent.Reloading`；原监听直接在任意事件线程遍历玩家，保存兜底此前缺失。普通文件热重载由 Forge watcher 负责，本补丁不重复读盘或保存。
+- 验证：`ConfigReloadTest` 真实内存配置覆盖底层值更新后的旧缓存、双向切换、客户端提示缓存、服务端队列、重复广播去重和停服丢弃；源码门禁固定关闭后排队及单人服务器边界。Forge 47.4.10 独立 clean 后完整 build 通过（158 项测试），官方最新 47.4.28 完整 build 通过，dependencies 确认实际解析坐标为 1.20.1-47.4.28_mapped_official_1.20.1；最终恢复基线构建。实机配置编辑器保存、暂停菜单及专服同步仍待用户授权验证。2026-10-16。
+
 ### 全局禁止食物食用配置
 
 | 字段 | 内容 |

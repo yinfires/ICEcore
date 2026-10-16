@@ -7,9 +7,12 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.server.ServerLifecycleHooks;
+import net.minecraft.server.MinecraftServer;
 
 @Mod.EventBusSubscriber(modid = ICECore.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public final class ICECoreConfigEvents {
+    // Accessed only on the server thread. Login already sends the current snapshot to new players.
+    private static ClientBoundFoodConsumptionConfigPacket lastBroadcast;
     private ICECoreConfigEvents() {
     }
 
@@ -18,14 +21,27 @@ public final class ICECoreConfigEvents {
         if (event.getConfig().getSpec() != ICECoreConfig.SPEC) {
             return;
         }
-        var server = ServerLifecycleHooks.getCurrentServer();
+        synchronize(ServerLifecycleHooks.getCurrentServer());
+    }
+
+    public static void synchronize(MinecraftServer server) {
         if (server == null) {
             return;
         }
-        var packet = new ClientBoundFoodConsumptionConfigPacket(ICECoreConfig.disableFoodConsumption(),
-                ICECoreConfig.enableModCompatibility());
-        for (var player : server.getPlayerList().getPlayers()) {
-            ICECoreNetwork.sendToPlayer(packet, player);
-        }
+        server.execute(() -> {
+            if (server != ServerLifecycleHooks.getCurrentServer()) {
+                return;
+            }
+            ICECoreConfig.SPEC.afterReload();
+            var packet = new ClientBoundFoodConsumptionConfigPacket(ICECoreConfig.disableFoodConsumption(),
+                    ICECoreConfig.enableModCompatibility());
+            if (packet.equals(lastBroadcast)) {
+                return;
+            }
+            lastBroadcast = packet;
+            for (var player : server.getPlayerList().getPlayers()) {
+                ICECoreNetwork.sendToPlayer(packet, player);
+            }
+        });
     }
 }

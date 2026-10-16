@@ -14,6 +14,7 @@ Last updated: 2026-10-10（工作区规则独立维护，补充本地开发与�
 | 厨具统一、雪克杯饮料扩展、料理台食品迁移 | [厨具统一静态核对](kitchen-unification-audit.md) | 读取雪克杯输入/倒出限制及寿司、拼盘、团子串三例；区分静态审计与未完成的运行验收 |
 | 工作方块桶、瓶、碗兼容，容器返还、盛取、提示或声音 | [工作方块容器兼容](workstation-container-compatibility.md) | 读取共用服务、数据包格式、解析优先级、交互矩阵、槽位元数据和验证要求；禁止在新工作方块重复写死容器逻辑 |
 | SmartKeyPrompts / KubeJS 自定义按键提示 | [KubeJS 提示编写方法](smartkeyprompts-kubejs.md) | 接口绑定、END 转发、缓存生命周期、类过滤与 Rhino 验证；版本变化重新核对 |
+| 游戏内 TOML 配置保存、热重载或禁食开关未即时生效 | [内容实现索引](content-implementation.md) | 读取“标准配置保存与运行时刷新”和“全局禁止食物食用配置” |
 | 任意代码或资源实现、修改、排错 | [内容实现索引](content-implementation.md) | 先读目录和本次涉及的功能条目；当前包含构建流程、模组加载、CozyCafe 菜单/电脑范围扩展和冒险模式建造系统条目 |
 | 模型、贴图、UV 制作与交付 | [工作区模型规则](../AGENTS.md)、[贴图与模型制作流程](texture-and-model-workflow.md)、[内容实现索引](content-implementation.md) | 先读“模型与 UV 制作验收”和制作流程，再读相关资产条目；可先生成参考图；新 MC 贴图及模型资产统一保存到 `D:/Minecraft/Mod Develop/模型/`，按任务分子目录 |
 | GitHub Wiki 内容、导航或独立仓库维护 | [根目录 Wiki](../wiki/Home.md)、[内容实现索引](content-implementation.md) | 仅在新增或改变长期使用说明时维护页面；纯视觉表现、渲染方式、内部实现、性能修复和开发期 bug 修正不写入 Wiki；读取 Wiki 当前页面、项目 Wiki 规范和独立仓库状态，只修改 `wiki/`，使用嵌套仓库命令提交与推送 |
