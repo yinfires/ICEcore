@@ -89,6 +89,34 @@ final class WorkstationMixinContractTest {
         assertTrue(render.contains("ItemRenderReplacer.getModel"));
         assertTrue(render.contains("icecore$needsCarrier"));
     }
+    @Test void stockpotProductClearsRealBottomAndFailedRecipeKeepsBowl() throws Exception {
+        String render = Files.readString(Path.of("src/main/java/com/yinfires/icecore/mixin/WorkstationStockpotRenderMixin.java"));
+        assertTrue(render.contains("pose.translate(.5, 3.0 / 16.0, .5)"));
+        int checked = 0;
+        try (var paths = Files.list(Path.of("libs"))) {
+            for (Path path : paths.filter(p -> p.getFileName().toString().contains("kaleidoscopecookery") && p.toString().endsWith(".jar")).toList()) {
+                try (ZipFile jar = new ZipFile(path.toFile())) {
+                    var entry = jar.getEntry("assets/kaleidoscope_cookery/models/block/stockpot.json");
+                    assertNotNull(entry);
+                    var model = com.google.gson.JsonParser.parseReader(new java.io.InputStreamReader(jar.getInputStream(entry), java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
+                    double bottom = 0;
+                    for (var raw : model.getAsJsonArray("elements")) {
+                        var element = raw.getAsJsonObject();
+                        var from = element.getAsJsonArray("from"); var to = element.getAsJsonArray("to");
+                        if (from.get(0).getAsDouble() <= 8 && to.get(0).getAsDouble() >= 8
+                                && from.get(2).getAsDouble() <= 8 && to.get(2).getAsDouble() >= 8)
+                            bottom = Math.max(bottom, to.get(1).getAsDouble());
+                    }
+                    assertEquals(2, bottom, path.toString());
+                    assertTrue(3.0 > bottom, "Product plane must clear the solid model bottom"); checked++;
+                }
+            }
+        }
+        assertTrue(checked >= 2, "Both supported kitchen versions must be checked");
+        String products = Files.readString(Path.of("src/main/java/com/yinfires/icecore/workstation/StockpotProducts.java"));
+        assertTrue(products.contains("StockpotRecipeSerializer.EMPTY_ID.equals(id)"));
+        assertTrue(products.indexOf("StockpotRecipeSerializer.DEFAULT_CARRIER") < products.indexOf("getRecipeManager()"));
+    }
     private static List<AnnotationNode> annotations(List<AnnotationNode> a, List<AnnotationNode> b) { List<AnnotationNode> result = new ArrayList<>(); if(a != null)result.addAll(a);if(b != null)result.addAll(b);return result; }
     private static Object value(AnnotationNode node, String key) { if(node.values != null)for(int i=0;i<node.values.size();i+=2)if(node.values.get(i).equals(key))return node.values.get(i+1);return null; }
 }

@@ -20,7 +20,8 @@ public abstract class WorkstationStockpotRenderMixin {
         Boolean needsCarrier = ((com.yinfires.icecore.workstation.StockpotProductView)pot).icecore$needsCarrier();
         if (needsCarrier == null ? !StockpotProducts.carrier(pot).isEmpty() : needsCarrier) return;
         pose.pushPose();
-        pose.translate(.5, .1, .5);
+        // Stockpot's solid bottom ends at Y=2/16; wok's 0.1 would bury the item.
+        pose.translate(.5, 3.0 / 16.0, .5);
         pose.mulPose(Axis.YP.rotationDegrees(pot.getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING).get2DDataValue() * 90));
         pose.mulPose(Axis.XP.rotationDegrees(90)); pose.scale(.5F, .5F, .5F);
         var item = pot.getResult().copyWithCount(1);

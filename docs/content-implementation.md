@@ -175,12 +175,13 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 ### 工作方块统一交互与 Jade（2026-10-16）
 
 - 目标 ID 来源为 recipe-manager `public/data/recipe-manager.json`。冰柜、发酵桶、汤锅、炒锅接入 `workstation.WorkstationInteractionService`；料理台仅由 `WorkstationCuisineMixin` 在工具处理之后接入单件投入，原生取出保持。容器识别、库存交换与后进先出复用现有服务；槽位元数据保存为 `ICEcoreSlots`，加载不发包，首次操作有界恢复。
-- 发酵桶空主手 Shift 开合，普通点击不再开合或倾倒；仅开盖取放，开盖清零进度。炒锅取消 `tickPutIngredient` 自动 startCooking，保留 onShovelHit；成品逐件领取，无容器空手可取且不烫伤。烧焦结算保留 1–3 个木炭并停止继续烧焦。汤锅省略 carrier 时从结果推导，显式 carrier/empty_carrier 保留；无需容器时不显示汤底，使用炒锅同款中心、高度、90°平放和0.5缩放。
+- 发酵桶空主手 Shift 开合，普通点击不再开合或倾倒；仅开盖取放，开盖清零进度。炒锅取消 `tickPutIngredient` 自动 startCooking，保留 onShovelHit；成品逐件领取，无容器空手可取且不烫伤。烧焦结算保留 1–3 个木炭并停止继续烧焦。汤锅省略 carrier 时从结果推导，显式 carrier/empty_carrier 保留；无需容器时不显示汤底，使用炒锅同款中心、90°平放和0.5缩放，高度按汤锅真实内底调整为3/16格。
 - 蒸笼 `getCookTick` 统一600 tick，开盖仅存放，关盖开始；同层同批统一进度与时长，完成槽标记-1并停止再次匹配。无热源暂停，开盖清零未完成槽，已完成成品保留。堆叠盖判定缓存按世界tick清空，同一连续堆叠只扫描一次，最多4096坐标，世界卸载可回收；点击失效缓存并清理覆盖层进度。
 - 茶壶普通右键放置保留BlockItem流程；茶杯禁止不合法持物点击落入掉落实体分支，合法倒茶、添空杯、同类叠放保留。料理台与发酵桶原专用框通过实际 overlay render 入口按目标取消，其它方块提示框不变。
 - `compat.jade.WorkstationJadeProvider` 在 Jade 请求时生成只读快照，不增加世界tick扫描；酒桶所有部件解析原点，显示4000mB和逐槽投入物；茶壶将原单份流体状态映射1000mB槽，完成时替换原料为成品。料理台、冰柜、汤锅、炒锅显示成品。六种工作状态使用剩余tick/20格式化MM:SS，竹匾不增加时间；容器要求等失败提示统一PlayerFeedback，成功取出不再显示底部提示，状态迁至Jade。
 - 2026-10-16 容器显示修正：`WorkstationItemStorage` / `WorkstationFluidStorage` 使用 Jade 11.13.3 标准 ViewGroup、ItemView 与 FluidView，`WorkstationJadeStorageMixin` 在按需 putData 入口为目标方块选择唯一存储内容来源；请求内标记避免物品/流体入口重复投影。已有容器读取槽位副本，未标准化的成品字段为只读展示，不注册自动化能力。物品优先级1000，流体1100，酒桶状态1200，工作倒计时10000；旧自绘物品/流体及三项专用翻译键删除。茶壶完成时原料与1000mB展示流体被剩余成品替换；其它真实槽保持。
 - `WorkstationCookeryOverlayMixin` 取消茶壶与炒锅实际客户端指向文字；成功取出提示从共享交互删除，原生反馈仅保留容器要求及明确失败，茶壶 take_tea_fluid.blocked 静默禁止。`WorkstationTeapotStartMixin` 在成功投入及条件首次满足时复用原生tick的配方/谜之茶初始化，跳过200tick准备等待与23tick启动轮询；同世界tick不重复扣时，原热源暂停保持。
+- 汤锅不可见根因（2026-10-16）：真实厨房1.4.1/1.5.1的stockpot.json实体底板为[2,0,2]→[14,2,14]，原0.1格展示面低于2/16格而被锅底遮挡；客户端实际包确认包含0.1。成品中心升到3/16格（比内底高1/16格），保留炒锅平放、0.5缩放及模型替换。WorkstationMixinContractTest从两版真实JAR几何读取中心底板高度，锁定展示面在实体外。无匹配配方的EMPTY_ID分支优先返回上游DEFAULT_CARRIER（真实Items.BOWL），取出、服务端分类及汤底表现使用同一规则，不影响明确empty_carrier配方。本轮定向测试、独立clean后Forge47.4.10完整build及167项测试通过，生产映射校验通过；未部署或启动客户端。
 - 汤锅 `WorkstationStockpotProductSyncMixin` 随上游原有保存/更新标签写入 `ICEcoreProductCarrier`，客户端不依赖尚未就绪的配方判断；旧标签缺失时按配方与结果可靠元数据回退。世界成品采用炒锅 ItemRenderReplacer 的pot模型列表、中心高度及变换，单成品固定第0项，无额外随机转向；需要容器仍显示汤底。新增契约验证标准存储与失败反馈边界，客户端布局和实际结果模型仍需实机确认。
 - 来源：libs 厨房1.4.1/1.5.1、youkaisfeasts0.5.0、烟火1.1.1、酒馆1.2.0、世界名酒1.1.12；世界名酒参考JAR从指定客户端复制至libs，不作为构建依赖。可选Mixin以class资源探测，桥接与辅助类型位于Mixin包之外。
 - 验证：166 项测试通过；新增 `WorkstationMixinContractTest` 使用真实JAR ASM逐项检查生产选择器和Shadow，现有顺序纯逻辑测试保留。独立执行 clean 后 Forge 47.4.10 完整 build 通过；47.4.28 兼容构建及实际依赖坐标检查通过，恢复47.4.10后最终 build 通过。生产 `build/libs/icecore-0.1.1.jar` 的Mixin、双语键及外部类打包边界检查通过；UTF-8、Git边界与CodeGraph状态检查通过。未部署或启动客户端；实机须覆盖Jade空满槽、汤锅摆放、原生工具及成品领取、旧存档、蒸笼层盖与多人双手交互。

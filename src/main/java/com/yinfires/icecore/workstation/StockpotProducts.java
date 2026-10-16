@@ -12,6 +12,9 @@ public final class StockpotProducts {
         ResourceLocation id;
         try { id = (ResourceLocation)RECIPE_ID.get(pot); }
         catch (IllegalAccessException e) { throw new IllegalStateException(e); }
+        // Failed recipes produce suspicious stew, which retains upstream's bowl requirement.
+        if (com.github.ysbbbbbb.kaleidoscopecookery.crafting.serializer.StockpotRecipeSerializer.EMPTY_ID.equals(id))
+            return com.github.ysbbbbbb.kaleidoscopecookery.crafting.serializer.StockpotRecipeSerializer.DEFAULT_CARRIER;
         var recipe = id == null ? null : pot.getLevel().getRecipeManager().byKey(id).orElse(null);
         if (recipe instanceof StockpotRecipe r) return r.carrier();
         if (recipe instanceof FlexStockpotRecipe r) return r.carrier();
