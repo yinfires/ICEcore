@@ -543,6 +543,18 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 | 验证方法 | `GrillingOilPressMixinTest` 检查完整生产选择器、空栈输出、配置注册及不提前定义目标类；基线 Forge 47.4.10 窄测试通过，单独 `clean` 后完整 `build` 通过，生产 JAR 注解描述符、SRG 空栈字段及语言资源检查通过，无打包上游类。ForgeGradle 6.0.54 连通性检查停在 TLS 握手，离线验证命令临时使用 `-Dnet.minecraftforge.gradle.check.certs=false --offline --no-daemon`，不修改持久设置。未启动客户端，手动/铁砧/Create 压榨及 HUD 实机回归待验证。 |
 | 最后修改 | 2026-10-11。 |
 
+### 森罗物语厨房汤锅盖直接切换与禁用盾牌
+
+- 2026-10-16：主手为空时 Shift 右键汤锅直接切换有盖/无盖，允许副手持物；操作独占此次点击，不同时取内容。`kaleidoscope_cookery:stockpot_lid` 不再举盾、格挡或用于盖锅，开盖和破坏汤锅不生成锅盖物品。现有物品与配方保留，无配置或命令。
+- 来源：`libs/` 中厨房 1.4.1 与客户端同版 1.5.1 的 `StockpotLidItem` 字节码均直接继承 `ShieldItem`，不覆写盾牌使用方法。Forge 47.4.10 映射及字节码确认 `use` 启动使用，`getUseAnimation` 返回 BLOCK，`getUseDuration` 返回 72000，`canPerformAction` 查询盾牌动作集合。
+- 入口：通用侧 `mixin.CookeryStockpotLidMixin` 以继承覆写替换上述四个方法：use 返回 PASS、不启动使用；动画 NONE、时长 0、工具动作 false。构建重混淆生成 SRG 方法名；不在外部目标上注入不存在的方法。`ICECoreMixinPlugin` 通过 class 资源检测跳过缺失模组，不提前加载目标类。
+- 方块入口：`compat.kaleidoscopecookery.StockpotInteractions` 在 Cookery 存在时注册 LOWEST RightClickBlock，尊重取消、DENY、旁观者与 mayInteract。主手空+蹲下命中 StockpotBlock 时两侧消费事件，副手重试不修改状态；仅服务端主手翻转 HAS_LID 并以 flags=3 同步，成功后播放上游 LANTERN_PLACE/BREAK 音效。普通右键进入上游汤底/食材/成品逻辑。
+- 物品与旧数据：`CookeryStockpotEntityMixin` 在真实 `onLitClick(Level,LivingEntity,ItemStack)Z` HEAD 返回 false，阻止原装盖消耗及取盖发物品；生产 `m_142466_(CompoundTag)V` TAIL 清空 lidItem，不修改 HAS_LID。`CookeryStockpotDropsMixin` 重定向真实 getDrops 内唯一 HAS_LID getValue 查询为 false，精确跳过锅盖追加，保留汤锅与食材掉落。两版目标 StockpotBlock/Entity 字节码完全一致。
+- 资源：`assets/kaleidoscope_cookery/lang/{zh_cn,en_us}.json` 覆盖真实 stockpot 和 stockpot_lid 提示键，说明空主手 Shift 开合及物品用途取消。长期操作说明维护于独立 Wiki《内容》。
+- 性能：仅物品使用或能力查询时 O(1)，无 tick、背包遍历、反射、I/O、缓存、网络或日志；使用结果采用原版 PASS 包装，无持续动画状态。
+- 验证：`CookeryStockpotLidMixinTest` 与 `CookeryStockpotRulesTest` 共 5 项，ASM 核对两版真实继承、交互/加载完整描述符、唯一盖子掉落查询及食材入口；检查双侧消费/主手服务端修改边界、生产选择器、旧数据清空、缺失门禁及 Forge RightClickBlock 的真实 Cancelable 注解。窄测试通过；最终构建及成品验证记录见下方。主副手、普通盾牌、普通右键取物、旧存档、破坏掉落与多人同步仍需实机复测，不启动或部署客户端。
+- 最终验证：Forge 47.4.10 独立 clean 后完整 build 通过（163 项测试）；Forge 官方 promotions 最新 47.4.28 完整 build 通过，dependencies 确认解析 `1.20.1-47.4.28_mapped_official_1.20.1`，随后恢复 47.4.10 构建。生产 JAR 核对 `m_7203_`/`m_6164_`/`m_8105_` 覆写、Forge canPerformAction、两个新 Mixin 的完整选择器、HEAD/TAIL 与 lidItem Shadow；通用侧注册、双语键、展开元数据、无测试/上游类及 Git 忽略边界检查通过。CodeGraph watcher 已收录新增类。未部署、启动客户端或提交推送。
+
 ### 森罗物语厨房菜籽油汤底兼容
 
 | 字段 | 内容 |

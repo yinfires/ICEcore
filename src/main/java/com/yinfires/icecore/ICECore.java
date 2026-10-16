@@ -53,6 +53,7 @@ public final class ICECore {
         }
         if (ModList.get().isLoaded("kaleidoscope_cookery")) {
             com.yinfires.icecore.compat.kaleidoscopecookery.OilPotInteractions.register();
+            com.yinfires.icecore.compat.kaleidoscopecookery.StockpotInteractions.register();
         }
         if (ModList.get().isLoaded("kaleidoscope_cookery") && ModList.get().isLoaded("kaleidoscope_grilling")) {
             modBus.addListener(com.yinfires.icecore.compat.kaleidoscopecookery.KaleidoscopeCookeryCompat::onCommonSetup);
