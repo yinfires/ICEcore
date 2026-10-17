@@ -28,6 +28,8 @@ public abstract class MultiPlayerGameModeMixin {
             // Let an empty main hand advance to the actual offhand wrench.
             callback.setReturnValue(com.yinfires.icecore.building.BuildingServerActions
                     .isWrench(player.getItemInHand(hand)) ? InteractionResult.SUCCESS : InteractionResult.PASS);
+        } else if (com.yinfires.icecore.building.BuildingClientEvents.shouldBlockRestrictedUse(player, hit)) {
+            callback.setReturnValue(InteractionResult.FAIL);
         }
     }
 }

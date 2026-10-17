@@ -184,6 +184,7 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 - 扳手接入 `BuildingStructure` 的显式大冰箱半边解析，点击上下均归一到下半；上下状态参与空间预览与区域限制。`ContainerContentAccess` 提供每半自身库存及升级指纹，现有结构循环检查上下各27格；任意一边非空或带升级都要求两次Shift确认，任意库存/升级变化使确认失效。`BuildingServerActions` 在移除任何结构块前先移除所有对应实体；强拆清空两半内容与升级且只返还一个新冰箱，不产生上半库存的世界掉落。原有区域/列表规则继续决定是否允许拆放，不自动添加管理员配置。
 - 世界模型直接引用原生 fridge_large_lower/upper，方向变换与原生一致；`FridgeClient` 使用原生同款颜色处理和cutoutMipped层，复用原生方块实体渲染器。物品模型由原生上下柜体与闭合上下门25个元素组合，上半仅平移16；原生实体几何实际Y=0..29，保留纹理绑定和UV，删除物品面tintindex/cullface并按整体中心缩放。资产生成/核对脚本、独立导出和正面/侧面/背面/斜视合成位于 `D:/Minecraft/Mod Develop/模型/一体式冰箱/`；未生成新贴图。可见特征映射为原生白色柜体→原柜体四壁，贯通门把手→原生上下门把手，后部黑色孔→原生背面贴图，29/16高度→完整双层物品轮廓。
 - `FridgeContractTest` 覆盖双格放置检查、生产字段/描述符、包外桥接、无配方、两半资源和扳手事务；`FridgeUpstreamContractTest` 通过ASM核对真实生产JAR注入方法、原生库存/渲染入口，并逐元素比较模型坐标、UV与纹理引用。已有建造回归同批执行。构建与实机验证状态见本条末尾追加记录；不把源码契约或合成图当作实机功能验收。
+- 2026-10-17验证：定向冰箱/建造回归通过；独立clean成功后Forge47.4.10完整build通过，Forge47.4.28（实际Maven最新47.x）带有限联网超时offline完整build通过，最终恢复47.4.10完整build与verifyProductionJar通过。183项测试零失败，生产包包含新方块/物品模型/战利品和包外桥接，不含net/blay09上游类、测试配方或旧Accessor。最终 `build/libs/icecore-0.1.1.jar` SHA-256为 `bdcf4395075916a7f9814bb1ee57f5f276fd5dfcffd96a190f013b292583dbad`。UTF-8、双语键集合、版本一致性、现存本地Markdown规则引用与Git忽略边界通过；CodeGraph已收录新增符号。实机未启动/未部署，仍需验证两半交互、厨房/升级/自动化、多玩家、重载、两半库存/确认变化/区域边界下扳手拆放、爆炸/取消放置与最终物品和门动画画面。
 
 ### 工作方块统一交互与 Jade（2026-10-16）
 
@@ -623,6 +624,10 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 
 ### 冒险模式建造系统
 
+- 承托依赖保护验证结果：8项定向测试通过；Forge 47.4.10 独立clean后完整build成功，verifyProductionJar通过，成品JAR的BuildingRules/BuildingServerActions与中英文提示已核对，UTF-8和Git忽略边界通过，CodeGraph已索引两个hasDependents入口。clean首轮停在ForgeGradle远程证书握手，结束本次进程后使用文档列出的离线证书检查参数重试成功，未改项目校验。未启动或部署客户端；真实标签依赖与主副手运行验收仍待授权。共享工作区另有交互改动，完整构建验证的是当时整体状态。
+
+- 2026-10-17 扳手承托依赖保护：`BuildingRules.hasDependents` 归一化目标并通过 `BuildingStructure` 获取全结构，每格检查六邻格、排除内部格；按当前有效列表的 `supports` 与目标朝外的 `allowedFaces` 判断，任一匹配即禁止拆除，不检查依赖方块区域或其它承托。`BuildingServerActions.remove` 在权限/距离后、内容确认和背包检查前执行，拒绝时清除强拆确认并通过 `PlayerFeedback` 显示 `icecore.build.block_depended_on`，双语资源同步。仅冒险模式扳手生效，Shift 不绕过；交互认领与客户端预览保持原入口。每次请求复杂度 O(S×6×L×E)，S 为结构格数、L 为列表数、E 为列表条目匹配成本；内部格排除 O(S)，当前结构有界为 1–2 格，命中立即退出，只有局部坐标及一次回调分配，无 tick 扫描、I/O、持久化关系或新增网络。验证入口：`BuildingDependencyTest` 的邻格方向/多格/短路行为测试和规则契约，`BuildingInteractionContractTest` 的失败顺序、确认清理、认领及双语检查；普通 JUnit 不初始化 Minecraft 方块注册表，真实规则与主副手交互实机待授权。
+
 | 字段 | 内容 |
 | --- | --- |
 | 功能领域 | 冒险模式放置、破坏与开发者规则 |
@@ -693,3 +698,13 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 - 历史“提示框恢复验收”的低层TooltipRenderUtil方案已被本轮完整原生入口替代；旧产物hash仅为历史记录，不代表当前兼容实现。
 
 - 2026-10-17完整原生Tooltip最终验证：177项测试零失败；基线Forge47.4.10独立clean后完整build、47.4.28完整build及最终47.4.10恢复build均通过，verifyProductionJar通过。成品不打包Modern UI/CozyCafe类，SHA-256为60ff45035966cb6e21329e1a0d5db47876164a7d9f324e999a89cec7d07b4984；原生入口和资源清理已核对。截图场景仍待用户实机复测，未部署或启动客户端。
+
+### 冒险模式普通交互限制（2026-10-17）
+
+- 支持全局JSON黑名单/白名单：精确方块、方块标签、来源命名空间、来源与标签交集；坐标特例按世界保存并绑定ID。默认空列表，仅冒险普通右键受限，有效建造和扳手、调整保留。
+- 入口、协议11/包23、加载/原子保存/缓存/两端拦截及性能边界见[冒险模式建造系统](adventure-building-system.md#冒险模式普通交互限制)。命令 `/icecore interaction` 权限2，成功操作立即保存同步，reload失败不替换旧规则；标签随原版/reload更新。
+- 使用文档：[冒险模式交互限制](../wiki/冒险模式交互限制.md)。配置/选择器纯逻辑、坐标维度/ID、原子替换失败、双手/事务/同步契约由InteractionConfigTest、InteractionIntegrationTest及现有建造测试覆盖；实机未启动。
+
+- 验证补充：最终全量198项测试零失败，新交互测试共10项，包含ASM直接读取当前Minecraft依赖的内部预测/Forge事件入口与BlockState.use完整描述符；客户端快照旧版本拒收及断线后低版本重新接收使用真实纯状态测试。Forge 47.4.10与47.4.28完整build及生产映射检查通过；客户端未启动、未部署JAR。
+
+- 移除命令补全只读取当前黑/白名单对应规则类型；modtag先补全已有交集规则的来源，再按所选来源补全其标签，保留未加载ID/标签以便删除。添加仍按注册表补全；按请求O(R)过滤去重，无tick扫描或额外网络，InteractionConfigTest覆盖列表隔离、类型隔离、交集第二参数、未知项和删除后刷新。

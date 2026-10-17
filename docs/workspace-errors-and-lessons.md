@@ -103,6 +103,17 @@ Last updated: 2026-09-27
 
 ### ERR-20261005-01：内存诊断未提前核对采样工具与输出边界
 
+- 2026-10-17 扳手依赖任务复发（累计至少15次）：规划首轮合并完整工具描述和多文档造成截断，实施阶段又在单段长度断言后追加其它段，低token预算导致截断。根因是门禁未覆盖整个底层返回值；影响为阅读证据不完整。正确做法与升级防线：每个底层工具调用仅输出一个统一计数的批次，最多6000字符、至少4000 token预算；超限拒绝并拆分，工具发现只输出名称。验证：本次关键代码与规则已按锁定范围重读，构建日志落tmp后仅读取短尾部；适用边界为文档、代码、工具与日志输出，状态继续观察，不能以局部断言宣称防线闭环。
+
+- 2026-10-17 同任务JUnit夹具复发：Mockito模拟BlockState/Block同样触发注册表初始化，JUnit XML明确记录Cannot instrument class Block和Not bootstrapped，导致5项测试无法执行。根因是误以为模拟方块类型不会加载静态依赖；影响仅为验证失败。正确做法：遵守生效规则中的普通JUnit引导限制；防线扩展到模拟对象，禁止mock方块/方块状态以绕过游戏引导，邻格遍历使用可控判定回调测试，真实列表/标签与拆除调用由规则契约覆盖，实机行为单独验收。已移除失败夹具，BuildingDependencyTest与BuildingInteractionContractTest共8项通过；适用边界为非游戏测试进程，完整构建与实机结论分别记录，状态为夹具已修正、实机待授权。
+
+#### 2026-10-17 交互限制任务：长输出防线复发补充
+
+- 触发：规划及实施读取规则、源码时合并输出，较小token预算再次截断；旧防线未覆盖整批与预算。证据为本次工具原始输出明确标记truncated；另首次编译遗漏ICECoreNetwork的类型化sendToPlayer重载，compileJava报告唯一类型错误，已补齐。
+- 根因/影响：分段计数后追加未经计数内容、预算不足；未先核对现有发送接口，增加无效阅读和一次编译失败，不据截断正文建立完成结论。
+- 正确做法/强化防线：后续文档回读在底层构造单批并限制6000字符，6000字符预算至少4000token；构建写tmp日志后只读短尾。新增网络包必须同时检查注册编号、协议、编码长度、发送重载及断线清理，并由编译和InteractionIntegrationTest的真实Minecraft类ASM读取、快照版本/断线行为测试守卫包入口/状态生命周期；未知规则保持纯逻辑测试，不初始化MC注册表。
+- 验证/边界/状态：实际长度门禁拒绝超限批次，配置及建造窄测试通过；与既有长输出经验合并补充，不另建重复记录。适用于工具阅读与新网络包；长输出防线继续观察，客户端交互尚未实机验证。
+
 - 2026-10-17 一体式冰箱任务复发（累计至少14次）：规划首轮合并完整CodeGraph元数据与多文档造成截断；实施部分读取在长度断言后追加正文，较低token预算仍截断。根因是未把整个底层输出和预算作为一个门禁，影响是阅读证据不完整。关键原生入口已按文件/方法独立重读，不据截断文本判断API；超6000字符批次多次被拒绝后拆分。防线升级：文档与工具发现必须独立输出，底层调用只允许输出一个已经计数的批次，6000字符批次使用至少4000 token预算；原生行为以真实JAR ASM和模型逐元素检查补强，禁止仅靠截断反编译片段建立结论。验证：FridgeUpstreamContractTest覆盖注入完整描述符与25个模型元素，FridgeContractTest覆盖包边界、拆放与扳手。适用边界为工具元数据、文档、JAR与日志读取；状态继续观察。
 
 - 2026-10-16 工作方块任务再次复发（累计复发次数13）：规划首轮合并完整工具描述与多文档导致截断；实施中宽JAR标签过滤及合并输出再次超过预算。根因是门禁未覆盖工具元数据与整批输出；已采用独立6000字符拒绝读取并增加直接ASM真实JAR选择器校验，超限输出实际被拒绝，不能以截断文本证明API。另发现按1.5.1反编译文本错误拼接TagMod包名，编译指出后核对两版真实类路径为init/tag/TagMod并修正；重复补丁目标被apply_patch拒绝，未部分写入。后续本类任务必须在编写前核对完整导入路径、生产描述符，并以真实JAR ASM门禁覆盖整批Mixin。状态继续观察；构建通过不代表实机行为验收。
@@ -1110,6 +1121,7 @@ Last updated: 2026-09-27
 
 - 2026-10-17 TLS等待复发升级（用户确认本项目多次发生，次数至少2）：冰箱47.4.28在线build停在Gradle插件解析的SSLSocket握手，任务未开始；改用offline后线程栈又确认ForgeGradle EnvironmentChecks.testServerConnection在SSLSocket握手，证明仅offline不能完全杜绝联网。根因是忘记已有TLS停滞经验，且把offline错误视为全部联网检查关闭。影响为构建无进展、耗时及误报验证边界。正确做法：默认offline、60秒无任务进展时jcmd只读本次daemon线程栈，区分插件解析/依赖下载/环境检查；只停本任务进程并按目标ForgeGradle实现设置有限联网超时，不关闭证书校验；缺缓存才按需在线补齐。防复发载体已落实到AGENTS.md质量与验证及workspace-development-rules.md构建章节。证据为tmp/fridge-inspect/latest-threads.txt和offline-threads.txt，两者只作本地诊断不提交。验证方法为带有限超时的offline兼容build及最终基线build，状态：防线已落盘，构建结果待本轮验证；适用边界为本机Gradle/ForgeGradle联网，不推定任何实际代码编译失败。
 - 同轮验证：反编译实际ForgeGradle6.0.54确认HttpsURLConnection HEAD未设置超时；传入sun.net.client.defaultConnectTimeout/defaultReadTimeout及org.gradle.internal.http.connectionTimeout/socketTimeout各10000ms，保持证书/环境检查开启，offline Forge47.4.28完整build与verifyProductionJar通过（1分31秒）。AGENTS.md已记录四个完整引用参数，后续从开工规则直接触发；状态为防线已验证，继续观察。
+- 最终基线验证：同组offline与超时参数下Forge47.4.10完整build、183项测试和verifyProductionJar通过（1分1秒），gradle.properties保持47.4.10。已完成工作区规则落盘回读与验证，不再以“仅加offline”作为完整TLS防线。
 
 - 最新复发证据：本次沿用 clean build 合并命令，违反生效规则 26；旧记录存在冲突示例，交接摘要未保留 token 约束。复发次数由 3 增至 4。
 - 根因与影响：未审查任务 token，导致无法获得有效完整构建结论；堆栈另确认 ForgeGradle EnvironmentChecks 卡在 SSL 握手，不能把等待当作完成。
@@ -1152,3 +1164,14 @@ Last updated: 2026-09-27
 - 原边框复发条目的“使用十参数TooltipRenderUtil及固定颜色”结论已废止，不再作为正确做法。当前做法：GuiGraphics.renderTooltip带原生ClientTooltipPositioner，UI内容、字体、背景与边框均由原生/Modern UI决定；保持6秒及末秒淡出，只在末1秒捕获原生渲染到透明RenderTarget后合成alpha，不复刻任何文本/边框。每屏一个按需GPU目标，消息过期、页面关闭释放，尺寸变更resize；不在空闲期间创建或每帧分配。
 - 强化防线：AGENTS.md新增跨内容的完整原生复用原则，禁止无需求自建替代内容；同页规则移除逐行手绘和固定渐变要求。CafeHoursCompatibilityTest废除硬编码色断言，禁止TooltipRenderUtil/drawString，强制native renderTooltip/positioner和资源清理；真实Modern UI JAR ASM验证Pre接管与positioner调用，不能仅检查本地源码自洽。已有Jade规则继续要求标准ItemView/FluidView唯一提供器。
 - 验证：实际Forge47.4.10 GuiGraphics renderTooltip→renderTooltipInternal→onRenderTooltipPre字节码和Modern UI事件/positioner已核对；定向测试、Forge47.4.10独立clean后完整build及47.4.28完整build已通过；最终恢复基线完整build和verifyProductionJar通过；177项测试零失败，包内第三方类排除通过。适用边界为原生内容视觉调整及当前Modern UI版本；无客户端启动授权，截图场景运行验证待用户复测，不能宣称视觉闭环。
+
+### ERR-20261017-02：交互列表移除补全误用全注册表
+
+- 触发场景：用户执行黑/白名单remove时，补全展示全部注册内容而非可删除项。
+- 事实证据：InteractionCommands的add/remove共用注册表补全分支，modtag第二参数也列出全部标签。
+- 根因与影响：未区分添加候选与已存规则；出现无效删除候选，无法直观看到列表当前内容，未知但已存条目不易删除。
+- 正确做法：remove从当前名单按精确类型过滤；modtag先列出交集来源，再按所选来源过滤标签；add保持注册表候选。
+- 防复发措施：InteractionConfig.removalSuggestions集中生成删除候选；InteractionConfigTest覆盖黑白名单隔离、四种类型隔离、交集依赖参数、未知项和修改后刷新。
+- 验证方法：交互定向测试和基线完整构建，检查候选不含其它类型或其它名单内容。
+- 适用边界：ICEcore交互黑白名单命令补全，不改变规则匹配及权限。
+- 状态：已修正；游戏内补全未启动客户端验证。

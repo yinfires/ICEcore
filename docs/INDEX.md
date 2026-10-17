@@ -29,6 +29,8 @@ Last updated: 2026-10-10（工作区规则独立维护，补充本地开发与�
 | 岛屿传送/实质化系统（区域捕获/重扫、隐藏=真移除、入场镜头过场、屏幕变形特效、分批生成、千格放置） | [内容实现索引](content-implementation.md) | 已全部落地：读实现索引「岛屿传送/实质化系统」条目（原设计交接文档已删除） |
 | 可复用镜头过场框架（相机接管、输入/HUD/手抑制、黑屏/闪白过渡与缓动，时间跳过与岛屿入场共用） | [内容实现索引](content-implementation.md) | 读“可复用镜头过场框架”条目：`client.cutscene` 的 `CameraPose`/`CutsceneCamera`/`CutsceneFade` 职责与两相位；改镜头/黑屏行为前先读 `TimeCutsceneSafetyTest` 安全不变式 |
 
+| 冒险模式交互黑白名单、来源模组/标签和坐标特例 | [冒险模式建造系统](adventure-building-system.md)、[使用说明](../wiki/冒险模式交互限制.md) | 读取普通交互限制条目、JSON、命令和标签人工查看方法 |
+
 ## 维护规则
 
 - 三款 Cookery 食物（蛋炒饭、番茄炒蛋盖饭、红烧牛肉）的独立模型：读 [三款食物模型记录](three-food-models.md)，核对来源、碗盘分类、可见特征与验收结果。

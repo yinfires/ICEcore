@@ -26,6 +26,10 @@ public abstract class BlockStateUseMixin {
                                                 CallbackInfoReturnable<InteractionResult> callback) {
         if (BuildingServerActions.shouldBlockVanillaBlockUse(level, player, hand, hit)) {
             callback.setReturnValue(InteractionResult.PASS);
+        } else if (!level.isClientSide && player instanceof net.minecraft.server.level.ServerPlayer serverPlayer
+                && !com.yinfires.icecore.building.AdjustmentModeManager.isActiveInAnyHand(serverPlayer)
+                && com.yinfires.icecore.interaction.InteractionEvents.blocked(level, player, hit.getBlockPos())) {
+            callback.setReturnValue(InteractionResult.FAIL);
         }
     }
 }

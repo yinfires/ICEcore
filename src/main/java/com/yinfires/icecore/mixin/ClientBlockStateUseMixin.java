@@ -26,6 +26,9 @@ public abstract class ClientBlockStateUseMixin {
         if (player instanceof LocalPlayer localPlayer
                 && BuildingClientEvents.shouldBlockWrenchBlockUse(localPlayer, hand, hit)) {
             callback.setReturnValue(InteractionResult.PASS);
+        } else if (level.isClientSide && player instanceof LocalPlayer localPlayer
+                && BuildingClientEvents.shouldBlockRestrictedUse(localPlayer, hit)) {
+            callback.setReturnValue(InteractionResult.FAIL);
         }
     }
 }

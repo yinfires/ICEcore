@@ -106,6 +106,8 @@
 
 ## 6. 运行时判定
 
+冒险模式扳手拆除增加承托依赖保护：按当前 `supports` 和 `allowedFaces` 判断整个目标结构各格六邻格的依赖，排除结构内部格。任一相邻方块的有效列表匹配目标承托及向外方向即可阻止拆除，不检查依赖方块的区域，也不因存在其它承托而放行。普通右键与 Shift 强拆均显示“该方块被其他方块依赖”；先拆依赖方块后才可继续。检查先于容器确认和背包容量，并清除旧强拆确认，不释放已认领的右键。
+
 放置与拆除使用服务端最终判定，并遵循原版交互距离。多格方块由 Forge 原生放置流程处理；客户端预览仅为视觉提示，距离不足时不显示，服务端会重新校验实际放置结果。扳手拆除会将命中的结构状态归一化到关键位置并整体处理。空目标先验证背包能容纳返还方块；非空目标须完成上述二次 Shift+右键确认，且只返还方块本身，失败时不改变世界。
 扳手拆除还必须满足：目标方块属于至少一个有效方块列表；匹配到区域限制的列表时，目标关键位置必须位于这些列表允许的区域内。承托和方向限制不影响拆除；仅有承托限制的有效列表可在交互距离内拆除。拆除请求仍只在冒险模式下处理。
 
@@ -114,3 +116,17 @@
 ## 右键交互优先级（2026-10-15）
 
 有效建造放置独占右键；区域、承托、方向、距离、多格占用或碰撞不满足时允许普通交互。放置事务被 Forge 拒绝后仍不回退交互。扳手仅在目标有效列表与区域允许拆除时独占右键；背包满和内容确认属于拆除执行阶段，不放行交互。非有效目标或区域外可正常交互。
+
+## 冒险模式普通交互限制
+
+全局配置 `config/icecore/adventure_interaction.json` 包含 `formatVersion: 1`、`blacklist` 和 `whitelist` 数组。字符串 `namespace:block` 匹配精确方块，`#namespace:tag` 匹配方块标签，`{"mod":"namespace"}` 匹配来源命名空间，`{"mod":"namespace","tag":"namespace:tag"}` 匹配二者交集。首次创建空数组，不内置整合包内容。有效建造放置、扳手拆除与调整优先；坐标特例和白名单豁免本系统黑名单；其它限制仍有效。只禁止冒险模式普通右键，OP不豁免；左键和其它模式不变。
+
+特例文件为存档 `data/icecore_interaction_exceptions.json`：`{"formatVersion":1,"exceptions":[{"dimension":"minecraft:overworld","pos":[1,64,2],"block":"minecraft:oak_door"}]}`。按状态属性复用 BuildingStructure 的主位置，门/床上下或前后半对应同一特例，不读取未加载邻格。状态变化不失效；换ID不匹配，放回原ID重新匹配。特例按存档独立，记录直到主动删除。
+
+入口为 `interaction.InteractionConfig`、`InteractionExceptions`、`InteractionManager`、`InteractionSnapshot`、`InteractionCommands`、`InteractionEvents`、`ClientBoundInteractionPacket` 和 `InteractionClientState`。建造事件中有效操作先认领，普通禁止事件返回FAIL并在LOWEST重申；客户端在现有MultiPlayerGameMode内部预测入口及BlockState.use阻止普通使用，外层原版请求包保留。网络协议11，包23发送展开后的方块ID与特例；登录、成功修改及标签更新同步，断线清空。服务端权威重检，不依赖客户端标签加载顺序。
+
+启动、命令编辑及标签重载编译缓存，复杂度O(R×B)，R为规则数、B为注册方块数；右键为集合查询和可选坐标键查询O(1)，结构解析缓存有界为注册方块种类。无tick扫描、交互I/O、反射或重复日志。未知合法选择器保留为未命中，重建时汇总最多20项。特例编码最多1000000字符，超限拒绝保存。规则与特例重载先全部解析，失败保留上一快照；写入使用同目录临时文件加原子替换，不支持原子移动的文件系统回退普通替换。
+
+命令、人工标签查看和当前整合包分类见Wiki《冒险模式交互限制》。验证入口：InteractionConfigTest、InteractionIntegrationTest、BuildingInteractionContractTest；保存失败测试检查旧目标及临时文件清理，真实MC交互仍需授权实机验证。
+
+移除命令补全只展示所选黑/白名单的对应类型条目；modtag标签按已选择来源过滤。未加载但已保存的条目仍可补全删除。添加命令继续使用当前注册表候选。

@@ -6,6 +6,32 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BuildingInteractionContractTest {
+    @Test
+    void dependencyFailurePrecedesContentAndDoesNotReleaseWrenchClaim() throws Exception {
+        String server = source("building/BuildingServerActions");
+        int dependency = server.indexOf("if (BuildingRules.hasDependents(level, keyPosition))");
+        assertTrue(dependency > server.indexOf("if (!BuildingRules.canBreak(level, keyPosition, state))"));
+        assertTrue(dependency < server.indexOf("int contentFingerprint ="));
+        assertTrue(dependency < server.indexOf("if (!canFit("));
+        String failure = server.substring(dependency, server.indexOf("ItemStack blockStack =", dependency));
+        assertTrue(failure.contains("clearRemovalConfirmation(player)"));
+        assertTrue(failure.contains("PlayerFeedback.show(player,"));
+        assertTrue(failure.contains("icecore.build.block_depended_on"));
+        assertTrue(failure.contains("return false;"));
+        assertFalse(failure.contains("isShiftKeyDown"));
+        String target = server.substring(server.indexOf("public static boolean isManagedTarget"),
+                server.indexOf("private static boolean canOccupy"));
+        assertFalse(target.contains("hasDependents"));
+        String client = source("building/BuildingClientEvents");
+        assertFalse(client.contains("hasDependents"));
+        for (String lang : new String[]{"zh_cn", "en_us"}) {
+            var json = com.google.gson.JsonParser.parseString(Files.readString(Path.of(
+                    "src/main/resources/assets/icecore/lang/" + lang + ".json"))).getAsJsonObject();
+            assertEquals(lang.equals("zh_cn") ? "该方块被其他方块依赖" : "Other blocks depend on this block",
+                    json.get("icecore.build.block_depended_on").getAsString());
+        }
+    }
+
     private String source(String name) throws Exception {
         return Files.readString(Path.of("src/main/java/com/yinfires/icecore/" + name + ".java"));
     }

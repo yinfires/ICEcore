@@ -48,6 +48,7 @@
   "icecore.build.missing": "目标不存在。",
   "icecore.build.invalid": "建造规则修改无效。",
   "icecore.build.inventory_full": "物品栏已满，无法拆除。",
+  "icecore.build.block_depended_on": "该方块被其他方块依赖",
   "icecore.build.adjust.invalid_stick": "必须手持普通木棍才能进入调整模式。",
   "icecore.build.adjust.enter": "已进入区域 %s 的调整模式。",
   "icecore.build.adjust.first": "已设置第一个坐标：%s",
@@ -161,5 +162,18 @@
   "icecore.workstation.steaming": "蒸制中：%s",
   "icecore.workstation.boiling": "烹煮中：%s",
   "icecore.workstation.baking": "烤制中：%s",
-  "block.icecore.fridge": "冰箱"
+  "block.icecore.fridge": "冰箱",
+  "icecore.interaction.failed": "交互规则操作失败：%s",
+  "icecore.interaction.reloaded": "交互规则已重新加载并同步",
+  "icecore.interaction.changed": "交互规则已修改、保存并同步",
+  "icecore.interaction.unchanged": "条目已存在或不存在，无需修改",
+  "icecore.interaction.no_target": "未指向交互距离内的有效方块",
+  "icecore.interaction.unloaded": "位置未加载或超出世界范围",
+  "icecore.interaction.page_invalid": "页码超出范围",
+  "icecore.interaction.page": "第 %s/%s 页，共 %s 条：%s",
+  "icecore.interaction.inspect": "方块 %s｜来源 %s｜标签 %s｜黑名单 %s｜白名单 %s｜坐标特例 %s｜冒险交互 %s",
+  "icecore.interaction.yes": "是",
+  "icecore.interaction.no": "否",
+  "icecore.interaction.denied": "禁止",
+  "icecore.interaction.allowed": "允许（仍受其它规则限制）"
 }

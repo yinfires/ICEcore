@@ -53,6 +53,9 @@ public final class BuildingClientEvents {
     private BuildingClientEvents() {
     }
 
+    private static final java.util.Set<PlayerInteractEvent.RightClickBlock> INTERACTION_PLACEMENT_CLAIMS =
+            java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
+
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public static void onRightClick(PlayerInteractEvent.RightClickBlock event) {
         // Keep the server packet authoritative while preventing local block use.
@@ -100,6 +103,7 @@ public final class BuildingClientEvents {
             PlacementPreview placement = computePlacementPreview(
                     minecraft, stack, event.getHand(), event.getHitVec());
             if (placement != null && placement.allowed()) {
+                INTERACTION_PLACEMENT_CLAIMS.add(event);
                 event.setUseBlock(net.minecraftforge.eventbus.api.Event.Result.DENY);
                 suppressPlacementPreviewHand = event.getHand();
                 suppressPlacementPreviewStack = stack.copy();
@@ -109,7 +113,12 @@ public final class BuildingClientEvents {
                 // block would be rebuilt while still marked hidden (invisible),
                 // then pop in a frame later when the tick clears the hidden set.
                 BuildingClientRenderState.clear();
+                return;
             }
+        }
+        if (shouldBlockRestrictedUse(minecraft.player, event.getHitVec())) {
+            event.setCanceled(true);
+            event.setCancellationResult(net.minecraft.world.InteractionResult.FAIL);
         }
     }
 
@@ -119,6 +128,10 @@ public final class BuildingClientEvents {
      */
     @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
     public static void onRightClickFinal(PlayerInteractEvent.RightClickBlock event) {
+        if (INTERACTION_PLACEMENT_CLAIMS.remove(event)) {
+            event.setUseBlock(net.minecraftforge.eventbus.api.Event.Result.DENY);
+            return;
+        }
         Minecraft minecraft = Minecraft.getInstance();
         if (event.getEntity() != minecraft.player || minecraft.player == null
                 || minecraft.gameMode == null) {
@@ -139,6 +152,11 @@ public final class BuildingClientEvents {
                 || minecraft.player.getOffhandItem().is(ModItems.WRENCH.get()))
                 && wrenchInteractionTarget(minecraft, event.getHitVec()) != null) {
             event.setCanceled(true);
+            return;
+        }
+        if (shouldBlockRestrictedUse(minecraft.player, event.getHitVec())) {
+            event.setCanceled(true);
+            event.setCancellationResult(net.minecraft.world.InteractionResult.FAIL);
         }
     }
 
@@ -408,6 +426,11 @@ public final class BuildingClientEvents {
     }
 
     /** Called inside prediction; the surrounding useItemOn still sends its packet. */
+    public static boolean shouldBlockRestrictedUse(net.minecraft.client.player.LocalPlayer player, BlockHitResult hit) {
+        return !isAdjustmentStick(player.getMainHandItem()) && !isAdjustmentStick(player.getOffhandItem())
+                && com.yinfires.icecore.interaction.InteractionEvents.blocked(player.level(), player, hit.getBlockPos());
+    }
+
     public static boolean claimPlacement(net.minecraft.client.player.LocalPlayer player,
                                          InteractionHand hand, BlockHitResult hit) {
         Minecraft minecraft = Minecraft.getInstance();

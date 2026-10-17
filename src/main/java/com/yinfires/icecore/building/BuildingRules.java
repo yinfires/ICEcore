@@ -5,6 +5,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.ArrayList;
@@ -79,5 +80,46 @@ public final class BuildingRules {
             }
         }
         return matches.isEmpty() ? Collections.emptyList() : List.copyOf(matches);
+    }
+
+    /** Execution check only: a dependency must not release a claimed wrench click. */
+    public static boolean hasDependents(Level level, BlockPos position) {
+        BlockPos primary = BuildingStructure.primaryPosition(level, position);
+        List<BlockPos> structure = BuildingStructure.positions(level.getBlockState(primary), primary);
+        Registry<Block> registry = level.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.BLOCK);
+        BuildingData data = BuildingRuntimeCache.data();
+        return hasDependents(structure, (part, face) -> {
+            BlockState dependent = level.getBlockState(part.relative(face));
+            if (dependent.isAir()) {
+                return false;
+            }
+            BlockState support = level.getBlockState(part);
+            // Region edits cannot remove an existing local dependency. Supports are OR,
+            // and any matching list establishes a dependency even with other supports nearby.
+            for (BlockListDefinition list : data.blockLists().values()) {
+                if (!list.supports().isEmpty() && list.hasBaseRestriction(data)
+                        && list.allowsFace(face) && list.matches(dependent, registry)
+                        && list.matchesSupport(data, support, registry)) {
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
+
+    static boolean hasDependents(List<BlockPos> structure,
+                                 java.util.function.BiPredicate<BlockPos, Direction> dependency) {
+        for (BlockPos part : structure) {
+            for (Direction face : Direction.values()) {
+                BlockPos neighbour = part.relative(face);
+                if (structure.contains(neighbour)) {
+                    continue;
+                }
+                if (dependency.test(part, face)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

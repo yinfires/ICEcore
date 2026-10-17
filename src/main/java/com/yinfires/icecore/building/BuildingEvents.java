@@ -114,8 +114,13 @@ public final class BuildingEvents {
                     event.setCanceled(true);
                     event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
                     BuildingServerActions.executePlacement(player, context);
+                    return;
                 }
             }
+        }
+        if (com.yinfires.icecore.interaction.InteractionEvents.blocked(player.level(), player, event.getPos())) {
+            event.setCanceled(true);
+            event.setCancellationResult(net.minecraft.world.InteractionResult.FAIL);
         }
     }
 
@@ -136,6 +141,12 @@ public final class BuildingEvents {
             // Keep later compatibility handlers from reopening vanilla block
             // interaction after the dismantle attempt, for either hand.
             event.setCanceled(true);
+            return;
+        }
+        if (!AdjustmentModeManager.isActiveInAnyHand(player)
+                && com.yinfires.icecore.interaction.InteractionEvents.blocked(player.level(), player, event.getPos())) {
+            event.setCanceled(true);
+            event.setCancellationResult(net.minecraft.world.InteractionResult.FAIL);
         }
     }
 

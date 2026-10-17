@@ -108,6 +108,11 @@ public final class BuildingServerActions {
         if (!BuildingRules.canBreak(level, keyPosition, state)) {
             return false;
         }
+        if (BuildingRules.hasDependents(level, keyPosition)) {
+            clearRemovalConfirmation(player);
+            PlayerFeedback.show(player, net.minecraft.network.chat.Component.translatable("icecore.build.block_depended_on"));
+            return false;
+        }
         ItemStack blockStack = new ItemStack(state.getBlock().asItem());
         if (blockStack.isEmpty()) {
             return false;

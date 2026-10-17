@@ -48,6 +48,7 @@
   "icecore.build.missing": "That entry does not exist.",
   "icecore.build.invalid": "That building rule change is invalid.",
   "icecore.build.inventory_full": "Your inventory is full; the block cannot be dismantled.",
+  "icecore.build.block_depended_on": "Other blocks depend on this block",
   "icecore.build.adjust.invalid_stick": "Hold a plain stick to enter adjustment mode.",
   "icecore.build.adjust.enter": "Entered adjustment mode for region %s.",
   "icecore.build.adjust.first": "First position set: %s",
@@ -161,5 +162,18 @@
   "icecore.workstation.steaming": "Steaming: %s",
   "icecore.workstation.boiling": "Boiling: %s",
   "icecore.workstation.baking": "Baking: %s",
-  "block.icecore.fridge": "Fridge"
+  "block.icecore.fridge": "Fridge",
+  "icecore.interaction.failed": "Interaction rule operation failed: %s",
+  "icecore.interaction.reloaded": "Interaction rules reloaded and synchronized",
+  "icecore.interaction.changed": "Interaction rules changed, saved and synchronized",
+  "icecore.interaction.unchanged": "Entry already present or absent; no change",
+  "icecore.interaction.no_target": "No valid block within interaction reach",
+  "icecore.interaction.unloaded": "Position is unloaded or outside world bounds",
+  "icecore.interaction.page_invalid": "Page is out of range",
+  "icecore.interaction.page": "Page %s/%s, %s entries: %s",
+  "icecore.interaction.inspect": "Block %s | Namespace %s | Tags %s | Blacklist %s | Whitelist %s | Position exception %s | Adventure interaction %s",
+  "icecore.interaction.yes": "Yes",
+  "icecore.interaction.no": "No",
+  "icecore.interaction.denied": "Denied",
+  "icecore.interaction.allowed": "Allowed (other rules still apply)"
 }
