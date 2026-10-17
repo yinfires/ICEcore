@@ -63,9 +63,8 @@ public final class MixingBowlBlock extends BaseEntityBlock {
         if (bowl.stage() == MixingBowlBlockEntity.Stage.OUTPUT) return handleOutput(serverPlayer, hand, held, bowl);
 
         if (held.isEmpty()) {
-            ItemStack plain = bowl.takeLastPlainInput();
+            ItemStack plain = bowl.takeLastPlainInput(stack -> com.yinfires.icecore.workstation.WorkstationInventoryTransfer.giveOne(player, stack));
             if (!plain.isEmpty()) {
-                player.setItemInHand(hand,plain);
                 playItemSound(level, pos, SoundEvents.ITEM_FRAME_REMOVE_ITEM);
             } else {
                 ItemStack required = bowl.requiredLastInputContainer();
@@ -117,10 +116,10 @@ public final class MixingBowlBlock extends BaseEntityBlock {
 
     private static InteractionResult handleOutput(ServerPlayer player, InteractionHand hand, ItemStack held, MixingBowlBlockEntity bowl) {
         Ingredient required = bowl.requiredOutputCarrier();
-        ItemStack result = bowl.takeOutput(held);
+        ItemStack result = bowl.takeOutput(held, stack -> !required.isEmpty()
+                || com.yinfires.icecore.workstation.WorkstationInventoryTransfer.giveOne(player, stack));
         if (!result.isEmpty()) {
-            if (required.isEmpty()) player.setItemInHand(hand,result);
-            else exchangeContainer(player,hand,held,result);
+            if (!required.isEmpty()) exchangeContainer(player,hand,held,result);
             playTakeSound(player.level(), bowl.getBlockPos(), result);
         } else if (!required.isEmpty()) {
             ItemStack[] options=required.getItems();

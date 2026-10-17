@@ -174,6 +174,19 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 
 ## 实现条目
 
+### 农夫乐事砧板单件输入与成品留存
+
+- 2026-10-17水平朝向再纠正：用户实测左右反向，保留正面朝上的XN平放，仅将水平改为YP。真实砧板原生renderer使用YP与负toYRot，炒锅朝向不等于砧板纹理朝向。四向测试同时检查正面法线和左右基向量；砧板仍批量取出，正常背包插入不排除选中快捷栏格。
+- 2026-10-17方向纠正：用户实测输入物品反面朝上；SRG映射与真实炒锅render确认平放是Axis.XN而非XP，朝向是Axis.YN而非YP。砧板原料/成品共用展示改为YN→XN，保留位置、缩放、模型替换。CuttingBoardContractTest读取真实炒锅轴字段，并用四向四元数检查物品正面法线朝上；不影响汤锅或其它工作方块。
+- 验证完成：方向修正后4项CuttingBoardContractTest通过，Forge47.4.10完整build及生产映射校验通过；本轮完整测试203项无失败。此前独立clean后的47.4.10完整构建与官方当前最新47.4.28完整兼容构建通过，最终恢复47.4.10。方向修正为客户端变换，未重新扩大兼容构建；JAR未部署、客户端未启动，实机方向仍需用户复测。
+- Farmers Delight 1.20.1-1.3.4：`WorkstationCuttingBoardEntityMixin` 保留原生加工与发射器调用，重定向唯一 `rollResults` 后保存全部结果并返回空列表，原生落地循环不再执行；耐久、时运、粒子、声音、统计、进度和单件原料消耗仍走原生。成品列表非空时拒绝再加工与新增投入。
+- `CuttingBoardInputHandler` 为原生单槽能力限制新增一件，已有内容时禁止追加；旧存档超量完整加载，每次加工一件。加载禁止内容变化回包，辅助类型在Mixin包外。`CuttingBoardInteraction` 使用共用STORED_AS_ITEM解析、容器返还、NBT精确取回和后进先出；空手批量取普通内容，容器化原料/成品需匹配空容器逐件领取。仅缺容器时调用PlayerFeedback；原生工具/配方/数量/清空文本通过真实调用点静默。
+- 背包转移使用Forge `PlayerMainInvWrapper` + `ItemHandlerHelper.insertItemStacked`，以返回剩余数扣减内容；不使用会在创造模式直接清空剩余栈的 `Inventory.add` 计算接收量。容器交换先模拟容量，无位置时静默保留全部；取放保留声音。仅主手认领玩家右键，副手不能重复提交。
+- 原料与成品使用独立WorkstationSlotState，分别保存ICEcoreCuttingInput和ICEcoreSlots，成品列表为ICEcoreCuttingProducts。上游save/load、getUpdateTag与onDataPacket链路同步全部数据；空成品条目保留原位置直到整批取完。拆除使用原生原料掉落加一次成品掉落，clearContent同步清理成品与容器数据。
+- `CuttingBoardItems` 复用炒锅中心(0.5,0.1,0.5)、朝向、90°平放、0.5缩放、按固定索引的种子旋转和0.025层偏移；砧板实体顶面1/16低于展示面0.1。每个结果项绘制一个模型，Jade标准ItemStorage展示完整数量；厨房模型替换通过独立可选桥接调用ItemRenderReplacer及pot模型列表，厨房缺失时回退原版模型；原生插板工具展示保留。
+- Jade仅按请求投影砧板当前原料或成品，沿用唯一标准容器内容提供器；没有流体槽、额外文字层、世界tick或轮询网络。加工匹配沿用原生缓存；容器解析在内容变化/交互发生时执行，背包扫描固定36格，渲染按结果项数量遍历、不按物品数量重复绘制，种子源复用避免逐帧创建随机对象。
+- 来源：客户端实际FarmersDelight-1.20.1-1.3.4.jar复制到libs作为验证参考，不加入运行依赖；真实厨房1.4.1/1.5.1及既有汤锅实现。`CuttingBoardContractTest`与`WorkstationMixinContractTest`覆盖真实JAR选择器/Shadow/调用目标、原生加工副作用、容器与部分转移边界、静默提示、可选模型和实体顶面。验证结果见本条后续记录；不启动客户端，四向/多产物展示、容器领取、背包满和多人同步待实机验收。
+
 ### 一体式双层冰箱
 
 - `icecore:fridge`，中文“冰箱”、英文“Fridge”；仅加入 ICEcore 创造物品栏，不提供合成配方。Cooking for Blockheads 16.0.15 与 Balm 7.3.44 为双端强制前置，Gradle flatDir 反混淆依赖来自 `libs/` 对应真实 JAR，不将上游类或贴图打包进 ICEcore。
@@ -188,6 +201,10 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 
 ### 工作方块统一交互与 Jade（2026-10-16）
 
+- 茶/茶杯/蒸笼背包拾取验证完成：2项新契约与现有真实JAR契约通过，Forge47.4.10完整build与verifyProductionJar通过，全部207项测试无失败，CodeGraph及Git/Wiki边界检查通过；未部署、未启动客户端，杯数、满背包、双手回退与半层/整层蒸笼取下仍需实机验收。
+- 2026-10-17茶与蒸笼背包取回：WorkstationCupPickupMixin对茶杯/空杯仅主手空手拾取接入giveOne，优先空杯、每次一件，接收后更新杯数与茶数，容量不足不改变方块；倒茶/添杯/同类叠放保留原生入口。WorkstationTeapotIngredientPickupMixin把status=0的茶底取回改为单件背包接收，成功后扣减并refresh。蒸笼takeFood仍取原生4/8槽范围，按实际背包接收量扣减、空槽才清计时；开盖/上方承托遮挡/顶层结构限制保留。空内容时接收一个蒸笼后才减层/移除；主手非空拒绝takeFood，SteamerBlock在投料后takeFood入口同时限制主手空手，避免双手回退取下。合法蒸笼堆叠与开合不变。扫描只在点击时执行，最多8槽×36背包格，无新tick/轮询/提示。TeaSteamerPickupContractTest及真实JAR选择器/调用目标契约覆盖；实机杯数/满背包/双手/层数待用户验收。
+- 本轮水平朝向与通用背包转移验证：砧板4项、背包转移2项及工作方块/烤炉/混合碗定向测试通过，Forge47.4.10完整build、生产映射校验通过；全部205项测试无失败，CodeGraph已更新，Git与Wiki差异检查通过。未部署或启动客户端，左右朝向与背包实际槽位/满背包行为待实机确认。
+- 2026-10-17通用空手取出保持每次一件，改为正常背包插入，不直接setItemInHand，不排除选中快捷栏格。WorkstationInventoryTransfer使用PlayerMainInvWrapper与insertItemStacked，先模拟容量再接收，成功后才扣减原料/成品；背包满静默保留。冰柜/发酵桶/汤锅/炒锅共用服务及烤炉/混合碗同类入口接入，带容器交换不变；砧板保留批量取出。背包扫描有界36格，无tick/轮询/新增提示；WorkstationInventoryTransferTest检查单件、正常插入、接收后扣减及全部入口取消指定手持替换。
 - 目标 ID 来源为 recipe-manager `public/data/recipe-manager.json`。冰柜、发酵桶、汤锅、炒锅接入 `workstation.WorkstationInteractionService`；料理台仅由 `WorkstationCuisineMixin` 在工具处理之后接入单件投入，原生取出保持。容器识别、库存交换与后进先出复用现有服务；槽位元数据保存为 `ICEcoreSlots`，加载不发包，首次操作有界恢复。
 - 发酵桶空主手 Shift 开合，普通点击不再开合或倾倒；仅开盖取放，开盖清零进度。炒锅取消 `tickPutIngredient` 自动 startCooking，保留 onShovelHit；成品逐件领取，无容器空手可取且不烫伤。烧焦结算保留 1–3 个木炭并停止继续烧焦。汤锅省略 carrier 时从结果推导，显式 carrier/empty_carrier 保留；无需容器时不显示汤底，使用炒锅同款中心、90°平放和0.5缩放，高度按汤锅真实内底调整为3/16格。
 - 蒸笼 `getCookTick` 统一600 tick，开盖仅存放，关盖开始；同层同批统一进度与时长，完成槽标记-1并停止再次匹配。无热源暂停，开盖清零未完成槽，已完成成品保留。堆叠盖判定缓存按世界tick清空，同一连续堆叠只扫描一次，最多4096坐标，世界卸载可回收；点击失效缓存并清理覆盖层进度。

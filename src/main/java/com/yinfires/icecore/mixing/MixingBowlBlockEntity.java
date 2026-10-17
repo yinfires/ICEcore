@@ -83,11 +83,19 @@ public final class MixingBowlBlockEntity extends BlockEntity implements Containe
     }
 
     public ItemStack takeLastPlainInput() {
+        return takeLastPlainInput(stack -> true);
+    }
+
+    public ItemStack takeLastPlainInput(java.util.function.Predicate<ItemStack> receive) {
         if (stage != Stage.INPUT) return ItemStack.EMPTY;
         int slot = lastInputSlot();
         if (slot < 0 || !WorkstationContainerInteraction.canTake(inputContainers.get(slot), ItemStack.EMPTY)) return ItemStack.EMPTY;
         ItemStack stack = inputs.get(slot);
-        clearInputSlot(slot); changed(); return stack;
+        ItemStack result = stack.copyWithCount(1);
+        if (!receive.test(result)) return ItemStack.EMPTY;
+        stack.shrink(1);
+        if (stack.isEmpty()) clearInputSlot(slot);
+        changed(); return result;
     }
 
     public ItemStack requiredLastInputContainer() {
@@ -134,13 +142,19 @@ public final class MixingBowlBlockEntity extends BlockEntity implements Containe
     }
 
     public ItemStack takeOutput(ItemStack held) {
+        return takeOutput(held, stack -> true);
+    }
+
+    public ItemStack takeOutput(ItemStack held, java.util.function.Predicate<ItemStack> receive) {
         if (stage != Stage.OUTPUT) return ItemStack.EMPTY;
         for (int i = 8; i >= 0; i--) if (!outputs.get(i).isEmpty()) {
             Ingredient carrier = carriers.get(i);
             if (!carrier.isEmpty() && !carrier.test(held)) return ItemStack.EMPTY;
             if (carrier.isEmpty() && !held.isEmpty()) return ItemStack.EMPTY;
-            ItemStack result = outputs.get(i);
-            outputs.set(i, ItemStack.EMPTY); carriers.set(i, Ingredient.EMPTY);
+            ItemStack result = outputs.get(i).copyWithCount(1);
+            if (!receive.test(result)) return ItemStack.EMPTY;
+            outputs.get(i).shrink(1);
+            if (outputs.get(i).isEmpty()) { outputs.set(i, ItemStack.EMPTY); carriers.set(i, Ingredient.EMPTY); }
             if (!hasOutputs()) stage = Stage.INPUT;
             changed(); return result;
         }

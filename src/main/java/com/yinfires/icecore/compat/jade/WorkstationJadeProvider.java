@@ -22,7 +22,7 @@ public enum WorkstationJadeProvider implements IServerDataProvider<BlockAccessor
         if (entity == null) return false;
         return switch (entity.getClass().getSimpleName()) {
             case "PotBlockEntity", "StockpotBlockEntity", "FermentationTankBlockEntity", "CuisineBoardBlockEntity",
-                 "FreezerBlockEntity", "TeapotBlockEntity", "SteamerBlockEntity", "BarrelBlockEntity", "OvenBlockEntity" -> true;
+                 "FreezerBlockEntity", "TeapotBlockEntity", "SteamerBlockEntity", "BarrelBlockEntity", "OvenBlockEntity", "CuttingBoardBlockEntity" -> true;
             default -> false;
         };
     }
@@ -40,6 +40,11 @@ public enum WorkstationJadeProvider implements IServerDataProvider<BlockAccessor
         CompoundTag data = new CompoundTag(); ListTag products = new ListTag(); ListTag inputs = new ListTag();
         String type = entity.getClass().getSimpleName(); data.putString("Type", type);
         switch (type) {
+            case "CuttingBoardBlockEntity" -> {
+                CuttingBoardAccess board = (CuttingBoardAccess)entity;
+                if (!board.icecore$products().isEmpty()) for (ItemStack item : board.icecore$products()) add(products, item);
+                else add(inputs, board.icecore$inventory().getStackInSlot(0));
+            }
             case "PotBlockEntity" -> {
                 int status = ExternalWorkstation.number(entity, "status");
                 if (status >= 2) add(products, (ItemStack)ExternalWorkstation.get(entity, "result"));

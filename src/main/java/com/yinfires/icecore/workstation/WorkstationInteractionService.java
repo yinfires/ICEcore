@@ -31,7 +31,8 @@ public final class WorkstationInteractionService {
             ItemStack output = adapter.output().copyWithCount(1);
             var carrier = adapter.carrier();
             if (carrier.isEmpty() ? held.isEmpty() : carrier.test(held)) {
-                give(player, hand, held, output, !carrier.isEmpty()); adapter.takeOutput(); adapter.changed();
+                if (!give(player, hand, held, output, !carrier.isEmpty())) return true;
+                adapter.takeOutput(); adapter.changed();
                 sound(player, SoundEvents.ITEM_FRAME_REMOVE_ITEM); return true;
             }
             if (held.isEmpty() && !carrier.isEmpty()) need(player, carrier.getItems()[0]);
@@ -42,8 +43,9 @@ public final class WorkstationInteractionService {
             ItemStack required = state.container(last);
             if (WorkstationContainerInteraction.canTake(required, held)) {
                 ItemStack item = adapter.item(last).copyWithCount(1);
+                if (!give(player, hand, held, item, !required.isEmpty())) return true;
                 ItemStack remainder = adapter.item(last).copy(); remainder.shrink(1); adapter.item(last, remainder);
-                state.reconcile(adapter.size(), adapter::item); adapter.changed(); give(player, hand, held, item, !required.isEmpty());
+                state.reconcile(adapter.size(), adapter::item); adapter.changed();
                 sound(player, SoundEvents.ITEM_FRAME_REMOVE_ITEM); return true;
             }
             if (held.isEmpty() && !required.isEmpty()) { need(player, required); return true; }
@@ -73,10 +75,9 @@ public final class WorkstationInteractionService {
         }
         return true;
     }
-    private static void give(ServerPlayer player, InteractionHand hand, ItemStack held, ItemStack output, boolean consume) {
-        if (consume) WorkstationContainerInteraction.exchange(player, hand, held, output);
-        else if (held.isEmpty()) player.setItemInHand(hand, output);
-        else player.getInventory().placeItemBackInInventory(output);
+    private static boolean give(ServerPlayer player, InteractionHand hand, ItemStack held, ItemStack output, boolean consume) {
+        if (consume) { WorkstationContainerInteraction.exchange(player, hand, held, output); return true; }
+        return WorkstationInventoryTransfer.giveOne(player, output);
     }
     private static void sound(ServerPlayer player, net.minecraft.sounds.SoundEvent sound) {
         player.level().playSound(null, player.blockPosition(), sound, SoundSource.BLOCKS, .8F, 1.1F);
