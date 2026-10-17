@@ -10,6 +10,8 @@ Last updated: 2026-10-10（工作区规则独立维护，补充本地开发与�
 | 工作区规则维护、实现/资源/构建/调试通用要求 | [项目工作区规则](../AGENTS.md)、[开发与调试规则](workspace-development-rules.md) | 规则维护读取“文档与规则维护”；实现、资源、构建与调试读取对应章节；必要规则直接维护在本工作区 |
 | 种子袋作物灌溉、肥料、洒水器与 Bakery 水槽补水 | [内容实现索引](content-implementation.md) | 读取“Dew Drop 灌溉与 Bakery 水槽兼容”和“种子袋种植系统”；真实操作说明在独立 Wiki《种植与灌溉》 |
 | 任意任务开工、规范错误复盘、经验沉淀 | [工作区规范错误与经验总结](workspace-errors-and-lessons.md) | 每次先读“生效中的防复发规则”；仅在任务命中相应类别或需要写入时读具体记录与模板 |
+| CozyCafe电脑页面提示、操作失败与开店限制 | [项目规则](../AGENTS.md)、[内容实现索引](content-implementation.md)、[错误与经验](workspace-errors-and-lessons.md) | 读取页面反馈例外、营业时间条目和ERR-20261017-01；复用完整原生电脑提示和Modern UI接管，不使用通用底部反馈或底层自绘 |
+| Yuushya入世声明、CozyCafe营业时间与夜间关店 | [内容实现索引](content-implementation.md) | 读取“Yuushya 入世声明与 CozyCafe 营业时间”；时间语义见 time-system.md，长期使用说明见Wiki菜单与顾客座位页 |
 | 咖啡馆客流量设计、每日额度、开店快照与多人生成节奏 | [客流量计算方案](cafe-customer-flow-design.md)、[内容实现索引](content-implementation.md) | 先读设计的额度来源、快照边界、计时上限与接纳规则；设计尚未实现，当前行为仍以实现索引中的 CozyCafe 条目为准 |
 | 厨具统一、雪克杯饮料扩展、料理台食品迁移 | [厨具统一静态核对](kitchen-unification-audit.md) | 读取雪克杯输入/倒出限制及寿司、拼盘、团子串三例；区分静态审计与未完成的运行验收 |
 | 工作方块桶、瓶、碗兼容，容器返还、盛取、提示或声音 | [工作方块容器兼容](workstation-container-compatibility.md) | 读取共用服务、数据包格式、解析优先级、交互矩阵、槽位元数据和验证要求；禁止在新工作方块重复写死容器逻辑 |

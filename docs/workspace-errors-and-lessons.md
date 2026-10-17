@@ -6,6 +6,10 @@ Last updated: 2026-09-27
 
 ## 生效中的防复发规则
 
+- 原生内容必须复用完整执行/绘制链路，包括提示框及Jade标准展示；调用底层绘图工具或复刻颜色不算复用。咖啡馆Tooltip须经GuiGraphics.renderTooltip→Forge Pre→Modern UI接管；见ERR-20261017-01复发升级。
+
+- CozyCafe电脑页面提示复用原生ClientBoundCafeCannotOpenPacket→setErrorMessage区域；通用PlayerFeedback规则不适用于页面反馈。新增原因必须在真实JAR与客户端映射双向核对，CafeHoursCompatibilityTest禁止页面路径引入overlay/title/chat。见ERR-20261017-01。
+
 - 物品提示隐藏必须同时核对原始正文、ItemTooltipEvent 的按键展开、GatherComponents 的图形效果及 JEI 物品/流体来源；不能用纯文本过滤替代图形组件入口兼容，也不能以清空最终列表误删配方/价格信息。见 ERR-20261015-02。
 
 - 建造右键按无修改校验结果认领，事务开始后不得重算归属；扳手按列表/区域权限确定意图，空主手需允许推进至副手扳手。见 ERR-20260821-01 的 2026-10-15 升级。
@@ -133,6 +137,9 @@ Last updated: 2026-09-27
 - 适用边界：本机 HotSpot JVM 诊断；其它 JVM、权限与工具版本需另行核对。对象直方图无引用链，不能单凭数量定位某个模组或认定泄漏。
 - 状态：诊断结论已纠正，后续操作门禁已加入生效规则。
 
+- 2026-10-17 三项兼容任务复发：规划首轮合并完整工具描述与多文档，实施阶段单段断言后追加未经计数的搜索结果，仍导致整批截断。影响为阅读证据不完整；关键API重新局部读取并由真实JAR ASM契约验证。根因是断言只覆盖单段，未覆盖整个底层输出。正确做法：长字节码先存tmp，目标批次统一计数，断言后不追加正文。防线升级：本地开发规则明确断言后不得追加未经计数内容，实际超限批次必须拒绝并拆分。验证：本轮超限读取被拒绝并缩小成功，新增ASM入口契约通过。适用边界为工具元数据、文档、字节码；状态继续观察。
+- 同轮运行时纠正：PATH python为WindowsApps应用别名，管道脚本未执行而退出未明显报错，语言和文档未写入。实际rg回读确认目标键缺失后，使用bundled Python绝对路径重做并验证双语JSON和文档内容。正确做法及防线：脚本执行前核对真实解释器路径，写入后以目标字段/文件内容回读确认，不能只看进程退出码。影响是首轮构建缺少新增反馈翻译，已补齐后重建；适用边界为Windows应用别名；状态为写入纠正、验证继续。
+
 ### ERR-20260909-01：GeckoLib 兼容只验证部分关键帧而遗漏缓动字段
 
 - 触发场景：首次修复 `13.25.41.zip` 的 post 对象解析崩溃，只查看每个动画文件前两个正则命中。
@@ -248,10 +255,10 @@ Last updated: 2026-09-27
 - 类型：事实错误与验证遗漏
 - 状态：已关闭
 - 首次发生：2026-09-06
-- 触发场景：记录 CozyCafe 顾客生成节奏时，将最低声望生成间隔写成约 240 tick（12 秒），并准备按配置注释的“每星加快 20%”理解各星级速度。
+- 触发场景：记录 CozyCafe 顾客生成节奏时，将最低声望生成间隔写成约 240 tick（6 秒），并准备按配置注释的“每星加快 20%”理解各星级速度。
 - 事实证据：`libs/cozycafe-1.9-all.jar` 中 `CafeManagerBlockEntity#tick` 的实际周期为 `20 * customerSpawnInterval * (1 - max(0, reputation - 1) / 5000)` tick，相关除法为 Java 整数除法；正常 `0–5000` 声望下被除数最大为 `4999`，商恒为 0。默认 `customerSpawnInterval=40`，故所有星级都是 800 tick（40 秒）一次尝试。`assignCustomersInArea` 还证明 `random < groupCustomerChance` 是停止条件，与配置字段名及注释表达的“追加概率”方向相反。
 - 根因：把 `CozyConfig` 英文注释中的设计说明当作运行事实，没有核对目标 JAR 中整数运算和概率分支的真实方向；旧诊断记录也没有保存足以复核的入口与公式。
-- 已造成或可能造成的影响：`docs/content-implementation.md` 曾给出错误的 12 秒结论；后续平衡调整、实机验收或故障排查可能按错误节奏判断，且每次询问都要重新逆向上游代码。
+- 已造成或可能造成的影响：`docs/content-implementation.md` 曾给出错误的 6 秒结论；后续平衡调整、实机验收或故障排查可能按错误节奏判断，且每次询问都要重新逆向上游代码。
 - 正确做法：数值结论以目标版本 JAR 的 `javap -c -p` 为准，配置注释只作为设计意图参考；同时记录版本、入口、完整公式、整数/浮点语义、随机边界和默认参数，并区分“生成尝试”“成功生成”与“每日判停阈值”。
 - 防复发措施：已增加生效规则第 28 条，并在 `docs/content-implementation.md` 的“CozyCafe 顾客座位与生成诊断”中固化 `libs/cozycafe-1.9-all.jar`、五个相关入口、声望分段、每日阈值、实际 40 秒周期、单批概率和通用概率公式；后续该问题直接读取该条目，仅在 CozyCafe 目标 JAR 版本变化时重新核对。
 - 验证方法：用 CozyCafe 1.9 JAR 的字节码核对 `CafeManagerBlockEntity#tick`、`#assignCustomersInArea`、`#getMaxCustomers`、`#getStarsFromReputation` 和 `CozyConfig`；以显式 UTF-8 回读两份文档，并执行 `git diff --check -- docs/content-implementation.md docs/workspace-errors-and-lessons.md`。
@@ -1115,3 +1122,26 @@ Last updated: 2026-09-27
 - 验证方法：窄测试、Forge 47.4.10 单独 clean 后完整 build 共135项测试通过；成品JAR生产调用与包边界检查通过；未启动客户端。测试覆盖纯逻辑/源码契约，不能代替所有19种作物和缺失可选模组的真实运行验收。
 - 适用边界：ICEcore 种子袋与 Dew Drop 9.0 每日生长兼容；不是通用作物计时器。
 - 状态：代码与自动防线已落实，实机运行观察待授权；首次记录2026-10-15，复发次数0。
+
+### ERR-20261017-01：咖啡馆电脑页面反馈误用原版底部提示
+
+- 触发场景：新增夜间开店限制时，把电脑页面开店失败当作通用临时玩家反馈处理；用户明确要求页面提示使用电脑自身区域。
+- 事实证据：修正前CozyCafeHoursMixin.canBeOpened注入调用PlayerFeedback.show；现有CozyCafeManagerSeatingMixin已用ClientBoundCafeCannotOpenPacket代码5，CafeManagerScreenErrorMixin映射errorMessage。真实CozyCafe1.10的setErrorMessage使用原因码0..4与errorDisplayTicks=240；提示包仅在CafeManagerScreen打开时应用。
+- 根因：优先套用通用PlayerFeedback规则，忽略同页面已有反馈链路；AGENTS.md未把页面例外直接列在通用规则旁，原测试只验证营业逻辑和入口描述符，没有禁止错误反馈通道。
+- 影响：夜间开店原因出现在原版底部信息栏而非电脑页面，显示位置和时长不一致；可能被其它临时提示覆盖。
+- 正确做法：服务端发送原生电脑提示包代码6，客户端扩展已有setErrorMessage映射，保持同一errorMessage和240tick生命周期；不引入独立overlay/title/chat。
+- 防复发措施：AGENTS.md明确咖啡馆页面是PlayerFeedback通用规则例外；开工生效节和INDEX增加路由；CafeHoursCompatibilityTest核对真实原因码范围、提示包构造/消费描述符、代码6双向映射及240tick，遍历已有页面相关Mixin禁止PlayerFeedback、displayClientMessage、sendSystemMessage、overlay和title入口。该测试纳入默认Gradle test/build。
+- 验证方法：定向CafeHoursCompatibilityTest、Forge47.4.10独立clean后完整build及生产JAR提示包和选择器核对；两种扩展原因和原生原因保持同页面区域，实机画面待授权。
+- 适用边界：咖啡馆电脑页面内操作提示；电脑外的管理命令和绑定操作仍使用通用PlayerFeedback规则。
+- 状态：代码、自动防线与Forge47.4.10独立clean后完整build通过；生产JAR检查通过。实机待验，未把静态构建当作画面验收。
+
+- 同轮用户补充位置和不消失问题：真实CozyCafe1.10 render将errorMessage通过renderComponentTooltip在leftPos+11/topPos+156绘制，存在鼠标tooltip偏移/翻转；containerTick才递减240tick，渲染路径没有独立截止。此前只把新原因映射到该状态，没有核验最终布局和消失。可能造成位置偏离Open按钮以及容器tick停滞时残留；未据静态结果断言所有实机不消失原因。正确做法：原生与扩展原因统一按toggleOpenButton实际坐标居中，6秒单调时钟截止、末1秒逐帧淡出，render HEAD清除正文及布局缓存；仅文本/宽度变化重算折行。强化防线已写AGENTS.md，CafePageFeedbackLayoutTest验证按钮移动、多行布局、半秒淡出及超时；CafeHoursCompatibilityTest锁定真实render/包装调用与按钮字段，要求时钟重置及清理代码。适用边界扩展至咖啡馆页面原生与扩展全部开店提示；实机仍待验。
+
+- ERR-20261017-01同轮时长调整验证：用户改为6秒，末1秒淡出；原生setErrorMessage返回后统一120tick，扩展原因同值。完整测试捕获CozyCafeSeatingProductionSelectorTest旧240tick断言，已同步新120tick契约，保留原生JAR240tick作为上游事实。根因是只更新新测试遗漏既有契约；防线为修改展示时长同时检索生产计时和全部契约，完整test/build验证；适用范围为咖啡馆页面时长。
+
+- ERR-20261017-01边框缺失复发：用户指出移动到Open按钮上方后边框消失，事实证据是drawAboveOpenButton仅drawString，跳过原renderComponentTooltip时未补回背景与边框。根因是把定位修正扩展成裸文字绘制，原防线只检查位置/时长/通道而未检查视觉结构。影响为提示样式改变、文字在复杂背景可读性降低。正确做法：复用Forge47.4.10实际TooltipRenderUtil.renderTooltipBackground十参数重载，保留原背景0xF0100010和渐变边框0x505000FF/0x5028007F，按相同alpha同步淡出；只在消息/宽度变更计算框宽。防线升级已写AGENTS.md；CafeHoursCompatibilityTest强制背景函数与原色存在，CafePageFeedbackLayoutTest验证背景及边框alpha和RGB保护。验证为定向测试、完整build、生产JAR及真实Forge重载签名核对；适用边界为咖啡馆电脑提示位置改造，状态：定向与完整测试通过，Forge47.4.10/47.4.28构建及生产JAR验证通过，最终恢复基线；实机待验。
+
+- ERR-20261017-01 Modern UI兼容复发升级（累计本记录复发3次）：用户QQ20261017-112027.png显示咖啡馆提示仍是紫色方框，旁边Open cafe原生提示已是Modern UI圆角框。证据：上一实现绕过GuiGraphics.renderTooltip，直接TooltipRenderUtil+drawString；实际Modern UI3.12.0.1 UIManagerForge.onRenderTooltipH通过RenderTooltipEvent.Pre调用drawExtTooltip，并传递getTooltipPositioner。根因：把低层工具当作完整原生流程，旧测试反而强制硬编码背景/边框，防线只验证实现自身而未覆盖整合包接管。影响：Modern UI样式、设置与绘制接管失效；用户已多次纠正同类Jade/原生表现问题。
+- 原边框复发条目的“使用十参数TooltipRenderUtil及固定颜色”结论已废止，不再作为正确做法。当前做法：GuiGraphics.renderTooltip带原生ClientTooltipPositioner，UI内容、字体、背景与边框均由原生/Modern UI决定；保持6秒及末秒淡出，只在末1秒捕获原生渲染到透明RenderTarget后合成alpha，不复刻任何文本/边框。每屏一个按需GPU目标，消息过期、页面关闭释放，尺寸变更resize；不在空闲期间创建或每帧分配。
+- 强化防线：AGENTS.md新增跨内容的完整原生复用原则，禁止无需求自建替代内容；同页规则移除逐行手绘和固定渐变要求。CafeHoursCompatibilityTest废除硬编码色断言，禁止TooltipRenderUtil/drawString，强制native renderTooltip/positioner和资源清理；真实Modern UI JAR ASM验证Pre接管与positioner调用，不能仅检查本地源码自洽。已有Jade规则继续要求标准ItemView/FluidView唯一提供器。
+- 验证：实际Forge47.4.10 GuiGraphics renderTooltip→renderTooltipInternal→onRenderTooltipPre字节码和Modern UI事件/positioner已核对；定向测试、Forge47.4.10独立clean后完整build及47.4.28完整build已通过；最终恢复基线完整build和verifyProductionJar通过；177项测试零失败，包内第三方类排除通过。适用边界为原生内容视觉调整及当前Modern UI版本；无客户端启动授权，截图场景运行验证待用户复测，不能宣称视觉闭环。

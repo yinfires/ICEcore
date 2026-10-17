@@ -34,7 +34,7 @@ final class CozyCafeSeatingProductionSelectorTest {
 
         String hud = source("src/main/java/com/yinfires/icecore/mixin/CozyCafeManagerScreenErrorMixin.java");
         assertTrue(hud.contains("code.byteValue() == 5"));
-        assertTrue(hud.contains("errorDisplayTicks = 240"));
+        assertTrue(hud.contains("errorDisplayTicks = 120"));
 
         String renderer = source("src/main/java/com/yinfires/icecore/mixin/CozyCafeMenuRendererSeatingMixin.java");
         assertTrue(renderer.contains("CafeMenuBlockEntity;getHasCustomer()Z"));

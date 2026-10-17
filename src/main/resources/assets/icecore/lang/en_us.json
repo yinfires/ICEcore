@@ -52,6 +52,7 @@
   "icecore.build.adjust.enter": "Entered adjustment mode for region %s.",
   "icecore.build.adjust.first": "First position set: %s",
   "icecore.build.adjust.second": "Second position set: %s",
+  "icecore.cozycafe.closed_hours": "Cafe opening hours are 06:00–18:00. The cafe cannot open now.",
   "icecore.cozycafe.range.mod_missing": "CozyCafe is not installed, so computer recognition ranges cannot be edited.",
   "icecore.cozycafe.range.player_only": "Only a player can edit a CozyCafe computer recognition range.",
   "icecore.cozycafe.range.invalid_stick": "Hold a plain stick to enter computer range adjustment mode.",

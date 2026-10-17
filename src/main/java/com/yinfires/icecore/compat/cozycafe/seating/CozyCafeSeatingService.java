@@ -373,6 +373,17 @@ public final class CozyCafeSeatingService {
         if (!(menu.getLevel() instanceof ServerLevel level)) return;
         BlockPos storedSeat = access.icecore$getSeatPos();
         Entity customer = level.getEntity(uuid);
+        if (customer == null && "pending_spawn".equals(access.icecore$getSeatingStage())) {
+            BlockPos managerPos = menu.getCafeManager();
+            if (managerPos != null && level.hasChunkAt(managerPos)
+                    && level.getBlockEntity(managerPos) instanceof CafeManagerBlockEntity manager
+                    && (!manager.isOpen() || com.yinfires.icecore.compat.cozycafe.CozyCafeHours.isClosed(
+                    level.getServer().overworld().getDayTime()))) {
+                release(menu);
+                menu.setCustomerTravelTime(-1);
+                return;
+            }
+        }
         SeatInfo info = inspect(level, menu.getBlockPos(), menu.getBlockState(), false);
         if (info == null) {
             cancelService(menu);

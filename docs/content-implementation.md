@@ -21,6 +21,7 @@ Last updated: 2026-10-05
 - 客户端可选 Mixin：`GrillingFoodTooltipMixin` 阻止烟火 FoodTooltip 两个效果入口；`FarmersFoodTooltipMixin` 阻止农夫乐事 TextUtils 效果入口；国味真实注册复用 Cookery `BowlFoodOnlyItem`→`FoodWithEffectsItem`，`CookeryFoodTooltipMixin` 只拦截其 PotionUtils 效果构建调用。依据烟火 1.1.1、农夫乐事 1.3.4、国味 1.1.14、厨房 1.4.1 实际 JAR 核验。结构兜底递归识别 effect/potion 翻译组件及关联属性段，不按语言或颜色猜测。
 - `PonderItemTooltipMixin` 阻止 Create 6.0.8 内嵌 Ponder 1.0.91 的 addToTooltip；`CreateItemDescriptionTooltipMixin` 阻止 Create ClientEvents.addToItemTooltip 的 Shift/Ctrl 概要；`LibItemDescriptionTooltipMixin` 阻止 CozyCafe 1.10 内嵌 LibTooltips 2.3 的 modifyItemTooltip（常驻介绍、Shift 提示与展开正文），不影响另外添加的价格。`JeiItemModNameTooltipMixin` 拦截 JEI 15.49 的两种添加模组名入口和 getModNameForTooltip，覆盖物品、流体等全部 ingredient 类型，保留其余原列表。所有外部目标以 class 资源门禁，均在 client 列表，无可选目标提前类加载。
 - 2026-10-15 用户截图回归：实际食品效果的图标、时长、概率由 Quality Food 2.4.3 `events.ForgeEvents.addEffectTooltip(GatherComponents)` 追加 `core.EffectComponent`，不属于文本列表。`QualityFoodTooltipMixin` 在该方法 HEAD 按 hideFoodEffects 取消，覆盖静态效果、动态食物属性与品质修改效果，不取消其另一个 addTooltip 品质说明入口，不改变食用效果。厨房现用 1.5.1 已额外核验原 Cookery 拦截目标不变。
+- 锦致装饰 Supplementaries 3.1.43：`SupplementariesPlaceableTooltipMixin` 定向替换 ClientEvents.onItemTooltip 第二次 Supplier.get（PLACEABLE_TOOLTIP），hideOriginalDetails开启时返回false，仅隐藏额外可放置说明，覆盖所有 SuppAdditionalPlacement 物品；关闭后读取原配置。其它提示、配方、价格与自定义描述保持；client注册及class资源门禁，ASM测试锁定字段与ordinal。
 - 性能：仅悬停构建提示时 O(当前提示组件数)；覆盖按物品 ID 哈希查询。无 tick、注册表遍历、反射、网络或文件轮询。文件只在资源重载读取；不可变快照整体替换，内存随当前配置规模有界，复制描述组件防止外部修改污染缓存。
 - 验证：TooltipRulesTest 覆盖开关组合、附加配方/价格保留、名称样式、效果结构、多行/翻译/空数组、坏配置原子保留及删除恢复；ItemTooltipMixinTest 核对真实 Forge 调用及可选客户端门禁。客户端三款食品、JEI/咖啡馆和思索显示仍待授权实机验收；未启动客户端。
 - 2026-10-15 验证结果：Forge 47.4.10 独立 clean 后完整 build 通过（151 项测试），Forge 官方 promotions 当前最新 47.4.28 完整 build 同样通过，并以 dependencies 输出确认实际坐标为 1.20.1-47.4.28_mapped_official_1.20.1；最终恢复基线构建。生产 JAR 已核对原始提示 SRG 选择器、Forge 调用、Cookery PotionUtils 调用及不打包外部类；双语键一致，CodeGraph 已更新，Git 无生成文件。已在指定客户端创建空 item_descriptions.json，未部署 JAR。
@@ -144,6 +145,7 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 | 代码入口 | `feedback.PlayerFeedback` |
 | 实现链路 | 服务端调用 `PlayerFeedback.show`、`showFailure` 或 `showSuccess` → 玩家来源调用 `ServerPlayer.displayClientMessage(message, true)` → Forge/Minecraft 发送 `ClientboundSystemChatPacket(overlay=true)` → 客户端 `ChatListener` 调用 `Gui.setOverlayMessage`；控制台等非玩家来源保留 `CommandSourceStack` 的原生命令输出。 |
 | 适用范围 | 所有 ICEcore 临时玩家反馈，包括建造系统、调整模式、CozyCafe 范围调整和货币查询/HUD 命令；管理员广播仍保留，但在线管理员反馈同样使用底部信息。聊天栏仅用于明确属于聊天或服务器管理日志的内容。 |
+| 页面反馈例外 | CozyCafe电脑页面操作及开店失败必须使用电脑自身提示包和setErrorMessage区域；不得使用PlayerFeedback、原版小标题、底部信息栏或聊天栏。代码5为无有效菜单座位，代码6为营业时间限制，显示6秒、最后1秒淡出；使用原生ClientTooltipPositioner按Open按钮实际坐标居中提示框，render HEAD以System.nanoTime保证容器tick暂停时到期清理。原生原因码0..4与扩展5/6共用行为，布局仅消息/宽度改变时缓存重算。 |
 | 性能与生命周期 | 只在实际事件或命令反馈时发送一个原版消息包，不增加 tick 监听、渲染遍历、定时器、客户端缓存或同步 I/O；显示和淡出生命周期完全由原版 HUD 管理。 |
 | 验证方法 | 用 Forge 47.4.10 的 `javap` 核对 `ServerPlayer.displayClientMessage(Component, boolean)`、`ClientboundSystemChatPacket` 和 `Gui.setOverlayMessage`；执行 `gradlew.bat compileJava`、资源处理和 `clean build`；扫描玩家反馈路径不存在直接 `sendSystemMessage`、`sendFailure` 或 `sendSuccess`。 |
 | 最后修改 | 2026-08-25，新增统一底部信息入口并将 ICEcore 现有玩家提示迁移到该入口。 |
@@ -343,6 +345,19 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 | 性能与生命周期 | 数据包 JSON 在资源重载时解析并缓存；正常显示和选项点击按事件执行，不新增逐 tick 文件 I/O。客户端打开期间每隔至少 5 个客户端世界 tick 请求一次目标实体同步；自动 criterion 入口会在所有 `SimpleCriterionTrigger` 触发时扫描全部对话条件，服务端脚本监听需保持 O(1) 或小范围按需处理。 |
 | 验证方法 | 以 UTF-8 直接读取 JAR 的 `mods.toml`、内置中英文语言和两个示例对话；使用 `jar tf` 与 `javap -p -c -s` 核对 `ChatBoxCommand`、`ChatBoxCommandUtil`、`ChatBoxUtil`、`ChatBoxDialoguesLoader`、`SimpleCriterionTriggerMixin`、`SimplePayload.onPlayerSkipChat`、`ComponentEvent`、`EventExecutor`、`ChatOption`、`SendClickEvent`、`ChatBoxEventsJS` 与 `CommonEventsPostJS`。未启动 Minecraft 客户端，界面和脚本实机行为仍需在用户明确授权后验证。 |
 | 最后修改 | 2026-09-24，加入 ChatBox 1.1.5 编译参考并核对 ICEcore 所用 API 与 1.1.4 签名一致；运行依赖由精确 1.1.4 放宽为 1.1.4 及更高版本。原有对话显示、进度条件触发、进入语句命令、选项事件、Forge/KubeJS 事件与网络安全边界结论来自 1.1.4 字节码核对。 |
+
+### Yuushya 入世声明与 CozyCafe 营业时间
+
+- Yuushya 2.3.0：`YuushyaJoinMessageMixin` 在真实 `lambda$init$4(ServerPlayer)` HEAD 取消声明生成与发送，不过滤普通聊天。
+- CozyCafe 1.10：所有维度电脑使用主世界时间，日内 `[12000,24000)`（18:00–次日06:00）禁止营业。`CozyCafeHoursMixin` 在电脑服务端 tick HEAD 使用 `setOpen(false,false)` 停止新客，已有顾客保留原订单、用餐、结算及正常离场。06:00仅恢复手动开店资格，原菜单/座位和每日限制保持。首次夜间加载立即关闭；前进跨关店点（包括整个夜间、多天）也关闭；倒退不触发跨越，夜间状态仍限制。手动白天开店重新记录观察时间。
+- 开店资格、setOpen和分配入口均受服务端限制，页面开店失败使用 `ClientBoundCafeCannotOpenPacket((byte)6)` → `CozyCafeManagerScreenErrorMixin` → 电脑原生 errorMessage 状态（120tick兼容计数、6秒单调时钟兜底、末1秒淡出）及Open按钮上方居中提示及 `icecore.cozycafe.closed_hours` 双语翻译。不新增命令或配置文件。
+- `CozyCafePendingSpawnMixin` 在异步皮肤查询前捕获电脑实例、时间与营业代次，finalizeSpawn HEAD 复验电脑移除/卸载、当前营业状态、跨关店点和旧代次。仅拒绝 MENU 新客，SIGN 离场保持；取消只释放同UUID菜单预留、重置旅行计时并清空临时电脑引用。现有validate仅对尚未入世的pending_spawn在电脑关闭时释放预留；walking/seated顾客保持。`CozyCafeAdmissionAccess` / `CozyCafePendingAdmission` 为包外桥接。
+- 性能：每个已加载电脑每tick O(1)，无新增世界/注册表扫描、I/O、网络轮询或日志。仅开闭变化沿用原生方块/招牌和现有展板同步；每个待生成顾客只保留一份电脑引用及两个long，入世或取消时清除，原异步任务生命周期保持。
+- 验证：`CozyCafeHoursTest` 覆盖06:00、18:00、午夜、加速、跨夜、多日、倒退与负数；`CafeHoursCompatibilityTest` 用 libs 当前真实JAR ASM核对入口描述符及可选门禁。未启动客户端；顾客完成订单、多人状态与异步延迟仍待授权实机验收。
+
+- 2026-10-17最终验证：Forge47.4.10独立clean后完整build通过，173项测试零失败；Forge官方当前最新47.4.28完整build通过，minecraft依赖报告确认1.20.1-47.4.28_mapped_official_1.20.1，最终恢复47.4.10完整构建。verifyProductionJar通过，成品Mixin注册、双语键与外部类排除已核对，SHA-256为a6af68bc07f1fdbb79dfeb46fa914d88fc44c96a944b4b9c27643a54a6752ec9。工作区Markdown引用、Git边界、CodeGraph新增符号已核验；未部署客户端JAR或启动客户端。
+
+- 2026-10-17电脑页面提示当前实现：保留errorMessage与原生/扩展原因映射、120tick及6秒单调时钟生命周期；保留原生提示内容包装，仅替换位置参数，调用上游wrapErrorText并缓存原生组件/visualOrderText，完整调用GuiGraphics.renderTooltip带ClientTooltipPositioner，进入Forge RenderTooltipEvent.Pre与Modern UI3.12.0.1 UIManagerForge接管，所有提示框内容样式均由原生流程绘制。不使用TooltipRenderUtil、固定背景色或手绘文字。末1秒以按需透明TextureTarget捕获原生结果并alpha合成；每屏一个目标，尺寸变化resize，过期/关闭destroyBuffers，恢复主目标和GL状态。仅显示期间O(行数)原生提示工作，末秒一份GPU目标和一次屏幕合成，无世界tick、同步I/O、网络轮询。CafeHoursCompatibilityTest读取Modern UI真实JAR核对Pre与positioner，禁止低层自绘并要求目标清理。实机截图场景待用户复测。
 
 ### CozyCafe 顾客区域与酒馆展板
 
@@ -659,3 +674,11 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 - MultiPlayerGameModeMixin 在生产 m_233746_ 内部预测入口返回 SUCCESS，停止双手重试，外层仍创建请求包；claimPlacement 复用预览合法性、距离和调整模式排除，仅有效时启动预览抑制。无新增协议、tick 扫描或日志。
 - 扳手客户端与服务端统一按归一化主位置 canBreak 判定交互归属，非列表/区域外放行；背包和容器确认失败继续独占。
 - 验证：BuildingInteractionContractTest 固定先声明再修改、末尾重申、内部预测选择器与 SUCCESS、区域权限边界及副手扳手推进；Forge 47.4.10 定向测试、生产命名测试及独立 clean 后完整 build 通过。实机熔炉/箱子/门、双手、多格与事务拒绝仍需用户授权。
+
+### 咖啡馆电脑提示框恢复验收（2026-10-17）
+
+- 保留Open按钮上方居中、6秒总时长和末1秒淡出；恢复原生Tooltip背景与渐变边框，两者透明度同步。Forge47.4.10和47.4.28完整build及verifyProductionJar通过，最终恢复基线47.4.10；177项测试零失败。最新产物SHA-256为ef0ddf124a46b9a4fa194bded720b57f651af64ce990032c52f7cbfee7b8716d，替代上述历史产物。未部署或启动客户端，实机画面待验。
+
+- 历史“提示框恢复验收”的低层TooltipRenderUtil方案已被本轮完整原生入口替代；旧产物hash仅为历史记录，不代表当前兼容实现。
+
+- 2026-10-17完整原生Tooltip最终验证：177项测试零失败；基线Forge47.4.10独立clean后完整build、47.4.28完整build及最终47.4.10恢复build均通过，verifyProductionJar通过。成品不打包Modern UI/CozyCafe类，SHA-256为60ff45035966cb6e21329e1a0d5db47876164a7d9f324e999a89cec7d07b4984；原生入口和资源清理已核对。截图场景仍待用户实机复测，未部署或启动客户端。

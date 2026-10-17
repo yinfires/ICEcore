@@ -12,6 +12,7 @@ public final class ICECoreMixinPlugin implements IMixinConfigPlugin {
     @Override public void onLoad(String mixinPackage) {}
     @Override public String getRefMapperConfig() { return null; }
     @Override public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
+        if (mixinClassName.contains("YuushyaJoinMessage") || mixinClassName.contains("SupplementariesPlaceableTooltip")) return present(targetClassName);
         if (mixinClassName.contains("Workstation")) return present(targetClassName);
         if (mixinClassName.contains("ItemDescriptionTooltip")) return present(targetClassName);
         if (mixinClassName.contains("PonderItemTooltip") || mixinClassName.contains("JeiItemModNameTooltip")) return present(targetClassName);

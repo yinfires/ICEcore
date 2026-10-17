@@ -52,6 +52,7 @@
   "icecore.build.adjust.enter": "已进入区域 %s 的调整模式。",
   "icecore.build.adjust.first": "已设置第一个坐标：%s",
   "icecore.build.adjust.second": "已设置第二个坐标：%s",
+  "icecore.cozycafe.closed_hours": "咖啡馆营业时间为 06:00–18:00，当前不能开店。",
   "icecore.cozycafe.range.mod_missing": "未安装 CozyCafe，无法修改电脑识别范围。",
   "icecore.cozycafe.range.player_only": "只有玩家可以修改 CozyCafe 电脑识别范围。",
   "icecore.cozycafe.range.invalid_stick": "必须手持普通木棍才能进入电脑范围修改模式。",
