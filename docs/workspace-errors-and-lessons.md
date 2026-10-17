@@ -103,6 +103,8 @@ Last updated: 2026-09-27
 
 ### ERR-20261005-01：内存诊断未提前核对采样工具与输出边界
 
+- 2026-10-17 一体式冰箱任务复发（累计至少14次）：规划首轮合并完整CodeGraph元数据与多文档造成截断；实施部分读取在长度断言后追加正文，较低token预算仍截断。根因是未把整个底层输出和预算作为一个门禁，影响是阅读证据不完整。关键原生入口已按文件/方法独立重读，不据截断文本判断API；超6000字符批次多次被拒绝后拆分。防线升级：文档与工具发现必须独立输出，底层调用只允许输出一个已经计数的批次，6000字符批次使用至少4000 token预算；原生行为以真实JAR ASM和模型逐元素检查补强，禁止仅靠截断反编译片段建立结论。验证：FridgeUpstreamContractTest覆盖注入完整描述符与25个模型元素，FridgeContractTest覆盖包边界、拆放与扳手。适用边界为工具元数据、文档、JAR与日志读取；状态继续观察。
+
 - 2026-10-16 工作方块任务再次复发（累计复发次数13）：规划首轮合并完整工具描述与多文档导致截断；实施中宽JAR标签过滤及合并输出再次超过预算。根因是门禁未覆盖工具元数据与整批输出；已采用独立6000字符拒绝读取并增加直接ASM真实JAR选择器校验，超限输出实际被拒绝，不能以截断文本证明API。另发现按1.5.1反编译文本错误拼接TagMod包名，编译指出后核对两版真实类路径为init/tag/TagMod并修正；重复补丁目标被apply_patch拒绝，未部分写入。后续本类任务必须在编写前核对完整导入路径、生产描述符，并以真实JAR ASM门禁覆盖整批Mixin。状态继续观察；构建通过不代表实机行为验收。
 - 同任务交接复核补充：重新读取时合并全文件标题与长行再次截断，返回后截取字符串也无法阻止工具内部已经发生的截断。已改为在PowerShell执行端构造目标条目并断言长度后输出，构建仅回读短尾部；完整回读工作方块条目、原记录与开发规则对应节，未以截断内容建立结论。防线须在每个底层工具返回前生效，不能只在functions.exec外层裁剪结果；适用边界与状态同原记录。
 
@@ -407,6 +409,8 @@ Last updated: 2026-09-27
 - 关联项：item-modeling-pilot.md、model-reference-library.md。
 
 ### ERR-20260825-03：普通桥接接口置于 Mixin 包导致进入世界崩溃
+
+- 2026-10-17 一体式冰箱实现复发1次：初稿ModFridge直接引用Mixin包内Accessor接口。尚未部署；静态复核发现该接口仍受Mixin包所有权限制。根因是把Accessor可调用性误当作普通接口可加载性，影响为潜在启动IllegalClassLoadError。已改为包外FridgeBlockTypeAccess接口与实际FridgeBlockEntityTypeMixin实现；生产字段以SRG f_58915_、开发别名validBlocks声明，原生允许方块集合在setup复制扩展。防线升级为FridgeContractTest固定包外桥接和无旧接口，生产JAR路径核查；适用边界与原记录一致。状态：静态与构建验证，实机待授权。
 
 - 类型：规范错误
 - 状态：观察中
@@ -1103,6 +1107,9 @@ Last updated: 2026-09-27
 - 验证与边界：Forge 47.4.10 定向测试及完整 build 通过；默认投料、流体失败拦截与成品阶段不变。状态：源码已修正，客户端实测待执行。
 
 #### ERR-20260902-01 命令检查复发升级（2026-10-01）
+
+- 2026-10-17 TLS等待复发升级（用户确认本项目多次发生，次数至少2）：冰箱47.4.28在线build停在Gradle插件解析的SSLSocket握手，任务未开始；改用offline后线程栈又确认ForgeGradle EnvironmentChecks.testServerConnection在SSLSocket握手，证明仅offline不能完全杜绝联网。根因是忘记已有TLS停滞经验，且把offline错误视为全部联网检查关闭。影响为构建无进展、耗时及误报验证边界。正确做法：默认offline、60秒无任务进展时jcmd只读本次daemon线程栈，区分插件解析/依赖下载/环境检查；只停本任务进程并按目标ForgeGradle实现设置有限联网超时，不关闭证书校验；缺缓存才按需在线补齐。防复发载体已落实到AGENTS.md质量与验证及workspace-development-rules.md构建章节。证据为tmp/fridge-inspect/latest-threads.txt和offline-threads.txt，两者只作本地诊断不提交。验证方法为带有限超时的offline兼容build及最终基线build，状态：防线已落盘，构建结果待本轮验证；适用边界为本机Gradle/ForgeGradle联网，不推定任何实际代码编译失败。
+- 同轮验证：反编译实际ForgeGradle6.0.54确认HttpsURLConnection HEAD未设置超时；传入sun.net.client.defaultConnectTimeout/defaultReadTimeout及org.gradle.internal.http.connectionTimeout/socketTimeout各10000ms，保持证书/环境检查开启，offline Forge47.4.28完整build与verifyProductionJar通过（1分31秒）。AGENTS.md已记录四个完整引用参数，后续从开工规则直接触发；状态为防线已验证，继续观察。
 
 - 最新复发证据：本次沿用 clean build 合并命令，违反生效规则 26；旧记录存在冲突示例，交接摘要未保留 token 约束。复发次数由 3 增至 4。
 - 根因与影响：未审查任务 token，导致无法获得有效完整构建结论；堆栈另确认 ForgeGradle EnvironmentChecks 卡在 SSL 握手，不能把等待当作完成。

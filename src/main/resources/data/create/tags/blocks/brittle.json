@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "icecore:fridge"
+  ],
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "create"
+    }
+  ]
+}

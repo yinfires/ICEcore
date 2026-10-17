@@ -55,6 +55,8 @@ repositories {
 }
 
 dependencies {
+    implementation fg.deobf('local:cookingforblockheads-forge-1.20.1:16.0.15')
+    implementation fg.deobf('local:balm-forge-1.20.1:7.3.44')
     compileOnly files('libs/kaleidoscope_grilling-1.1.1-forge1.20.1.jar')
     compileOnly fg.deobf('local:dew_drop_farmland_growth:9.0')
     compileOnly fg.deobf('local:dew_drop_watering_cans:1.0.2')

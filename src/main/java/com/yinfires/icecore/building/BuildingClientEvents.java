@@ -491,6 +491,9 @@ public final class BuildingClientEvents {
         if (placementContext == null) {
             return false;
         }
+        if (com.yinfires.icecore.fridge.FridgePairing.integrated(state)
+                && (minecraft.level.isOutsideBuildHeight(origin)
+                    || !minecraft.level.getWorldBorder().isWithinBounds(origin))) return false;
         if (!minecraft.level.getBlockState(origin).canBeReplaced(
                 BlockPlaceContext.at(placementContext, origin, placementContext.getClickedFace()))) {
             return false;

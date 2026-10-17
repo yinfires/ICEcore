@@ -18,6 +18,8 @@ public final class BuildingClientRules {
         if (lists.isEmpty()) return false;
         for (var list : lists) {
             boolean inRegion = list.regions().isEmpty() || list.matchesRegion(data, level.dimension().location(), target);
+            if (inRegion && com.yinfires.icecore.fridge.FridgePairing.integrated(placing) && !list.regions().isEmpty())
+                inRegion = list.matchesRegion(data, level.dimension().location(), target.above());
             boolean onSupport = list.supports().isEmpty() || list.matchesSupport(data, support, registry);
             if (!inRegion || !onSupport || !list.allowsFace(face)) return false;
         }
@@ -47,6 +49,8 @@ public final class BuildingClientRules {
             matched = true;
             if (list.regions().isEmpty()) continue;
             if (!list.matchesRegion(data, level.dimension().location(), target)) return false;
+            if (com.yinfires.icecore.fridge.FridgePairing.integrated(state)
+                    && !list.matchesRegion(data, level.dimension().location(), target.above())) return false;
         }
         if (!matched) return false;
         // Every valid placement list is dismantlable. Region bindings still

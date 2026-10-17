@@ -137,17 +137,28 @@ public final class BuildingServerActions {
         clearRemovalConfirmation(player);
         List<ItemStack> returns = List.of(blockStack);
         List<BlockPos> structure = BuildingStructure.positions(state, keyPosition);
+        if (com.yinfires.icecore.fridge.FridgePairing.integrated(state)
+                && !com.yinfires.icecore.fridge.FridgePairing.matches(state, level.getBlockState(keyPosition.above()))) {
+            return false;
+        }
         if (!canFit(player.getInventory(), returns)) {
             PlayerFeedback.show(player, net.minecraft.network.chat.Component.translatable("icecore.build.inventory_full"));
             return false;
         }
+        // Remove every entity before any structural block. Integrated blocks may remove their
+        // partner in onRemove; clearing only the currently clicked half would leak partner loot.
         for (BlockPos part : structure) {
-            // The wrench has already copied all container contents into the
-            // return list. Remove the block entity first so a modded onRemove
-            // implementation cannot emit the same contents as world drops.
+            if (com.yinfires.icecore.fridge.FridgePairing.integrated(state)
+                    && level.getBlockEntity(part) instanceof net.blay09.mods.cookingforblockheads.tile.FridgeBlockEntity fridge) {
+                fridge.getContainer().clearContent();
+                fridge.hasIceUpgrade = false;
+                fridge.hasPreservationUpgrade = false;
+            }
             if (level.getBlockEntity(part) != null) {
                 level.removeBlockEntity(part);
             }
+        }
+        for (BlockPos part : structure) {
             level.removeBlock(part, false);
         }
         for (ItemStack returned : returns) {
@@ -209,6 +220,9 @@ public final class BuildingServerActions {
         net.minecraft.world.item.context.BlockPlaceContext positionContext =
                 net.minecraft.world.item.context.BlockPlaceContext.at(context, position, context.getClickedFace());
         return level.getBlockState(position).canBeReplaced(positionContext)
+                && (!com.yinfires.icecore.fridge.FridgePairing.integrated(state)
+                    || (!level.isOutsideBuildHeight(position) && level.getWorldBorder().isWithinBounds(position)
+                        && level.mayInteract(player, position)))
                 && level.isUnobstructed(state, position, CollisionContext.of(player));
     }
 

@@ -160,5 +160,6 @@
   "icecore.workstation.cooking": "烹饪中：%s",
   "icecore.workstation.steaming": "蒸制中：%s",
   "icecore.workstation.boiling": "烹煮中：%s",
-  "icecore.workstation.baking": "烤制中：%s"
+  "icecore.workstation.baking": "烤制中：%s",
+  "block.icecore.fridge": "冰箱"
 }

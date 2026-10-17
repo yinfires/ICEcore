@@ -160,5 +160,6 @@
   "icecore.workstation.cooking": "Cooking: %s",
   "icecore.workstation.steaming": "Steaming: %s",
   "icecore.workstation.boiling": "Boiling: %s",
-  "icecore.workstation.baking": "Baking: %s"
+  "icecore.workstation.baking": "Baking: %s",
+  "block.icecore.fridge": "Fridge"
 }

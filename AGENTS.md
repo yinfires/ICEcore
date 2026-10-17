@@ -80,6 +80,9 @@
 
 ## 质量与验证
 
+- 本机已多次在 Forge 47.4.28 兼容构建中遇到 Gradle 插件仓库或 ForgeGradle 环境联网检查的 TLS 握手停滞。已有依赖缓存的基线/兼容验证默认使用 `--offline`，不得反复启动无超时在线构建。离线不代表 ForgeGradle 环境检查不联网；若60秒无任务进展，读取该次 Gradle daemon 的线程栈区分插件解析、依赖下载与 `EnvironmentChecks.testServerConnection`。仅停止本任务进程，设置有限联网超时后重试；缺少缓存才按需联网补齐，不能关闭证书或环境校验。具体证据与处理见 `docs/workspace-errors-and-lessons.md` 的 ERR-20260902-01 TLS 复发升级。
+- 本机 Gradle 构建默认带完整单引号参数 `'-Dsun.net.client.defaultConnectTimeout=10000'`、`'-Dsun.net.client.defaultReadTimeout=10000'`、`'-Dorg.gradle.internal.http.connectionTimeout=10000'`、`'-Dorg.gradle.internal.http.socketTimeout=10000'`。前两项限制 ForgeGradle 6.0.54 的 HttpsURLConnection 环境检查，后两项限制 Gradle 插件/依赖 HTTP；`--offline` 与超时须同时使用，首次缺缓存时才去掉 offline。更换 ForgeGradle/JDK 后重新核对超时实现。
+
 - 优先运行与改动最接近的窄验证，再按风险扩大到 `gradlew.bat clean build`。不得通过删除校验、吞异常或保留死代码来让构建通过。
 - 完成前必须检查实现的性能开销，重点核对高频调用、主线程工作、集合扫描、对象分配、缓存失效、网络频率和日志量；发现可能造成卡顿的路径时，先优化或限制其边界，再进行最终构建验证。
 - 完成前检查编译、资源展开、JAR 内容、Git 忽略边界和 CodeGraph 状态；不要提交生成目录或本地运行数据。

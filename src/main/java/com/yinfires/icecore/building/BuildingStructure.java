@@ -29,6 +29,11 @@ public final class BuildingStructure {
 
     public static BlockPos primaryPosition(BlockGetter level, BlockPos position) {
         BlockState state = level.getBlockState(position);
+        if (com.yinfires.icecore.fridge.FridgePairing.integrated(state)) {
+            if (!com.yinfires.icecore.fridge.FridgePairing.upper(state)) return position;
+            BlockPos below = position.below();
+            return com.yinfires.icecore.fridge.FridgePairing.matches(state, level.getBlockState(below)) ? below : position;
+        }
         StructureProperty structure = find(state);
         if (structure == null || !structure.valueName(state).equals(structure.secondary())) {
             return position;
@@ -105,6 +110,10 @@ public final class BuildingStructure {
     }
 
     private static StructureProperty discover(BlockState state) {
+        if (com.yinfires.icecore.fridge.FridgePairing.integrated(state)) {
+            return new StructureProperty(net.blay09.mods.cookingforblockheads.block.FridgeBlock.MODEL_TYPE,
+                    "large_lower", "large_upper", PairKind.VERTICAL);
+        }
         for (Property<?> property : state.getProperties()) {
             String propertyName = property.getName().toLowerCase(Locale.ROOT);
             List<String> values = new ArrayList<>();

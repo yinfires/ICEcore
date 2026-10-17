@@ -174,6 +174,17 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 
 ## 实现条目
 
+### 一体式双层冰箱
+
+- `icecore:fridge`，中文“冰箱”、英文“Fridge”；仅加入 ICEcore 创造物品栏，不提供合成配方。Cooking for Blockheads 16.0.15 与 Balm 7.3.44 为双端强制前置，Gradle flatDir 反混淆依赖来自 `libs/` 对应真实 JAR，不将上游类或贴图打包进 ICEcore。
+- `fridge.ModFridge` 注册方块与物品，在 common setup 工作队列中通过包外 `FridgeBlockTypeAccess` 扩展原生 `ModBlockEntities.fridge` 的 validBlocks。`FridgeBlockEntityTypeMixin` 使用映射核验的生产字段 `f_58915_`，保留其它允许方块。库存、网络、Balm能力、54格菜单、FridgeScreen、FridgeRenderer、DoorAnimator、声音、厨房供料和升级均保留原生完整入口。
+- `IntegratedFridgeBlock` 继承原生 FridgeBlock，上下固定 LARGE_LOWER/LARGE_UPPER；`FridgePairingMixin` 在邻居和基座查找入口限定同种方块、相反半边和一致朝向/铰链，原生冰箱排除新冰箱。无水平搜索或跨台库存合并。菜单默认名称使用本地翻译键；原生命名、染色、常开、制冰与保鲜接口保留。
+- `IntegratedFridgeItem` 沿用 BlockItem 放置流程，预检上下空间、碰撞、世界高度/边界与交互权限；两次写入由 ForgeHooks 的 MultiPlace 快照捕获，取消时统一回滚，不消耗物品。第二次写入失败时恢复第一格快照。快照恢复期间不触发清理或掉落；BlockStateTag 不能把已放下半变成单层。支持原生悬空放置，禁止活塞移动。
+- 任意半边替换时只掉落该半的27格库存和实际持有的升级，再无方块掉落地清理正确配对半边；另一半仅结算自己的内容。保鲜和制冰以各实体原始标志检查，避免上半getter指向基座而返还两次。方块本体由发起拆除的原版战利品入口产生一次；创造模式不额外掉落本体，爆炸沿用survives_explosion，内容/升级受doTileDrops约束。事件驱动的一次延后tick清理命令生成的缺损结构，不持续轮询。
+- 扳手接入 `BuildingStructure` 的显式大冰箱半边解析，点击上下均归一到下半；上下状态参与空间预览与区域限制。`ContainerContentAccess` 提供每半自身库存及升级指纹，现有结构循环检查上下各27格；任意一边非空或带升级都要求两次Shift确认，任意库存/升级变化使确认失效。`BuildingServerActions` 在移除任何结构块前先移除所有对应实体；强拆清空两半内容与升级且只返还一个新冰箱，不产生上半库存的世界掉落。原有区域/列表规则继续决定是否允许拆放，不自动添加管理员配置。
+- 世界模型直接引用原生 fridge_large_lower/upper，方向变换与原生一致；`FridgeClient` 使用原生同款颜色处理和cutoutMipped层，复用原生方块实体渲染器。物品模型由原生上下柜体与闭合上下门25个元素组合，上半仅平移16；原生实体几何实际Y=0..29，保留纹理绑定和UV，删除物品面tintindex/cullface并按整体中心缩放。资产生成/核对脚本、独立导出和正面/侧面/背面/斜视合成位于 `D:/Minecraft/Mod Develop/模型/一体式冰箱/`；未生成新贴图。可见特征映射为原生白色柜体→原柜体四壁，贯通门把手→原生上下门把手，后部黑色孔→原生背面贴图，29/16高度→完整双层物品轮廓。
+- `FridgeContractTest` 覆盖双格放置检查、生产字段/描述符、包外桥接、无配方、两半资源和扳手事务；`FridgeUpstreamContractTest` 通过ASM核对真实生产JAR注入方法、原生库存/渲染入口，并逐元素比较模型坐标、UV与纹理引用。已有建造回归同批执行。构建与实机验证状态见本条末尾追加记录；不把源码契约或合成图当作实机功能验收。
+
 ### 工作方块统一交互与 Jade（2026-10-16）
 
 - 目标 ID 来源为 recipe-manager `public/data/recipe-manager.json`。冰柜、发酵桶、汤锅、炒锅接入 `workstation.WorkstationInteractionService`；料理台仅由 `WorkstationCuisineMixin` 在工具处理之后接入单件投入，原生取出保持。容器识别、库存交换与后进先出复用现有服务；槽位元数据保存为 `ICEcoreSlots`，加载不发包，首次操作有界恢复。
