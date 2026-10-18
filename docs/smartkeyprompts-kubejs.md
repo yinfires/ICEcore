@@ -71,3 +71,10 @@ END 提交供下一 START 消费，避免依赖同阶段监听顺序。停止条
 - node --check 只检查语法；用客户端实际 Rhino JAR验证加载/重复加载、START/END 转发、改键、对象复用、空手、界面、无玩家和依赖缺失；Java绑定/API额外用实际 JAR 核对。
 - 实机验收查看 startup.log 与 client.log 的具体 ERROR 和脚本加载行，不能仅依赖末尾错误计数；验证提示、改键、黑名单、退出世界与关闭界面的清理。
 - 临时测试已于 2026-10-05 按用户要求移除：两个 smartkeyprompts_use_test 脚本及 icecore.test_prompt.use 中英文翻译均不再部署。模板只保存在本文，ICEcore 的正式给予提示 Java 兼容保留。
+
+## 工作方块正式提示（2026-10-18）
+
+- 指定客户端startup_scripts与client_scripts均为icecore_workstation_prompts.js；双语操作键在客户端assets/icecore/lang，行为矩阵见content-implementation.md“工作方块情境按键提示”。组合键用实际潜行键ID + '+' + 实际使用键ID，混合碗同样为组合键搅拌。
+- 1.1.3-hotfix原生KeyUtils.translateKey会把组合键翻译为带+字符串，KeyRenderer.drawKeyBoardKey将整串绘成单个长键帽；仅脚本不能实现独立键帽。ICEcore SmartKeyPromptsComboMixin复用原生逐键绘制及+文字并修正HUD宽度，不复制键帽贴图/背景。原生缓存HashSet不保证提交顺序，兼容只在列表重算时保证垃圾桶投入在取出前。
+- 目标Rhino真实解释器测试通过；启动事件须完整重启，实际client/startup日志及HUD、改键、缩放/对齐、黑名单、退出清理仍需实机验收，不自动启动客户端。
+- 2026-10-18后续外观要求：ICEcore组合键兼容中的单键/组合键两条原生绘制分支统一传入pressed=false；所有SmartKeyPrompts提示保持未按下外观，不改变按键绑定、实际输入、提示条件或原生键帽样式。SmartKeyPromptsComboContractTest直接检查编译字节码两处调用前均为ICONST_0，防止某分支残留按压变化。

@@ -5,6 +5,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(targets = {
+    "com.github.ysbbbbbb.kaleidoscopecookery.blockentity.misc.TrashCanBlockEntity",
     "com.github.ysbbbbbb.kaleidoscopecookery.blockentity.kitchen.PotBlockEntity",
     "com.github.ysbbbbbb.kaleidoscopecookery.blockentity.kitchen.StockpotBlockEntity",
     "dev.xkmc.youkaishomecoming.content.pot.ferment.FermentationTankBlockEntity",

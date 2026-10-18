@@ -16,4 +16,37 @@ public final class WorkstationInventoryTransfer {
         if (!insert(player, single, true).isEmpty()) return false;
         return insert(player, single, false).isEmpty();
     }
+
+    /** Atomic main-hand container exchange, including capacity freed by consuming the last container. */
+    public static int exchangeBatch(Player player, ItemStack replacement, int requested, boolean consume, boolean simulate) {
+        int limit = consume ? Math.min(requested, player.getMainHandItem().getCount()) : requested;
+        if (limit <= 0) return 0;
+        int moved = maximumExchange(limit, count -> exchangeSnapshot(player, replacement, count, consume) != null);
+        if (moved == 0) return 0;
+        var snapshot = exchangeSnapshot(player, replacement, moved, consume);
+        if (!simulate) for (int slot = 0; slot < 36; slot++)
+            player.getInventory().setItem(slot, snapshot.getStackInSlot(slot));
+        return moved;
+    }
+
+    /** Full consumption can free the selected slot, so test that boundary before binary search. */
+    public static int maximumExchange(int limit, java.util.function.IntPredicate fits) {
+        if (limit <= 0) return 0;
+        if (fits.test(limit)) return limit;
+        int low = 0, high = limit - 1;
+        while (low < high) {
+            int middle = low + (high - low + 1) / 2;
+            if (fits.test(middle)) low = middle;
+            else high = middle - 1;
+        }
+        return low;
+    }
+
+    private static net.minecraftforge.items.ItemStackHandler exchangeSnapshot(Player player, ItemStack replacement, int count, boolean consume) {
+        var inventory = player.getInventory();
+        var snapshot = new net.minecraftforge.items.ItemStackHandler(36);
+        for (int slot = 0; slot < 36; slot++) snapshot.setStackInSlot(slot, inventory.getItem(slot).copy());
+        if (consume && !player.getAbilities().instabuild) snapshot.getStackInSlot(inventory.selected).shrink(count);
+        return ItemHandlerHelper.insertItemStacked(snapshot, replacement.copyWithCount(count), false).isEmpty() ? snapshot : null;
+    }
 }

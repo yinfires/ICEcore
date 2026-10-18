@@ -11,7 +11,9 @@ final class WorkstationInventoryTransferTest {
         assertTrue(transfer.contains("PlayerMainInvWrapper(player.getInventory())"));
         assertTrue(transfer.contains("stack.copyWithCount(1)"));
         assertTrue(transfer.indexOf("insert(player, single, true)") < transfer.indexOf("insert(player, single, false)"));
-        assertFalse(transfer.contains("selected"));
+        String singleTransfer = transfer.substring(0, transfer.indexOf("public static int exchangeBatch"));
+        assertFalse(singleTransfer.contains("selected"));
+        assertTrue(transfer.contains("snapshot.getStackInSlot(inventory.selected).shrink(count)"));
         assertFalse(transfer.contains("setItemInHand"));
         assertFalse(transfer.contains("placeItemBackInInventory"));
         String service = Files.readString(ROOT.resolve("workstation/WorkstationInteractionService.java"));

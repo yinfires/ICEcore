@@ -14,7 +14,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class ICECoreNetwork {
-    private static final String PROTOCOL_VERSION = "11";
+    private static final String PROTOCOL_VERSION = "12";
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             ResourceLocation.fromNamespaceAndPath(ICECore.MOD_ID, "main"),
             () -> PROTOCOL_VERSION,
@@ -32,6 +32,10 @@ public final class ICECoreNetwork {
             return;
         }
         registered = true;
+        CHANNEL.messageBuilder(com.yinfires.icecore.workstation.ServerBoundTrashPutPacket.class, 24, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(com.yinfires.icecore.workstation.ServerBoundTrashPutPacket::encode)
+                .decoder(com.yinfires.icecore.workstation.ServerBoundTrashPutPacket::new)
+                .consumerMainThread(com.yinfires.icecore.workstation.ServerBoundTrashPutPacket::handle).add();
         CHANNEL.messageBuilder(com.yinfires.icecore.interaction.ClientBoundInteractionPacket.class, 23, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(com.yinfires.icecore.interaction.ClientBoundInteractionPacket::encode)
                 .decoder(com.yinfires.icecore.interaction.ClientBoundInteractionPacket::new)
@@ -118,6 +122,7 @@ public final class ICECoreNetwork {
     public static void sendToServer(ServerBoundAddMenuItemPacket packet) {
         CHANNEL.sendToServer(packet);
     }
+    public static void sendToServer(com.yinfires.icecore.workstation.ServerBoundTrashPutPacket packet) { CHANNEL.sendToServer(packet); }
 
     public static void sendToPlayer(ClientBoundAddMenuItemPacket packet, ServerPlayer player) {
         CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);

@@ -12,6 +12,9 @@
     "FridgeBlockEntityTypeMixin",
     "FridgePairingMixin",
     "WorkstationStateMixin",
+    "WorkstationTrashCanMixin",
+    "WorkstationTrashEnterMixin",
+    "WorkstationTrashAnimationMixin",
     "WorkstationMetadataMixin",
     "WorkstationPotMixin",
     "WorkstationCuisineMixin",
@@ -83,6 +86,9 @@
     "WorkstationStockpotProductSyncMixin"
   ],
   "client": [
+    "SmartKeyPromptsComboMixin",
+    "WorkstationTrashAnimationRenderMixin",
+    "WorkstationTrashAttackMixin",
     "WorkstationCuttingBoardRenderMixin",
     "WorkstationOverlayMixin",
     "WorkstationStockpotRenderMixin",

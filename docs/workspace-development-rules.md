@@ -17,7 +17,7 @@ Last updated: 2026-10-10
 - 先确认真实结构、代码、资源和注册 ID；上游行为以当前指定版本的源码、JAR、元数据、配方、战利品表和日志为依据，外部网页只用于定位。
 - 结构性问题优先 CodeGraph；字符串、日志、注释、资源键和已锁定文件细节使用 `rg` 或局部读取。大文件先定位标题或关键词，中文使用显式 UTF-8。
 - `rg`、`git`、`node` 等不在 PATH 时，确认原因后切换可用的绝对路径或 PowerShell、`Select-String`、`.NET`、Gradle wrapper；不反复重试相同失败命令。Windows脚本执行前核对解释器真实路径，排除WindowsApps应用别名；写入后回读目标字段，不能只看退出码。JAR 读取遵循根目录的本地规则与经验文档第 23 条。
-- 输出前核对文本长度与工具 token 预算；文档和字节码每次先构造完整批次文本，以长度断言限制整批最多 6000 字符，超限必须拒绝输出并拆分；断言后不得追加未经计数的正文、搜索结果或工具描述；禁止仅以行数限制代替长度门禁。工具发现先只输出名称，仅对实际使用的工具读取描述。截断后缩小范围重读，不以截断输出宣称已完成阅读。
+- 输出前核对文本长度与工具 token 预算；每个底层工具返回只输出一个先计数的完整批次，文档和字节码整批最多6000字符，使用至少4000 token预算；超限拒绝并拆分，断言后不得追加正文、搜索结果或工具描述。禁止以行数限制代替长度门禁。工具发现先只输出名称，仅对实际使用的工具读取描述。截断后缩小范围重读，不以截断输出宣称已完成阅读。
 - 日志、启动参数和进程命令行输出前隐藏 access token、UUID、clientId、XUID、JWT 等敏感字段；默认排除完整启动参数行。
 
 ## 服务端权威、同步与性能
@@ -58,7 +58,7 @@ Last updated: 2026-10-10
 
 - 已有本地缓存的基线与47.x兼容构建默认使用 `--offline`。本机47.4.28多次发生TLS握手停滞；60秒无任务进展时只读该次daemon线程栈，区分插件仓库解析和ForgeGradle `EnvironmentChecks.testServerConnection`（后者即使offline也会联网）。停止本任务进程，按真实ForgeGradle实现设置有限连接/读取超时再试；不得重复无界在线等待或关闭证书/环境检查。缺失缓存时才进行按需、有超时的在线解析。clean仍必须独立执行。
 - 本机实际 ForgeGradle 6.0.54 环境检查使用无显式超时的 HttpsURLConnection HEAD。构建同时传入 `'-Dsun.net.client.defaultConnectTimeout=10000'`、`'-Dsun.net.client.defaultReadTimeout=10000'`、`'-Dorg.gradle.internal.http.connectionTimeout=10000'`、`'-Dorg.gradle.internal.http.socketTimeout=10000'`；PowerShell 每项必须完整引用。前两项约束JDK联网，后两项约束Gradle HTTP；不设置check.certs=false或禁用环境校验。
-- 使用项目 `gradlew.bat` 和 Java 17 工具链；当前 `build.gradle` 明确 `JavaLanguageVersion.of(17)`。基线 Forge 47.4.10，其它 47.x 验证须核对实际解析坐标并恢复基线。
+- 使用项目 `gradlew.bat` 和 Java 17 工具链；当前 `build.gradle` 明确 `JavaLanguageVersion.of(17)`。基线 Forge 47.4.10，其它 47.x 验证须核对实际解析坐标并恢复基线；PowerShell版本覆盖参数同样完整引用，例如'-Pforge_version=47.4.28'，防止点号拆参为47。
 - 交付仅使用完整 `build` 完成且 `verifyProductionJar` 通过的 `build/libs` 成品；不能交付重混淆完成前的JAR或IDE开发包。检查已有客户端包时可执行 `verifyProductionJar -PproductionJar=<绝对路径>`，并比较SHA-256；该任务只读目标包，拒绝仍含映射表中Minecraft开发方法名的生产包。
 - PowerShell 调用 Gradle 时，将 `-D` JVM 系统属性作为完整单引号参数传递，例如 `'-Dnet.minecraftforge.gradle.check.certs=false'`；避免点号参数被拆分为任务名。先核对日志中的任务图，再判断编译结果。
 - 窄验证优先，按风险扩大到完整构建；`clean` 单独执行成功后，再以新的 Gradle 进程执行 `test` 或 `build`，禁止合并在同一命令。纯文档修改使用 UTF-8、内容、引用与 Git 边界检查。

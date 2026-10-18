@@ -4,6 +4,8 @@ import com.github.ysbbbbbb.kaleidoscopecookery.block.kitchen.*;
 import com.github.ysbbbbbb.kaleidoscopecookery.blockentity.kitchen.*;
 import com.github.ysbbbbbb.kaleidoscopecookery.init.tag.TagMod;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -26,13 +28,21 @@ public final class WorkstationEvents {
         boolean freezer = type.equals("FreezerBlockEntity");
         var held = player.getMainHandItem();
         if (held.is(com.yinfires.icecore.item.ModItems.WRENCH.get()) || player.getOffhandItem().is(com.yinfires.icecore.item.ModItems.WRENCH.get())) return;
+        if (type.equals("TrashCanBlockEntity")) {
+            consume(event);
+            if (!level.isClientSide && event.getHand() == InteractionHand.MAIN_HAND)
+                ((com.github.ysbbbbbb.kaleidoscopecookery.blockentity.misc.TrashCanBlockEntity) entity).withdrawItem(player);
+            return;
+        }
         if (ferment && player.isShiftKeyDown() && held.isEmpty()) {
             consume(event);
             if (!level.isClientSide && event.getHand() == InteractionHand.MAIN_HAND) {
                 boolean open = !block.getValue(BlockStateProperties.OPEN);
                 if (open) ExternalWorkstation.set(entity, "recipeProgress", 0);
-                level.setBlock(pos, block.setValue(BlockStateProperties.OPEN, open), 3);
+                boolean changed = level.setBlock(pos, block.setValue(BlockStateProperties.OPEN, open), 3);
                 ExternalWorkstation.call(entity, "notifyTile");
+                if (changed) level.playSound(null, pos, open ? SoundEvents.BARREL_OPEN : SoundEvents.BARREL_CLOSE,
+                        SoundSource.BLOCKS, 1.0F, 1.0F);
             }
             return;
         }
