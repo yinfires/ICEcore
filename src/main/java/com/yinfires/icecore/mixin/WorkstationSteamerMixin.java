@@ -71,26 +71,16 @@ public abstract class WorkstationSteamerMixin {
         var state = self.getBlockState();
         boolean half = state.getValue(com.github.ysbbbbbb.kaleidoscopecookery.block.kitchen.SteamerBlock.HALF);
         int end = half ? 4 : 8;
-        boolean empty = true, changed = false;
+        boolean changed = false;
         var items = self.getItems();
         for (int i = 0; i < end; i++) {
             ItemStack stored = items.get(i);
             if (stored.isEmpty()) continue;
-            empty = false;
             ItemStack remainder = com.yinfires.icecore.workstation.WorkstationInventoryTransfer.insert(player, stored, false);
             int moved = stored.getCount() - remainder.getCount();
             if (moved <= 0) continue;
             stored.shrink(moved); changed = true;
             if (stored.isEmpty()) { items.set(i, ItemStack.EMPTY); self.getCookingTime()[i] = 0; self.getCookingProgress()[i] = 0; }
-        }
-        if (empty && !state.getValue(com.github.ysbbbbbb.kaleidoscopecookery.block.kitchen.SteamerBlock.HAS_LID)
-                && !level.getBlockState(above).is(state.getBlock())) {
-            if (!com.yinfires.icecore.workstation.WorkstationInventoryTransfer.giveOne(player,
-                    new ItemStack(com.github.ysbbbbbb.kaleidoscopecookery.init.ModItems.STEAMER.get()))) return;
-            level.playSound(null, pos, state.getSoundType(level, pos, player).getBreakSound(), net.minecraft.sounds.SoundSource.BLOCKS, 1F, 1F);
-            level.setBlockAndUpdate(pos, half ? net.minecraft.world.level.block.Blocks.AIR.defaultBlockState()
-                    : state.setValue(com.github.ysbbbbbb.kaleidoscopecookery.block.kitchen.SteamerBlock.HALF, true));
-            SteamerControl.lidChanged(level, pos); cir.setReturnValue(true); return;
         }
         if (changed) { com.yinfires.icecore.workstation.ExternalWorkstation.changed(self); cir.setReturnValue(true); }
     }

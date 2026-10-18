@@ -203,7 +203,7 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 ### 工作方块情境按键提示（2026-10-18）
 
 - 方块规则部署于指定客户端`kubejs/startup_scripts/icecore_workstation_prompts.js`与`client_scripts/icecore_workstation_prompts.js`。启动脚本经Platform客户端/依赖检查注册Forge END，客户端绑定SKP$PromptUtils按条件每tick提交；IIFE/var避免目标Rhino共享作用域冲突。完整重启加载启动注册。
-- 精确ID：kaleidoscope_tavern:barrel仅layer=ceiling且index非4外围八格显示右键开关盖；kaleidoscope_world_liquor:freezer、kaleidoscope_fragrantorchard:juicer、youkaisfeasts:fermentation_tank、kaleidoscope_cookery:stockpot显示潜行+使用开关盖；icecore:mixing_bowl显示潜行+使用搅拌；kaleidoscope_cookery:trash_can显示攻击投入/使用取出；kaleidoscope_cookery:steamer与teapot显示使用拾取。除酒桶几何范围外对准即显示，不以持物/加工/遮挡过滤。
+- 精确ID：kaleidoscope_tavern:barrel仅layer=ceiling且index非4外围八格显示右键开关盖；kaleidoscope_world_liquor:freezer、kaleidoscope_fragrantorchard:juicer、youkaisfeasts:fermentation_tank、kaleidoscope_cookery:stockpot显示潜行+使用开关盖；icecore:mixing_bowl显示潜行+使用搅拌；kaleidoscope_cookery:trash_can显示攻击投入/使用取出；kaleidoscope_cookery:steamer显示潜行+使用开关盖，teapot显示使用拾取。除酒桶几何范围外对准即显示，不以持物/加工/遮挡过滤。
 - 从Client.options.keyShift/keyUse/keyAttack读取真实绑定；改键重建对象不修改HUD集合引用，退出世界清缓存，界面/非方块目标停止提交。客户端assets/icecore/lang双语icecore.workstation_prompt.{lid,put,take,stir,pickup}，不覆盖已有NPC翻译。
 - SmartKeyPromptsComboMixin仅client列表、资源存在门禁；实际1.1.3-hotfix HUD.renderKeyPrompts逐行建立上下文，5处Font.m_92895_宽度调用按新增键帽宽度修正，3处drawKeyBoardKey继续原生绘制每个键帽，drawText绘制独立+。保留原生缩放、位置、描述和黑名单；按用户2026-10-18追加要求，所有SmartKeyPrompts单键与组合键原生绘制均固定pressed=false，按下后键帽保持未按下外观，游戏实际按键处理不变；updateCachedPrompts只交换倒置的垃圾桶投入/取出顺序，解决原生HashSet消费无序。单键保持原生入口。
 - ComboKeyLayout测量键帽（每键文本宽+12）、间隔（+文本宽+4）、整体宽度。脚本直接读取BlockState与KubeJS Block.id，缓存酒桶layer/index属性定义，不调用会创建Map并遍历属性的BlockContainerJS.getProperties；每行查询O(1)，布局字符串最多缓存128项，字体对象变化/原生clearCache失效，按键变化使用新key；稳定渲染无字符串拆分或布局分配。顺序检查仅在原生提示列表变化时O(当前提示数)，交换时一次有界复制。无网络、反射、IO、注册表遍历或持续日志。
@@ -212,6 +212,10 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 - 最终验证：新增5项定向测试及目标Rhino解释通过；独立clean后Forge47.4.10完整build、47.4.28完整build（dependencyInsight核对实际1.20.1-47.4.28_mapped_official_1.20.1）、恢复47.4.10最终build均通过，全部221项无失败，verifyProductionJar通过。生产包核对SRG宽度调用、1/5/3精确注入计数及原生KeyRenderer入口；CodeGraph同步、双语、Git忽略与旧版本日志无误改检查通过。确认无Minecraft进程后部署客户端mods/icecore-0.1.1.jar，SHA256=73FF7DEAB3317D462F82F141AB8E0075CBAA313D89FFBA53A3E95156B45F8559，原包备份tmp/instance-backups/icecore-before-workstation-prompts-20261018.jar。未自动启动游戏，真实HUD和脚本绑定/黑名单/改键/缩放/三种对齐仍待完整重启实机验收。
 
 - 未按下外观追加验证：6项定向通过；独立clean后Forge47.4.10完整build与verifyProductionJar通过，全部223项无失败。此次仅原生键帽调用boolean固定false，无新Forge API或兼容范围变更；单键与组合键两处编译字节码均由测试锁定ICONST_0，无新增高频开销。客户端在构建期间自行退出，部署前重新确认无游戏进程后替换mods/icecore-0.1.1.jar，SHA256=3B41CAC07C54666A5373886EBAD993DFE9254E06A86CBF6FB7FBA62C405055A1，原包备份tmp/instance-backups/icecore-before-unpressed-prompts-20261018.jar。未自动启动游戏，实际按压外观待下次完整启动复验。
+
+- 2026-10-18蒸笼操作更新：客户端steamer规则改为lid_combo，提示潜行+右键开关盖。WorkstationSteamerBlockMixin在原生use HEAD认领持SteamerItem点击，禁止跳转SteamerItem.place；getStateForPlacement HEAD同时拒绝目标位置或下方为同类蒸笼，覆盖潜行绕过Block.use、半层补全及副手物品回退。普通非蒸笼承托上的首个半层仍走原生放置。WorkstationSteamerMixin删除空内容giveOne/减层/移除分支，保留4/8槽食物接收、满背包留槽、原生开盖和顶层遮挡限制；已有堆叠不迁移。两处放置检查O(1)只在点击时执行，无新tick/网络/缓存；取食物原有有界8槽×36背包检查保持。TeaSteamerPickupContractTest覆盖两版JAR真实use/placement/food入口及禁止拆层；目标Rhino用更新提示规则复测通过。此前2026-10-17允许右键堆叠/取下的记录为历史行为，由本条取代。
+
+- 蒸笼限制最终验证：目标Rhino解释及定向测试通过，独立clean后Forge47.4.10完整build、verifyProductionJar通过，全部224项无失败；两版厨房真实JAR入口契约通过，生产包包含use HEAD及m_5573_放置拦截。客户端退出后再次确认无游戏进程并部署mods/icecore-0.1.1.jar，SHA256=4235CAF0B1F9DC266ADF68F201FE92137BB3D777635F01EE2503CC3DD17A62C4；旧包备份tmp/instance-backups/icecore-before-steamer-no-stack-20261018.jar。Wiki内容页单独修改未提交/推送，主仓库忽略Wiki；代码/文档UTF-8、Git差异和CodeGraph同步已核对。未自动启动游戏，半层/整层、持物/副手/潜行放置、原生开关盖、食物取放及旧堆叠仍待实机复验。
 
 ### 工作方块统一交互与 Jade（2026-10-16）
 

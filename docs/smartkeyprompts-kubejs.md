@@ -78,3 +78,5 @@ END 提交供下一 START 消费，避免依赖同阶段监听顺序。停止条
 - 1.1.3-hotfix原生KeyUtils.translateKey会把组合键翻译为带+字符串，KeyRenderer.drawKeyBoardKey将整串绘成单个长键帽；仅脚本不能实现独立键帽。ICEcore SmartKeyPromptsComboMixin复用原生逐键绘制及+文字并修正HUD宽度，不复制键帽贴图/背景。原生缓存HashSet不保证提交顺序，兼容只在列表重算时保证垃圾桶投入在取出前。
 - 目标Rhino真实解释器测试通过；启动事件须完整重启，实际client/startup日志及HUD、改键、缩放/对齐、黑名单、退出清理仍需实机验收，不自动启动客户端。
 - 2026-10-18后续外观要求：ICEcore组合键兼容中的单键/组合键两条原生绘制分支统一传入pressed=false；所有SmartKeyPrompts提示保持未按下外观，不改变按键绑定、实际输入、提示条件或原生键帽样式。SmartKeyPromptsComboContractTest直接检查编译字节码两处调用前均为ICONST_0，防止某分支残留按压变化。
+
+- 2026-10-18蒸笼改为lid_combo，使用潜行键+使用键显示开关盖，不再提交拾取提示；已用目标Rhino复测更新规则。蒸笼叠加与取下由模组交互限制，脚本仅显示操作说明。
