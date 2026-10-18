@@ -15,6 +15,14 @@ Last updated: 2026-10-05
 ## 当前状态
 
 ### 物品提示与客户端描述覆盖
+- 2026-10-18茶壶验证：描述窄测试通过，Forge47.4.10独立clean后完整build及verifyProductionJar通过，全量236项测试零失败（当前工作区测试集合）；Forge47.4.28完整build通过，最终恢复47.4.10基线成品；未部署或启动客户端。
+- 2026-10-18茶壶内容物保留：`TeapotContentsTooltipMixin`只标记真实TeapotItem.m_7373_两处原生List.add产生的茶液/成品与数量行，`PreservedTooltipContents`保留原生组件及样式，`TooltipRules.replaceBody`替换正文后追加保留行。旧数组、分区对象、空覆盖和hideOriginalDetails均保留动态内容，不重建NBT/文字、不恢复静态介绍。仅悬停生成时O(当前行数)，两处标记O(1)，无tick/I/O/网络。client可选目标资源门禁；TeapotContentsTooltipTest核对厨房1.4.1/1.5.1实际SRG描述符、两处追加及开关/覆盖矩阵，实机仍待复测。
+
+- 2026-10-18 四分区验证：Forge47.4.10独立clean后完整build通过，官方promotions核对当前1.20.1最新为47.4.28并完整build通过；全量237项测试零失败、verifyProductionJar通过，最终恢复47.4.10。双语语言键集合一致，Wiki示例ID核对厨房1.5.1真实teapot物品模型及语言资源，客户端生效JSON保持空配置；未部署或启动客户端。
+- 2026-10-18 四分区扩展：`ItemDescriptions` 支持旧行数组及 `description/common/placement/actions/blocks` 对象；普通与通用默认灰色、位置绿色“可放置在%s”、动作正文0xFFFFAA。固定顺序，无标题、空行或额外段间距，所有部分可缺省或为空；显式文本颜色保留。客户端JSON仍由启动/F3+T重载，错误保留完整旧快照；示例只在Wiki，不写入生效配置。
+- 按键链路：`DescriptionAction` 以ComponentContents携带动作并通过原有正文替换和Component.copy；GatherComponents只将本模组动作转换为TooltipComponent，RegisterClientTooltipComponentFactories注册`DescriptionActionTooltip`。`FixedDescriptionKeys`将大小写无关的shift/ctrl/control等别名与鼠标名映射为固定标准键ID，不读玩家KeyMapping；已安装SmartKeyPrompts时复用KeyUtils.translateKey和KeyRenderer.drawKeyBoardKey/drawText，缺失时原版翻译与方括号降级。键帽只占原生16像素高度，说明和长组合按宽度换行；背景/边框保持GuiGraphics→Forge Pre→Modern UI原生接管。
+- Jade链路：现有`ICECoreJadePlugin`注册`CommonDescriptionProvider`，按选取物品（为空时block.asItem）自动匹配，显式blocks优先；仅以原生文本元素插在真实CORE_OBJECT_NAME行下方，保留存储/流体/状态。重复显式方块关联使整次重载失败。
+- 性能与生命周期：配置/关联映射重载时一次构建；展示按ID哈希查询。Jade有描述时仅扫描当前Tooltip行寻找名称，O(当前行数)，无注册表扫描、网络、反射或tick I/O。动作布局最多256项，按动作/宽度/依赖状态缓存，字体变化重测量，资源重载清空；不创建GPU目标。语言入口为`tooltip.icecore.description.placement/place_separator`双语键。验证入口为DescriptionSectionsTest、CommonDescriptionLookupTest、DescriptionRenderingContractTest、CommonDescriptionJadeContractTest及既有TooltipRulesTest；真实SmartKeyPrompts1.1.3-hotfix、Jade11.13.3、ModernUI3.12.0.1 ASM覆盖名称、键帽、标题tag和原生文字/图像两阶段入口。实际颜色、行距、键帽和Jade顺序仍待授权实机验证，未启动客户端。
 
 - 2026-10-18 默认描述约定：后续新增或修改物品描述，在配置中关闭原始描述后，统一通过下述客户端 `config/icecore/item_descriptions.json` 与现有 `ItemDescriptions` 覆盖链路提供，避免给物品添加原生描述；用户明确要求原生描述时才例外。规则承载于根目录 `AGENTS.md`；本次仅记录约定，未修改物品实现或客户端配置。验证方式：UTF-8 回读规则与本条目、检查 Git 差异。
 - `icecore-client.toml`：`tooltip.hideOriginalDetails=true`、`tooltip.hideFoodEffects=true`，Forge 标准配置入口双语说明。原始提示过滤在 `ItemStack.m_41651_` 调用 `ForgeEventFactory.onItemTooltip` 之前执行，保留名称组件原对象；不清空最终 GatherComponents，因此 JEI 烤炉批量/时间、咖啡馆价格和其它事件附加信息保留。效果开关独立过滤物品效果段，不改变玩法。
@@ -190,6 +198,14 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 
 ### 一体式双层冰箱
 
+- 2026-10-18原生采集最终验证：仅将上下合并容器交给Jade ItemCollector，恢复完整常规容器同类/NBT汇总规则。隔离副本定向冰箱7项通过，独立clean后Forge47.4.10完整build与verifyProductionJar通过，225项测试零失败；tmp/fridge-validation/build/libs/icecore-0.1.1.jar SHA-256为b3bf986aeca27614e2c9406f9b2852bdb8f66ccdd5fbd912772ad8fa026712b9。未混入并行描述工作、未改Jade设置或显示上限、未启动/部署客户端。当前包替代下述旧手工投影构建；实机仅需复测上下同类数量汇总、不同NBT分开与取空更新。
+
+
+- 2026-10-18最终空槽修正验证：用户最终要求保留Jade原生9项规则，已删除专属数量扩展/标记/注入；仅修正合并投影中的空槽过滤。目标Jade配置原值9/54/9回读通过。并行描述任务出现后使用HEAD加本次冰箱源码的tmp/fridge-validation隔离副本验证，独立clean后Forge47.4.10完整build与verifyProductionJar通过，225项测试零失败；成品tmp/fridge-validation/build/libs/icecore-0.1.1.jar的SHA-256为964605f8a90a8b884c092760694f3394c327ae401252b9e50ef9ce4aac1540de，不含已撤销数量扩展或并行描述类。主工作区其他任务改动保留；未启动或部署客户端。实机需确认空上半/空前9格时能显示下半物品、上下瞄准列表一致、普通9项与详情54项原规则。以下上一轮225项/旧哈希仅为历史验证，不对应本轮最终包。
+
+
+- 2026-10-18 Jade 合并验证：冰箱定向回归7项通过；独立clean后Forge47.4.10完整build与verifyProductionJar通过，225项测试零失败。成品`build/libs/icecore-0.1.1.jar`包含Jade插件和合并提供器，不包含上游net/blay09类或测试类，SHA-256为`7fe3256fd70694d347671f061ae6f202ccc6d44e99501afcf665a88861256055`。UTF-8、版本一致性、Git范围/忽略检查及CodeGraph更新通过；未改Forge API，不另做兼容版本构建。未启动或部署客户端，Jade配置下的实机显示与上下内容更新仍待复测。本轮仅补充当前新增冰箱日志的合并展示行为，不改变旧版本或Wiki使用说明。
+- 2026-10-18 Jade库存整体读取：WorkstationItemStorage#getGroups仅对icecore:fridge调用原生FridgeBlockEntity#getCombinedContainer，将上下54格容器交给Jade11.13.3原生ItemCollector<Container>与ContainerItemIterator(0)。空槽过滤、同类物品按物品与NBT合并计数、54种采集上限、NewCount序列化及客户端普通/详情显示规则均沿用Jade原生流程；不自建逐槽展示或同类合并算法、不改原生配置。每次Jade按需查询仅创建有界采集器并线性采集54格，不添加tick、网络、反射、日志或持久缓存。FridgeUpstreamContractTest核对原生合并容器、ItemCollector.update与真实JAR的ItemDefinition物品/NBT和addTo计数入口。下文旧投影/哈希记录仅为历史，当前最终验证见本条后续结果。
 - `icecore:fridge`，中文“冰箱”、英文“Fridge”；仅加入 ICEcore 创造物品栏，不提供合成配方。Cooking for Blockheads 16.0.15 与 Balm 7.3.44 为双端强制前置，Gradle flatDir 反混淆依赖来自 `libs/` 对应真实 JAR，不将上游类或贴图打包进 ICEcore。
 - `fridge.ModFridge` 注册方块与物品，在 common setup 工作队列中通过包外 `FridgeBlockTypeAccess` 扩展原生 `ModBlockEntities.fridge` 的 validBlocks。`FridgeBlockEntityTypeMixin` 使用映射核验的生产字段 `f_58915_`，保留其它允许方块。库存、网络、Balm能力、54格菜单、FridgeScreen、FridgeRenderer、DoorAnimator、声音、厨房供料和升级均保留原生完整入口。
 - `IntegratedFridgeBlock` 继承原生 FridgeBlock，上下固定 LARGE_LOWER/LARGE_UPPER；`FridgePairingMixin` 在邻居和基座查找入口限定同种方块、相反半边和一致朝向/铰链，原生冰箱排除新冰箱。无水平搜索或跨台库存合并。菜单默认名称使用本地翻译键；原生命名、染色、常开、制冰与保鲜接口保留。

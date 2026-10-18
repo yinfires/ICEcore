@@ -1,6 +1,8 @@
 package com.yinfires.icecore.compat.jade;
 
 import com.yinfires.icecore.workstation.ExternalWorkstation;
+import com.yinfires.icecore.fridge.FridgePairing;
+import net.blay09.mods.cookingforblockheads.tile.FridgeBlockEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.*;
@@ -10,6 +12,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.items.ItemStackHandler;
 import snownee.jade.api.*;
 import snownee.jade.api.view.*;
+import snownee.jade.addon.universal.ItemCollector;
+import snownee.jade.addon.universal.ItemIterator;
 import java.util.*;
 
 /** Read-only projection into Jade's standard item storage UI. */
@@ -20,6 +24,12 @@ public enum WorkstationItemStorage implements IServerExtensionProvider<Object, I
         return ClientViewGroup.map(groups, ItemView::new, null);
     }
     public List<ViewGroup<ItemStack>> getGroups(ServerPlayer player, ServerLevel level, Object target, boolean details) {
+        if (target instanceof FridgeBlockEntity fridge && FridgePairing.integrated(fridge.getBlockState())) {
+            // Native pairing resolves either half to the same upper + lower inventory.
+            Container container = fridge.getCombinedContainer();
+            return new ItemCollector<Container>(new ItemIterator.ContainerItemIterator(0))
+                    .update(container, level.getGameTime());
+        }
         if (!(target instanceof BlockEntity entity) || !WorkstationJadeProvider.supported(entity)) return null;
         CompoundTag data = WorkstationJadeProvider.snapshot(entity);
         List<ItemStack> items = new ArrayList<>();

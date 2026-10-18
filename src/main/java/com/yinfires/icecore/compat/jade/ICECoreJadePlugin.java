@@ -31,6 +31,7 @@ public final class ICECoreJadePlugin implements IWailaPlugin {
     }
     @Override
     public void registerClient(IWailaClientRegistration registration) {
+        registration.registerBlockComponent(CommonDescriptionProvider.INSTANCE, net.minecraft.world.level.block.Block.class);
         registration.registerItemStorageClient(WorkstationItemStorage.INSTANCE);
         registration.registerFluidStorageClient(WorkstationFluidStorage.INSTANCE);
         registration.registerBlockComponent(WorkstationJadeProvider.INSTANCE, net.minecraft.world.level.block.Block.class);

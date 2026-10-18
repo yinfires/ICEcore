@@ -80,7 +80,7 @@ class TooltipRulesTest {
         assertEquals(ChatFormatting.GRAY.getColor(), descriptions.get(apple).get(1).getStyle().getColor().getValue());
         assertEquals(List.of(), descriptions.get(ResourceLocation.parse("minecraft:stick")));
         for (String bad : List.of("{", "{\"items\":{\"apple\":[]}}", "{\"items\":{\"minecraft:apple\":[null]}}",
-                "{\"items\":{\"minecraft:apple\":[true]}}", "{\"items\":{\"minecraft:apple\":{}}}")) {
+                "{\"items\":{\"minecraft:apple\":[true]}}")) {
             Files.writeString(file, bad);
             descriptions.reload(file);
             assertEquals(2, descriptions.get(apple).size());

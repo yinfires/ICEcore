@@ -16,8 +16,13 @@ public final class TooltipRules {
 
     public static void replaceBody(List<Component> lines, List<Component> replacement) {
         if (lines.isEmpty()) return;
+        List<Component> contents = new java.util.ArrayList<>();
+        for (int i = 1; i < lines.size(); i++) {
+            if (lines.get(i).getContents() instanceof PreservedTooltipContents) contents.add(lines.get(i));
+        }
         lines.subList(1, lines.size()).clear();
         if (replacement != null) replacement.forEach(line -> lines.add(line.copy()));
+        lines.addAll(contents);
     }
 
     /** Inspect translation structure, never rendered text, language or styling. */

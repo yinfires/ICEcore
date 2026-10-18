@@ -15,7 +15,7 @@ public final class ICECoreMixinPlugin implements IMixinConfigPlugin {
         if (mixinClassName.contains("SmartKeyPromptsCombo")) return present(targetClassName);
         if (mixinClassName.contains("YuushyaJoinMessage") || mixinClassName.contains("SupplementariesPlaceableTooltip")) return present(targetClassName);
         if (mixinClassName.contains("Workstation")) return present(targetClassName);
-        if (mixinClassName.contains("ItemDescriptionTooltip")) return present(targetClassName);
+        if (mixinClassName.contains("ItemDescriptionTooltip") || mixinClassName.contains("TeapotContentsTooltip")) return present(targetClassName);
         if (mixinClassName.contains("PonderItemTooltip") || mixinClassName.contains("JeiItemModNameTooltip")) return present(targetClassName);
         if (mixinClassName.contains("FoodTooltip")) return present(targetClassName);
         if (mixinClassName.contains("CookeryStockpot")) return present(targetClassName);

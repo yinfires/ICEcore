@@ -82,4 +82,66 @@ final class FridgeUpstreamContractTest {
         }
         assertEquals(25,checked); assertEquals(checked,boxes.size());
     }
+
+    @Test void jadeReadsNativeCombinedInventoryThroughTheStandardStoragePipeline() throws Exception {
+        ClassNode provider = new ClassNode();
+        new ClassReader(Files.readAllBytes(Path.of("build/classes/java/main/com/yinfires/icecore/compat/jade/WorkstationItemStorage.class"))).accept(provider, 0);
+        MethodNode groups = provider.methods.stream().filter(m -> m.name.equals("getGroups")).findFirst().orElseThrow();
+        var instructions = Arrays.asList(groups.instructions.toArray());
+        int combined = -1, fallback = -1;
+        for (int i = 0; i < instructions.size(); i++) {
+            if (!(instructions.get(i) instanceof MethodInsnNode call)) continue;
+            if (call.name.equals("getCombinedContainer")) {
+                assertEquals("net/blay09/mods/cookingforblockheads/tile/FridgeBlockEntity", call.owner);
+                assertEquals("()Lnet/minecraft/world/Container;", call.desc);
+                combined = i;
+            }
+            if (call.name.equals("supported")) fallback = i;
+        }
+        assertTrue(combined >= 0 && combined < fallback, "Fridge projection must precede workstation filtering");
+        var fridgeCalls = instructions.subList(0, fallback).stream()
+                .filter(i -> i instanceof MethodInsnNode).map(i -> (MethodInsnNode)i).toList();
+        assertTrue(fridgeCalls.stream().anyMatch(c -> c.owner.endsWith("/FridgePairing") && c.name.equals("integrated")));
+        assertTrue(fridgeCalls.stream().anyMatch(c -> c.owner.equals("snownee/jade/addon/universal/ItemCollector") && c.name.equals("update")));
+        assertTrue(fridgeCalls.stream().anyMatch(c -> c.owner.equals("snownee/jade/addon/universal/ItemIterator$ContainerItemIterator") && c.name.equals("<init>")));
+        assertFalse(fridgeCalls.stream().anyMatch(c -> Set.of("setItem", "removeItem", "clearContent", "add").contains(c.name)));
+        try (ZipFile jar = new ZipFile("libs/Jade-1.20.1-Forge-11.13.3.jar")) {
+            ClassNode collector = clazz(jar, "snownee/jade/addon/universal/ItemCollector");
+            assertTrue(collector.methods.stream().flatMap(m -> Arrays.stream(m.instructions.toArray()))
+                    .anyMatch(i -> i instanceof MethodInsnNode c && c.owner.endsWith("Object2IntLinkedOpenHashMap") && c.name.equals("addTo")), "Use Jade's own same-item counting");
+            ClassNode definition = clazz(jar, "snownee/jade/addon/universal/ItemCollector$ItemDefinition");
+            assertTrue(definition.fields.stream().anyMatch(f -> f.name.equals("item")));
+            assertTrue(definition.fields.stream().anyMatch(f -> f.name.equals("tag")), "Different NBT must retain native separation");
+        }
+        try (ZipFile jar = new ZipFile(JAR.toFile())) {
+            MethodNode nativeGroups = clazz(jar, "net/blay09/mods/cookingforblockheads/tile/FridgeBlockEntity").methods.stream()
+                    .filter(m -> m.name.equals("getCombinedContainer")).findFirst().orElseThrow();
+            var calls = Arrays.stream(nativeGroups.instructions.toArray()).filter(i -> i instanceof MethodInsnNode)
+                    .map(i -> (MethodInsnNode)i).toList();
+            assertTrue(calls.stream().anyMatch(c -> c.name.equals("getBaseFridge")));
+            assertTrue(calls.stream().anyMatch(c -> c.name.equals("findNeighbourFridge")));
+            assertTrue(calls.stream().anyMatch(c -> c.owner.endsWith("/CombinedContainer") && c.name.equals("<init>")));
+        }
+        try (ZipFile jar = new ZipFile("libs/Jade-1.20.1-Forge-11.13.3.jar")) {
+            ClassNode jade = clazz(jar, "snownee/jade/addon/universal/ItemStorageProvider");
+            MethodNode draw = jade.methods.stream().filter(m -> m.name.startsWith("lambda$append$")
+                    && Arrays.stream(m.instructions.toArray()).anyMatch(i -> i instanceof MethodInsnNode c
+                    && c.owner.equals("java/lang/Math") && c.name.equals("min"))).findFirst().orElseThrow();
+            var drawing = Arrays.asList(draw.instructions.toArray());
+            int limit = -1, empty = -1;
+            for (int i = 0; i < drawing.size(); i++) {
+                if (!(drawing.get(i) instanceof MethodInsnNode c)) continue;
+                if (c.owner.equals("java/lang/Math") && c.name.equals("min")) limit = i;
+                if (c.owner.equals("net/minecraft/world/item/ItemStack") && c.name.equals("m_41619_")) empty = i;
+            }
+            assertTrue(limit >= 0 && empty > limit, "Jade limits raw views before skipping empty stacks");
+            MethodNode putData = jade.methods.stream()
+                    .filter(m -> m.name.equals("putData")).findFirst().orElseThrow();
+            assertTrue(Arrays.stream(putData.instructions.toArray()).anyMatch(i -> i instanceof MethodInsnNode c
+                    && c.owner.equals("snownee/jade/api/view/IServerExtensionProvider") && c.name.equals("getGroups")));
+            assertTrue(Arrays.stream(putData.instructions.toArray()).anyMatch(i -> i instanceof MethodInsnNode c
+                    && c.owner.equals("snownee/jade/api/view/ViewGroup") && c.name.equals("saveList")));
+        }
+    }
+
 }

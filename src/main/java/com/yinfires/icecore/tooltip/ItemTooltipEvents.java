@@ -21,6 +21,11 @@ import java.util.List;
 @Mod.EventBusSubscriber(modid = ICECore.MOD_ID, value = Dist.CLIENT)
 public final class ItemTooltipEvents {
     private static final ItemDescriptions DESCRIPTIONS = new ItemDescriptions();
+    private record LayoutKey(DescriptionAction action, int width, boolean keycaps) {}
+    private static final java.util.Map<LayoutKey, DescriptionActionTooltip> ACTION_LAYOUTS = new java.util.LinkedHashMap<>();
+    public static List<Component> common(net.minecraft.resources.ResourceLocation block, net.minecraft.resources.ResourceLocation item) {
+        return DESCRIPTIONS.common(block, item);
+    }
     private ItemTooltipEvents() {}
 
     private static List<Component> replacement(ItemStack stack) {
@@ -41,6 +46,30 @@ public final class ItemTooltipEvents {
         }
     }
 
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void gather(net.minecraftforge.client.event.RenderTooltipEvent.GatherComponents event) {
+        var elements = event.getTooltipElements();
+        boolean keycaps = net.minecraftforge.fml.ModList.get().isLoaded("smartkeyprompts");
+        int maxWidth = Math.max(1, Math.min(event.getScreenWidth() - 24,
+                event.getMaxWidth() > 0 ? event.getMaxWidth() : 320));
+        for (int i = 0; i < elements.size(); i++) {
+            var text = elements.get(i).left().orElse(null);
+            if (text instanceof Component component && component.getContents() instanceof DescriptionAction action) {
+                elements.set(i, com.mojang.datafixers.util.Either.right(new DescriptionActionTooltip.Data(action, maxWidth, keycaps)));
+            }
+        }
+    }
+
+    private static DescriptionActionTooltip layout(DescriptionActionTooltip.Data data) {
+        var key = new LayoutKey(data.action(), data.maxWidth(), data.keycaps());
+        var cached = ACTION_LAYOUTS.get(key);
+        if (cached != null) return cached;
+        if (ACTION_LAYOUTS.size() >= 256) ACTION_LAYOUTS.clear();
+        var created = new DescriptionActionTooltip(data);
+        ACTION_LAYOUTS.put(key, created);
+        return created;
+    }
+
     @Mod.EventBusSubscriber(modid = ICECore.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
     public static final class Registration {
         private Registration() {}
@@ -48,7 +77,12 @@ public final class ItemTooltipEvents {
         public static void register(RegisterClientReloadListenersEvent event) {
             event.registerReloadListener((ResourceManagerReloadListener) Registration::reload);
         }
+        @SubscribeEvent
+        public static void factories(net.minecraftforge.client.event.RegisterClientTooltipComponentFactoriesEvent event) {
+            event.register(DescriptionActionTooltip.Data.class, ItemTooltipEvents::layout);
+        }
         private static void reload(ResourceManager resources) {
+            ACTION_LAYOUTS.clear();
             DESCRIPTIONS.reload(FMLPaths.CONFIGDIR.get().resolve("icecore/item_descriptions.json"));
         }
     }

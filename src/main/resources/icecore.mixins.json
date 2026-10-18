@@ -101,6 +101,7 @@
     "PonderItemTooltipMixin",
     "JeiItemModNameTooltipMixin",
     "ItemOriginalTooltipMixin",
+    "TeapotContentsTooltipMixin",
     "GrillingFoodTooltipMixin",
     "FarmersFoodTooltipMixin",
     "GrillingJadeGrillMixin",

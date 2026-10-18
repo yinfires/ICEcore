@@ -1,4 +1,6 @@
 {
+  "tooltip.icecore.description.placement": "Can be placed %s",
+  "tooltip.icecore.description.place_separator": ", ",
   "item.icecore.wrench": "Wrench",
   "item.icecore.wheat_seed_bag": "Wheat Seed Bag",
   "item.icecore.carrot_seed_bag": "Carrot Seed Bag",
