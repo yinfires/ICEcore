@@ -30,7 +30,8 @@ public final class TrashCanInteraction {
     public static int last(TrashCanBlockEntity trash) {
         var storage = trash.getStorage();
         for (int slot = storage.getSlots() - 1; slot >= 0; slot--)
-            if (!storage.getStackInSlot(slot).isEmpty()) return slot;
+            if (!storage.getStackInSlot(slot).isEmpty()
+                    && !com.yinfires.icecore.spoilage.ShelfLife.expired(storage.getStackInSlot(slot))) return slot;
         return -1;
     }
 

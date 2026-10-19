@@ -1,4 +1,8 @@
 {
+  "item.icecore.expired_food": "过期物品",
+  "item.icecore.expired_food.name": "过期的%s",
+  "tooltip.icecore.expired_food": "只能丢弃，别无用途。",
+  "tooltip.icecore.shelf_life": "保质期：%s天",
   "tooltip.icecore.description.placement": "可放置在%s",
   "tooltip.icecore.description.place_separator": "、",
   "item.icecore.wrench": "扳手",

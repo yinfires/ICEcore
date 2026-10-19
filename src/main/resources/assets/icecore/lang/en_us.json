@@ -1,4 +1,8 @@
 {
+  "item.icecore.expired_food": "Expired Item",
+  "item.icecore.expired_food.name": "Expired %s",
+  "tooltip.icecore.expired_food": "Only fit for disposal. No other use.",
+  "tooltip.icecore.shelf_life": "Shelf life: %s days",
   "tooltip.icecore.description.placement": "Can be placed %s",
   "tooltip.icecore.description.place_separator": ", ",
   "item.icecore.wrench": "Wrench",

@@ -14,6 +14,20 @@ Last updated: 2026-10-05
 
 ## 当前状态
 
+### 按游戏天保质期与过期物品
+
+- 2026-10-19实机反馈修正：FridgeBlockEntity.getCombinedContainer在原生直接字段组装前绑定自身、基座和邻居；CombinedContainer通过包外PreservedContainer聚合暂停标志，Slot读取再次保持冻结。DefaultContainer反序列化后重绑，已加载冰箱首次tick及日期变化仅检查本半27格，避免普通库存访问改变所有者后持续扣天；不全世界扫描。CozyCafe原生取下先shrink使主手成为可用空槽，脏盘可能填入后被使用结果覆盖，现仅延后该次原生消耗至原生食物/脏盘交付完成，保留原生添加、溢出掉落和音效。创造Tooltip同时检查客户端gameMode与Player，消除模式/能力同步先后造成的闪显；过期描述显式GRAY，保质期样式保持。默认描述灰色规则已写AGENTS.md，现有ItemDescriptions默认灰色保持。ShelfLifeRegressionTest新增3项真实上游时序/入口及样式门禁；定向测试、独立clean后的Forge47.4.10完整build、Forge47.4.28完整build均通过，244项测试零失败及verifyProductionJar通过；最终恢复47.4.10完整build通过，产物SHA-256为ad8a30c37ff033b740365044bcc7165be49ee7d0e11a2dcd0d3cf4aa1f56bf6c。未启动或部署客户端，上下冰箱跨日/重载、创造切换以及主副手空槽/满背包取盘仍待实机复测。
+
+
+- `spoilage.ShelfLife`、`ShelfLifeState` 按主世界 `TimeCalendar.day` 结算：06:00跨日、向前跨多天补扣，倒退不回春；创造背包和 `icecore:fridge` 暂停，暂停与剩余天数进入 ItemStack NBT。旧 Spoiled 秒数首次接触清除并重新起算，已有腐肉不还原。
+- 服务器读取 `config/icecore/shelf_life.json` 的 `groups`（天数字符串→物品ID数组）与 `excluded`；水桶强制排除，未知ID/重复ID/非法天数保留旧快照。启动与 `/reload` 加载，无逐帧文件读取。名单存指定客户端；从配方管理系统正式数据生成1天291项、7天204项，495项均存在目标资源模型；注册表再次校验，运行时不读取外部配方系统。
+- `ShelfLifeItemStackMixin` 在真实getItem边界按需结算，使用生产字段与Forge delegate原位替换为独立 `icecore:expired_food`；失效原能力，清除复制/存档的ForgeCaps。过期物品仅保存Original外观、StackLimit和EmptyContainer，不继承食物、方块、原物品标签及能力。普通物品/配方展示模板不初始化；背包、物品实体、槽位、Forge ItemStackHandler、普通容器与炉子接入实际获取/存取入口。
+- 暂停由Balm DefaultContainer存取边界及原生FridgeBlockEntity绑定，只对ICEcore方块启用；取出恢复，未加载时仍由持久化Paused保持暂停。菜单快照与合并使用不同判定，避免相同剩余天数吞掉恢复状态同步；副本脱离结算避免同步快照自动变动。鼠标主动点击以实际移动数取最短天数，自动合并要求剩余天数相同且其它NBT/能力相容。
+- CozyCafe继续使用原生platedFood；装卸盘保留状态，上菜handleServe先结算。Tooltip末尾附加动态天数，过期描述固定双语翻译并通过现有客户端描述JSON配置。`ExpiredFoodModel`包装原模型为绿色顶点色，保留原几何、UV和原生Tooltip渲染；资源重载清模型缓存。
+- 垃圾桶沿用putItem、动画、容器交换事务；过期投入后立即销毁，获取storage时也清理存量过期内容，防止原生倒序取出、能力提取和破坏掉落返回。`requiredEmptyContainer`读取过期物保存的精确空容器；数量以真实投入量结算。
+- 性能：普通getItem仅执行线程/状态门禁，已绑定物品同一天/暂停状态/规则版本/Tag身份不变时跳过结算。无世界/方块实体扫描；玩家仍由原生库存tick访问，跨日仅遍历在线玩家固定库存；网络仅登录/日期变化发送主世界日期（协议13）。嵌套原版BlockEntityTag.Items每外层结算最多256个子栈，模型缓存512项、每模型quad缓存4096项，资源重载清理，停止服务器释放玩家缓存。
+- 验证：`ShelfLifeTest` 覆盖日期、多日跳过、倒退、暂停恢复、配置排除/重复及手动移动数量；`ShelfLifeUpstreamTest` 按真实Minecraft SRG、Spoiled2.2.0、CozyCafe1.10、Balm7.3.44和CFB16.0.15 JAR验证注入方法。最终Forge47.4.28完整build通过；随后独立clean并恢复Forge47.4.10完整build通过，241项测试零失败，verifyProductionJar通过。真实上游方法与Shadow字段描述符检查通过，生产JAR含31个相关类与过期物模型、不包含上游类；SHA-256为81f77a3e77e503fe7c64cdd4fca0bb01879b7807074ff1c27c7a32577f5bb54d。Git忽略边界、双语资源与CodeGraph索引检查通过。这些为纯状态机/数量规则测试、真实JAR字节码与构建验证，不等同于完整游戏环境交互测试。未启动或部署客户端，实际外观、餐盘、垃圾桶和自动化行为待实机验收。
+
 ### 物品提示与客户端描述覆盖
 - 2026-10-18茶壶验证：描述窄测试通过，Forge47.4.10独立clean后完整build及verifyProductionJar通过，全量236项测试零失败（当前工作区测试集合）；Forge47.4.28完整build通过，最终恢复47.4.10基线成品；未部署或启动客户端。
 - 2026-10-18茶壶内容物保留：`TeapotContentsTooltipMixin`只标记真实TeapotItem.m_7373_两处原生List.add产生的茶液/成品与数量行，`PreservedTooltipContents`保留原生组件及样式，`TooltipRules.replaceBody`替换正文后追加保留行。旧数组、分区对象、空覆盖和hideOriginalDetails均保留动态内容，不重建NBT/文字、不恢复静态介绍。仅悬停生成时O(当前行数)，两处标记O(1)，无tick/I/O/网络。client可选目标资源门禁；TeapotContentsTooltipTest核对厨房1.4.1/1.5.1实际SRG描述符、两处追加及开关/覆盖矩阵，实机仍待复测。

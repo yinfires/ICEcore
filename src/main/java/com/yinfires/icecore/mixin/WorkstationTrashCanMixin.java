@@ -18,6 +18,10 @@ public abstract class WorkstationTrashCanMixin {
     @Unique private ItemStack[] icecore$containers;
     @Unique private boolean icecore$shifted;
     @Unique private ItemStack icecore$soundItem = ItemStack.EMPTY;
+    @Inject(method = "<init>(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)V", at = @At("RETURN"))
+    private void icecore$bindDiscardingStorage(CallbackInfo ci) {
+        ((TrashCanBlockEntity)(Object)this).getStorage();
+    }
 
     @Inject(method = "putItem(Lnet/minecraft/world/item/ItemStack;)V", at = @At("HEAD"))
     private void icecore$beforePut(ItemStack input, CallbackInfo ci) {
@@ -29,6 +33,13 @@ public abstract class WorkstationTrashCanMixin {
         for (int i = 0; i < storage.getSlots(); i++) icecore$containers[i] = state.container(i).copy();
         icecore$shifted = false;
         icecore$soundItem = input.copyWithCount(1);
+    }
+    @Inject(method = "getStorage()Lnet/minecraftforge/items/ItemStackHandler;", at = @At("RETURN"))
+    private void icecore$discardExpired(org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable<ItemStackHandler> cir) {
+        var storage = cir.getReturnValue();
+        ((com.yinfires.icecore.spoilage.DiscardingStorage)storage).icecore$discardExpired();
+        for (int i = 0; i < storage.getSlots(); i++)
+            if (com.yinfires.icecore.spoilage.ShelfLife.expired(storage.getStackInSlot(i))) storage.setStackInSlot(i, ItemStack.EMPTY);
     }
 
     @Redirect(method = "putItem(Lnet/minecraft/world/item/ItemStack;)V", at = @At(value = "INVOKE",
@@ -43,6 +54,9 @@ public abstract class WorkstationTrashCanMixin {
     private void icecore$afterPut(ItemStack input, CallbackInfo ci) {
         TrashCanBlockEntity self = (TrashCanBlockEntity) (Object) this;
         var storage = self.getStorage();
+        // Destroy expired deposits before they become extractable or block drops.
+        for (int i = 0; i < storage.getSlots(); i++)
+            if (com.yinfires.icecore.spoilage.ShelfLife.expired(storage.getStackInSlot(i))) storage.setStackInSlot(i, ItemStack.EMPTY);
         var state = ((WorkstationAccess) self).icecore$slots();
         state.reconcile(storage.getSlots(), storage::getStackInSlot);
         if (icecore$shifted) for (int i = 0; i < storage.getSlots() - 1; i++)

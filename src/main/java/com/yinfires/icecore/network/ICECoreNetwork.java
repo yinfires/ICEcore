@@ -14,7 +14,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class ICECoreNetwork {
-    private static final String PROTOCOL_VERSION = "12";
+    private static final String PROTOCOL_VERSION = "13";
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             ResourceLocation.fromNamespaceAndPath(ICECore.MOD_ID, "main"),
             () -> PROTOCOL_VERSION,
@@ -23,6 +23,9 @@ public final class ICECoreNetwork {
     );
 
     private static boolean registered;
+    public static void shelfLifeDay(long day, ServerPlayer player) {
+        CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new com.yinfires.icecore.spoilage.ClientBoundShelfLifePacket(day));
+    }
 
     private ICECoreNetwork() {
     }
@@ -32,6 +35,10 @@ public final class ICECoreNetwork {
             return;
         }
         registered = true;
+        CHANNEL.messageBuilder(com.yinfires.icecore.spoilage.ClientBoundShelfLifePacket.class, 25, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(com.yinfires.icecore.spoilage.ClientBoundShelfLifePacket::encode)
+                .decoder(com.yinfires.icecore.spoilage.ClientBoundShelfLifePacket::new)
+                .consumerMainThread(com.yinfires.icecore.spoilage.ClientBoundShelfLifePacket::handle).add();
         CHANNEL.messageBuilder(com.yinfires.icecore.workstation.ServerBoundTrashPutPacket.class, 24, NetworkDirection.PLAY_TO_SERVER)
                 .encoder(com.yinfires.icecore.workstation.ServerBoundTrashPutPacket::encode)
                 .decoder(com.yinfires.icecore.workstation.ServerBoundTrashPutPacket::new)

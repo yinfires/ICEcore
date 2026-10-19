@@ -15,6 +15,7 @@ import java.util.Map;
 public final class ModItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, ICECore.MOD_ID);
     public static final RegistryObject<Item> WRENCH = ITEMS.register("wrench", () -> new WrenchItem(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> EXPIRED_FOOD = ITEMS.register("expired_food", com.yinfires.icecore.spoilage.ExpiredFoodItem::new);
 
     /** Tea is capped at its leaf-harvest stage; Jade and growth treat this age as mature. */
     public static final int TEA_HARVEST_AGE = 6;

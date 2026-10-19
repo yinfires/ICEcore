@@ -16,6 +16,8 @@ public final class WorkstationContainerInteraction {
     }
 
     public static ItemStack requiredEmptyContainer(ItemStack filled, FluidContainerMode mode) {
+        if (filled.getItem() instanceof com.yinfires.icecore.spoilage.ExpiredFoodItem)
+            return com.yinfires.icecore.spoilage.ExpiredFoodItem.container(filled);
         return WorkstationContainerCompat.describe(filled)
                 .filter(entry -> mode == FluidContainerMode.STORED_AS_ITEM
                         || entry.behavior() == WorkstationContainerCompat.Behavior.INGREDIENT)
