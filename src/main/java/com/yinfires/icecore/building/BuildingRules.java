@@ -26,7 +26,7 @@ public final class BuildingRules {
         ResourceLocation dimension = level.dimension().location();
         for (BlockListDefinition list : lists) {
             boolean region = list.regions().isEmpty() || list.matchesRegion(BuildingRuntimeCache.data(), dimension, target);
-            if (region && com.yinfires.icecore.fridge.FridgePairing.integrated(placing) && !list.regions().isEmpty()) {
+            if (region && (com.yinfires.icecore.fridge.FridgePairing.integrated(placing) || placing.getBlock() instanceof com.yinfires.icecore.shelf.ShelfBlock) && !list.regions().isEmpty()) {
                 region = list.matchesRegion(BuildingRuntimeCache.data(), dimension, target.above());
             }
             boolean supportAllowed = list.supports().isEmpty()
@@ -61,7 +61,7 @@ public final class BuildingRules {
             if (!list.matchesRegion(BuildingRuntimeCache.data(), dimension, keyPosition)) {
                 return false;
             }
-            if (com.yinfires.icecore.fridge.FridgePairing.integrated(state)
+            if ((com.yinfires.icecore.fridge.FridgePairing.integrated(state) || state.getBlock() instanceof com.yinfires.icecore.shelf.ShelfBlock)
                     && !list.matchesRegion(BuildingRuntimeCache.data(), dimension, keyPosition.above())) return false;
         }
         // Every valid placement list also grants dismantling permission. Region

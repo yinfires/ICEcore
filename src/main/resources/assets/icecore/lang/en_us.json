@@ -181,5 +181,6 @@
   "icecore.interaction.yes": "Yes",
   "icecore.interaction.no": "No",
   "icecore.interaction.denied": "Denied",
-  "icecore.interaction.allowed": "Allowed (other rules still apply)"
+  "icecore.interaction.allowed": "Allowed (other rules still apply)",
+  "block.icecore.shelf": "Shelf"
 }

@@ -146,6 +146,8 @@ public final class BuildingServerActions {
                 && !com.yinfires.icecore.fridge.FridgePairing.matches(state, level.getBlockState(keyPosition.above()))) {
             return false;
         }
+        if (state.getBlock() instanceof com.yinfires.icecore.shelf.ShelfBlock
+                && !com.yinfires.icecore.shelf.ShelfBlock.paired(state,level.getBlockState(keyPosition.above()))) return false;
         if (!canFit(player.getInventory(), returns)) {
             PlayerFeedback.show(player, net.minecraft.network.chat.Component.translatable("icecore.build.inventory_full"));
             return false;
@@ -225,7 +227,7 @@ public final class BuildingServerActions {
         net.minecraft.world.item.context.BlockPlaceContext positionContext =
                 net.minecraft.world.item.context.BlockPlaceContext.at(context, position, context.getClickedFace());
         return level.getBlockState(position).canBeReplaced(positionContext)
-                && (!com.yinfires.icecore.fridge.FridgePairing.integrated(state)
+                && (!(com.yinfires.icecore.fridge.FridgePairing.integrated(state) || state.getBlock() instanceof com.yinfires.icecore.shelf.ShelfBlock)
                     || (!level.isOutsideBuildHeight(position) && level.getWorldBorder().isWithinBounds(position)
                         && level.mayInteract(player, position)))
                 && level.isUnobstructed(state, position, CollisionContext.of(player));

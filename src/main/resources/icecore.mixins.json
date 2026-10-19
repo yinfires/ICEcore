@@ -101,7 +101,8 @@
     "DewDropIrrigationSprinklerMixin",
     "WorkstationTeapotStartMixin",
     "WorkstationJadeStorageMixin",
-    "WorkstationStockpotProductSyncMixin"
+    "WorkstationStockpotProductSyncMixin",
+    "ShelfJadeAccessorMixin"
   ],
   "client": [
     "ShelfLifeTooltipMixin",
@@ -154,7 +155,14 @@
     "JeiRecipeManagerInternalMixin",
     "WorkstationCookeryOverlayMixin",
     "WorkstationJadeFluidOrderMixin",
-    "WorkstationBarrelJadeMixin"
+    "WorkstationBarrelJadeMixin",
+    "WoodTooltipBackgroundMixin",
+    "WoodTooltipLayoutMixin",
+    "WoodModernTooltipMixin",
+    "WoodJadeBackgroundMixin",
+    "WoodJadeLayoutMixin",
+    "WoodJadeTitleMixin",
+    "WoodOverlayBackgroundMixin"
   ],
   "injectors": {
     "defaultRequire": 1

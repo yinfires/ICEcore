@@ -34,6 +34,11 @@ public final class BuildingStructure {
             BlockPos below = position.below();
             return com.yinfires.icecore.fridge.FridgePairing.matches(state, level.getBlockState(below)) ? below : position;
         }
+        if (state.getBlock() instanceof com.yinfires.icecore.shelf.ShelfBlock) {
+            BlockPos base=com.yinfires.icecore.shelf.ShelfBlock.base(state,position);
+            if (!base.equals(position) && !com.yinfires.icecore.shelf.ShelfBlock.paired(state,level.getBlockState(base))) return position;
+            return base;
+        }
         StructureProperty structure = find(state);
         if (structure == null || !structure.valueName(state).equals(structure.secondary())) {
             return position;

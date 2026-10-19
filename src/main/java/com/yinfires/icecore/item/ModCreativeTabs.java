@@ -22,6 +22,7 @@ public final class ModCreativeTabs {
                 output.accept(com.yinfires.icecore.mixing.ModMixing.MIXING_BOWL_ITEM.get());
                 output.accept(com.yinfires.icecore.oven.ModOven.OVEN_ITEM.get());
                 output.accept(com.yinfires.icecore.fridge.ModFridge.FRIDGE_ITEM.get());
+                output.accept(com.yinfires.icecore.shelf.ModShelf.ITEM.get());
             })
             .build());
 

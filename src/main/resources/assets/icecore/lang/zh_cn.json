@@ -181,5 +181,6 @@
   "icecore.interaction.yes": "是",
   "icecore.interaction.no": "否",
   "icecore.interaction.denied": "禁止",
-  "icecore.interaction.allowed": "允许（仍受其它规则限制）"
+  "icecore.interaction.allowed": "允许（仍受其它规则限制）",
+  "block.icecore.shelf": "架子"
 }

@@ -111,6 +111,8 @@ Last updated: 2026-09-27
 
 ### ERR-20261005-01：内存诊断未提前核对采样工具与输出边界
 
+- 2026-10-19架子任务复发（既有累计再加1）：规划与实施初期批量输出完整工具说明、文档与字节码，返回多次truncated，另误把JadeOverlayRendererMixin/ContainerContentAccess猜成其它路径；实际分别在mixin与mixing包。根因是未在每个完整底层输出前执行6000字符门禁、未先查结构符号，影响为规则证据不完整和重复读取。已重新按锁定范围回读关键规则、以真实JAR的javap和ShelfTest ASM验证目标；后续单批out统一计数、超限拒绝、至少4000 token预算，构建日志落tmp短尾回读。更强防线：新增ShelfTest验证实际Modern UI/Jade描述符与SRG drawBackdrop映射；调度过滤前先存在真实ShelfTest，正常编译发现InvWrapper实际位于items.wrapper后更正导入，禁止把普通编译通过当作运行验证。验证为门禁回读、ShelfTest及完整构建；适用边界为本地规则/工具输出、路径和外部API核对。状态继续观察，实机未授权。 同轮完整构建捕获Forge新增背景重载无SRG名，生产JAR核验后改为显式targets/remap=false并增加真实Forge九int重载ASM门禁，未放宽通用命名测试；中文文档Python读取曾漏encoding导致GBK解码失败，已显式utf8回读后更新。 CodeGraph sync报告up-to-date但漏掉新shelf目录，已用完整index收录545文件并复查符号；index进度输出亦须重定向日志以免ANSI进度占满预算。 本次反馈修订又触发输出截断，旧“人工控制输出”防线未有效执行；后续必须每批先构造单一out并硬性检查长度再输出，禁止正文与工具说明混批。完整测试另捕获新Minecraft Mixin使用开发名选择器，已依据output.tsrg和真实生产字节码改成SRG完整描述符；现有MixinProductionNamingPolicyTest保持强制，251项测试与两版构建通过。
+
 - 2026-10-19保质期任务复发（既有次数再加1）：规划和实施初批、最终复查及本轮修复开工合并多文档、工具元数据及长行，工具返回truncated；旧防线未在构造整个底层返回值前执行。影响为阅读证据不完整、重复检索，未以截断结果证明验证完成。正确做法为锁定文件后拆成单一UTF-8批次；后续使用唯一out、6000字符拒绝门禁，JAR入口交给ShelfLifeUpstreamTest读取真实ASM校验，构建日志落tmp仅回读短尾。防复发升级：文档/字节码调用禁止“局部计数后追加正文”，先对完整返回值计数，再分配至少4000token预算；测试过滤运行前确认测试源已存在，本轮早期空过滤失败已补真实状态机和上游方法测试。验证方法为后续门禁回读、ShelfLifeTest/UpstreamTest及完整build；适用范围为工具发现、中文大文档、字节码与测试调度；状态观察中，不宣称实机闭环。
 - 同轮验证遗漏补充：给WorkstationTrashCanMixin新增无描述符的`<init>`注入，既有WorkstationMixinContractTest完整构建失败，错误为选择器不含括号。根因是新增入口未沿用该类全描述符约定，可能掩盖构造器重载变化；已改为真实BlockPos/BlockState构造描述符，保留原测试强度，后续外部工作方块新增构造注入同样通过该契约与完整build校验。适用边界为现有工作方块Mixin选择器，最终测试结果见实现条目。
 
@@ -1059,6 +1061,13 @@ Last updated: 2026-09-27
 
 ### ERR-20260924-01：混合碗世界展示未按指定发酵罐实现
 
+- 2026-10-19架子性能复发（既有累计再加1）：用户确认明显掉帧。事实：旧渲染每槽getModel后又调用CFB renderItem→renderStatic→getModel；满架至少144次模型解析/帧，底面缓存不减少面提交/变换。根因为视觉修订只看固定比例，未验证稳态调用量。影响为多架重复解析及分配。正确做法库存修订驱动快照、共享有界静态顶点缓存、原生捕获与动态回退；光影开启为保证逐物品扩展数据回退。防线升级为ShelfRenderCacheTest的32×72×100次命中builder仅一次、帧预算/内存淘汰/重载测试，ShelfItemMeshTest比对属性/实时光照/法线与单项预算；原生实际FPS须实机采样，禁止用模拟builder次数冒充运行帧率。适用边界为架子静态原版物品，动态/特殊模型仍有原生成本。状态实现及静态验证中，实机未授权。实现中首轮测试直接mock RenderType触发渲染静态初始化，改为null层标识和原生VertexConsumer对照，不引导图形上下文。
+
+
+- 2026-10-19 20:56架子再次复发（累计再加1）：QQ20261019-205601.png确认0.1比例太小。真实CFB16.0.15 FridgeRenderer为0.3整体缩放、0.175局部列距，投影本来允许交叠；旧测试错误要求投影互不重叠，导致同入口仍偏离大小与紧凑度。正确做法恢复真实0.3统一比例，保留架子均匀2×9落点与底面贴板。旧0.1结论废止。强化防线：ShelfTest读取真实FridgeRenderer的0.3常量，同时核对本实现比例与RenderUtils的FIXED字段，明确不以无交叠要求缩小。验证为定向/完整构建及静态投影比对；适用边界为本架子，特殊动态模型与实际视觉仍需用户复测。状态代码修正、实机待验。
+- 2026-10-19架子复发（既有累计再加1）：用户QQ20261019-200441.png指出展示与指定冰箱不符；旧实现用GROUND和逐模型归一化，测试反而锁定512缓存而未检查参考入口。根因是把视觉适配当作改变原生展示上下文的理由。影响为西瓜片摆放方式不符。正确做法直接调用真实CFB RenderUtils.renderItem，FIXED+YP45°，全槽统一0.1比例；仅测量底面接触高度，不改变模型尺寸。防线升级：ShelfTest读取真实CFB JAR的renderItem字节码并检查FIXED入口与原生renderStatic调用，验证9列间距、72落点四向唯一，不再将GROUND作为正确实现。验证为定向测试、两版Forge构建和生产JAR；特殊自定义模型及满架接触需实机。适用边界为指定冰箱方式的架子；状态静态修正，实机待验。
+
+
 - 2026-10-18同类汇总纠正（原记录复发加1）：用户指出冰箱仍每格独立显示，只要求上下显示合并。事实为先前手工构造ViewGroup绕过ItemCollector；真实Jade ItemCollector以ItemDefinition(item,tag)通过Object2IntLinkedOpenHashMap.addTo汇总计数。根因是只复用展示/序列化而未复用容器采集全流程，旧测试反而固定手工单组。影响为同类占多个显示名额及非必要显示扩展。正确做法仅将原生getCombinedContainer作为ContainerItemIterator采集源，不修改Jade设置或渲染。防线已更新本节并以FridgeUpstreamContractTest锁定真实ItemCollector.update、addTo与item/tag定义；验证为隔离定向/完整build及生产JAR，实机上下同类/NBT差异/取空待复测。适用边界为常规Jade容器展示；状态静态验证中，历史手工过滤/数量扩展结论已废止。
 
 
@@ -1205,6 +1214,10 @@ Last updated: 2026-09-27
 - 状态：代码与自动防线已落实，实机运行观察待授权；首次记录2026-10-15，复发次数0。
 
 ### ERR-20261017-01：咖啡馆电脑页面反馈误用原版底部提示
+
+- 2026-10-19 20:56分隔线再次复发（累计再加1）：用户两张截图证明Jade细线带缩进/阴影，与物品提示实心一像素线不同，且仅标题仍插入。事实为HorizontalLineElement原生绘制半像素线、两像素缩进与主题阴影，旧测试只查类存在，未检查绘制语义和有无正文条件。正确做法在原生Jade行布局中使用最小分隔元素，共用物品Tooltip的WoodPanel.separator，1像素白线加1像素间隔；加入前删除旧线，仅其后存在有效正文/库存/流体时添加，忽略CORE_MOD_NAME及SpacerElement。旧“直接HorizontalLineElement即同款”结论废止。强化防线：ShelfTest同时要求三个消费入口共用绘制方法，正文判定必须位于删除旧线之后；布局预览分别覆盖只有标题/模组名与正文/库存。验证为定向/完整构建及最终资源合成；适用边界为指定木框，状态静态修正、实机待验。
+- 2026-10-19木框/分隔线复发（既有累计再加1）：用户茶壶和草方块截图显示右/底不足、无名称分隔；旧木框6像素边框却套用4像素原版外沿，取消Modern UI整个背景方法也取消原生titleGap分隔。根因为只验裁片与目标签名，未把最终内容边界和取消范围纳入验证。正确做法按组件实际宽高+6像素边框+1像素阴影计算，Jade在原生尺寸计算前加入边距及原生HorizontalLineElement，标题仅移动原生行。防线：ShelfTest补充各尺寸/GUI倍率的内部容量检查、真实Jade布局及Modern UI标题参数描述符门禁；最终合成与游戏验证分别报告。验证为定向测试、完整构建与最终资源合成；适用边界为当前TSK2、Modern UI3.12.0.1、Jade11.13.3。状态静态验证中，未启动客户端，不宣称游戏像素验收完成。
+
 
 - 触发场景：新增夜间开店限制时，把电脑页面开店失败当作通用临时玩家反馈处理；用户明确要求页面提示使用电脑自身区域。
 - 事实证据：修正前CozyCafeHoursMixin.canBeOpened注入调用PlayerFeedback.show；现有CozyCafeManagerSeatingMixin已用ClientBoundCafeCannotOpenPacket代码5，CafeManagerScreenErrorMixin映射errorMessage。真实CozyCafe1.10的setErrorMessage使用原因码0..4与errorDisplayTicks=240；提示包仅在CafeManagerScreen打开时应用。

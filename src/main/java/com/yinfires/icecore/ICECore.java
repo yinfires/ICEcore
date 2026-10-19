@@ -38,6 +38,7 @@ public final class ICECore {
         ModMixing.register(modBus);
         ModOven.register(modBus);
         com.yinfires.icecore.fridge.ModFridge.register(modBus);
+        com.yinfires.icecore.shelf.ModShelf.register(modBus);
         com.yinfires.icecore.workstation.WorkstationEvents.register();
         if (ModList.get().isLoaded("dew_drop_farmland_growth") && ModList.get().isLoaded("dew_drop_watering_cans")) {
             com.yinfires.icecore.compat.dewdrop.DewDropIrrigationEvents.register();

@@ -18,7 +18,7 @@ public final class BuildingClientRules {
         if (lists.isEmpty()) return false;
         for (var list : lists) {
             boolean inRegion = list.regions().isEmpty() || list.matchesRegion(data, level.dimension().location(), target);
-            if (inRegion && com.yinfires.icecore.fridge.FridgePairing.integrated(placing) && !list.regions().isEmpty())
+            if (inRegion && (com.yinfires.icecore.fridge.FridgePairing.integrated(placing) || placing.getBlock() instanceof com.yinfires.icecore.shelf.ShelfBlock) && !list.regions().isEmpty())
                 inRegion = list.matchesRegion(data, level.dimension().location(), target.above());
             boolean onSupport = list.supports().isEmpty() || list.matchesSupport(data, support, registry);
             if (!inRegion || !onSupport || !list.allowsFace(face)) return false;
@@ -49,7 +49,7 @@ public final class BuildingClientRules {
             matched = true;
             if (list.regions().isEmpty()) continue;
             if (!list.matchesRegion(data, level.dimension().location(), target)) return false;
-            if (com.yinfires.icecore.fridge.FridgePairing.integrated(state)
+            if ((com.yinfires.icecore.fridge.FridgePairing.integrated(state) || state.getBlock() instanceof com.yinfires.icecore.shelf.ShelfBlock)
                     && !list.matchesRegion(data, level.dimension().location(), target.above())) return false;
         }
         if (!matched) return false;

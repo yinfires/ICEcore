@@ -514,7 +514,7 @@ public final class BuildingClientEvents {
         if (placementContext == null) {
             return false;
         }
-        if (com.yinfires.icecore.fridge.FridgePairing.integrated(state)
+        if ((com.yinfires.icecore.fridge.FridgePairing.integrated(state) || state.getBlock() instanceof com.yinfires.icecore.shelf.ShelfBlock)
                 && (minecraft.level.isOutsideBuildHeight(origin)
                     || !minecraft.level.getWorldBorder().isWithinBounds(origin))) return false;
         if (!minecraft.level.getBlockState(origin).canBeReplaced(

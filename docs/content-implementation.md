@@ -210,6 +210,30 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 - Jade仅按请求投影砧板当前原料或成品，沿用唯一标准容器内容提供器；没有流体槽、额外文字层、世界tick或轮询网络。加工匹配沿用原生缓存；容器解析在内容变化/交互发生时执行，背包扫描固定36格，渲染按结果项数量遍历、不按物品数量重复绘制，种子源复用避免逐帧创建随机对象。
 - 来源：客户端实际FarmersDelight-1.20.1-1.3.4.jar复制到libs作为验证参考，不加入运行依赖；真实厨房1.4.1/1.5.1及既有汤锅实现。`CuttingBoardContractTest`与`WorkstationMixinContractTest`覆盖真实JAR选择器/Shadow/调用目标、原生加工副作用、容器与部分转移边界、静默提示、可选模型和实体顶面。验证结果见本条后续记录；不启动客户端，四向/多产物展示、容器领取、背包满和多人同步待实机验收。
 
+### 双格架子与木色提示背景
+
+- `icecore:shelf`（架子 / Shelf）为两格高普通72格容器，仅创造物品栏提供，无配方、厨房供料或冰箱升级。右键任意半边打开同一9列8行原版风格菜单。模型、JZ材质及TSK2来源为用户`D:/下载/JZ.zip`；原工程存于`D:/Minecraft/Mod Develop/模型/双格架子/`，正式纹理32×32，世界模型按Y=16拆分并连续裁切立柱UV，物品保留完整0..32高度。
+- `shelf.ModShelf`注册方块、物品、下半唯一实体与菜单，`ShelfItem`复用冰箱上下空间/权限/碰撞预检及Forge快照回滚事务；`ShelfBlock`按朝向/相反半边严格配对，事件触发单次延后检查，无持续ticker。破坏任意半边清理另一半，本体掉落一次，库存受doTileDrops约束；扳手接入BuildingStructure与双格区域规则，内容指纹变化重置强拆确认，实体先移除避免库存泄漏。
+- `ShelfBlockEntity`以Container+InvWrapper提供库存，NBT清槽加载，完整updateTag/packet消费。库存变化合并为下一tick一次快照同步，初次区块加载完整快照，无空闲网络；普通食物沿用ShelfLife.release继续计时。`ShelfJadeAccessorMixin`仅将任意半边的原生BlockAccessor容器来源归一到下半，不另建Jade内容提供器，不修改汇总或数量上限。
+- `ShelfLayout`固定每板2×9：菜单顶端两行对应Y=32顶板，其后24/16/8；X=2.5..13.5、Z=5/11，随四向旋转。`ShelfRenderer`调用CFB16.0.15真实`RenderUtils.renderItem`，保留FIXED、YP45°及原生统一0.3比例，不按物品归一化。按原生FIXED变换后的quad最低点仅修正接触高度；有界512模型缓存、重烘焙清空，不改变模型原生比例。无quad自定义渲染回退-.5；自定义Forge变换/动态模型仍需实机核验。每可见实体最多72次非空原生绘制，空槽跳过，无额外网络或tick。
+- `client.WoodPanel`使用TSK2左上27×27有效裁片，六像素固定九宫格边框。Tooltip外框按原生组件宽高加两侧各6像素及右/下1像素文字阴影计算；不是固定额外扩展6像素。`WoodTooltipLayoutMixin`保留原生positioner并将整个框约束到屏幕内；原版名称首行有正文才绘制一像素白线。Modern UI3.12.0.1仍经Pre接管，使用其titleGap/titleHeight判断与原生字体、图形、居中、滚动；背景入口补回白线，逻辑坐标取整并在同一原生pose内纠正边缘位置。超过整屏的原生滚动提示仍依赖Modern UI。
+- Jade由`WoodJadeLayoutMixin`在recalculateSize前设置6像素边距（右边另含1像素文字阴影），通过`compat.jade.WoodTitleSeparator`插入与物品提示共用`WoodPanel.separator`的一逻辑像素纯白线（无缩进/阴影）；2像素行高纳入Jade原生布局，仅标题下有有效正文/库存/流体时插入，模组名与空白占位不算正文，删除再插入避免累积。`WoodJadeTitleMixin`只调整CORE_OBJECT_NAME的原生行X位置，在扣除图标后的文本区域居中；带右对齐附加元素的复合标题保留原生排列。`WoodJadeBackgroundMixin`仅替换背景，保留alpha、内容、容器汇总、流体、位置及缩放。`WoodOverlayBackgroundMixin`继续沿用原生底部计时与淡出。本轮不改变咖啡馆页面链路。
+- 验证入口：`ShelfTest`检查72个固定落点、两格几何/UV边界、同步/放置契约及Modern UI/Jade真实JAR方法描述符；同批运行冰箱与建造回归。构建、视觉合成与实机边界见后续验证记录；不自行部署或启动客户端。
+
+- 2026-10-19验证：定向Shelf/Fridge/Building回归通过；独立clean后Forge47.4.10完整build与verifyProductionJar通过，Forge47.4.28兼容build及最终资源复验通过，最终恢复47.4.10完整build与生产校验。249项测试零失败；生产JAR含架子/贴图/Mixin且不含第三方或测试类，SHA-256 `0447267b260add88fe2bcde722bb683f9258b76dca28fcf20065439ae11416d4`。原模型正/侧/俯/底四视图与九宫格单/多行、Jade及底部反馈布局静态合成已实际查看；初版四像素边框导致左边框拉宽，已按像素改成(2,2)起27×27裁片和六像素边框，新增中心区域逐像素纯色门禁。预览位于模型目录preview；合成不是游戏或编辑器截图。Blockbench重导入、空/满/稀疏物品实景、四向光照、特殊BEWLR模型边界、多人操作及Modern UI/JEI/Jade游戏内接管仍待实机；未启动、未部署客户端。UTF-8、双语键、当前版本及旧日志保留、规则链接与Git忽略边界已检查。
+
+- 2026-10-19反馈修订验证：本轮ShelfTest定向通过；独立clean后完整构建发现WoodTooltipLayoutMixin选择器不符合生产命名门禁，按已核对SRG完整描述符修正，未放宽测试。Forge47.4.10与47.4.28完整build/verifyProductionJar通过，最终恢复47.4.10；251项测试零失败，最终JAR SHA-256 `0154dad972c2f8e02a37b968c8fea366afb6b9ca951433673811176f0ef2b532`，替代上述初版产物。生产包确认新增布局Mixin、架子渲染器及木框资源齐全，无第三方类混入；CodeGraph收录551文件。三张用户截图均已实际查看，最终九宫格静态合成`preview/wood-layout-correction.png`已检查；示意文字/图标不是游戏渲染，不能证明目标字体、特殊模型或整合包最终像素效果。未启动或部署客户端，实机验收项继续保留。
+
+- 2026-10-19 20:56反馈修订：用户两图要求冰箱实际大小与同款横线。恢复CFB原始0.3统一比例（初版0.1废止），保留架子72个固定均匀落点。`WoodPanel.separator`统一Jade、Modern UI、原版Tooltip为全内容宽1逻辑像素白线；Jade仍用原生行布局，分隔元素高2像素，无阴影和缩进。标题后只剩模组名或空白占位时不插入；有描述/库存/流体时插入。布局按需重算为O(行数+元素数)，最多一条分隔元素，不增加逐tick或网络开销；原生内容、字体、图标、存储采集不变。原版西瓜片/FIXED变换静态投影对照`preview/shelf-scale-correction.png`与木框布局预览已打开检查，分别呈现旧0.1、新0.3及冰箱原生紧凑度、无正文不画线；静态投影不等于游戏实际画面，未启动/部署客户端。
+
+- 本次最终验证：ShelfTest定向通过；独立clean后基线完整build、Forge47.4.28兼容build及最终恢复47.4.10完整build/verifyProductionJar全部通过；252项测试零失败。生产包包含WoodTitleSeparator及三个共用入口，无第三方类；CodeGraph552文件。最终SHA-256 `3cd6d8e0594624d749198cb9d7190d26391a18d83598125a8282ec05b5da2664`。GUI与西瓜片最终实机效果仍需用户复测。
+
+- 架子性能优化：`ShelfBlockEntity.renderRevision`在load/setChanged推进；客户端弱键快照仅修订变化时复制非空槽与序列化完整ItemStack数据（含ForgeCaps），正常帧不扫描72槽、不复制或比较NBT。`ShelfRenderCache`按完整数据和资源代次共享原生捕获结果；常驻槽直连缓存条目并用同一key更新LRU。4096条/32MiB预算含序列化key估算与顶点，单项256KiB，淘汰时解除顶点引用；每RenderTick.START最多构建2项，其余原生绘制。资源重烘焙、退出世界清理，弱键不持有实体本身；坐标/朝向/物品旋转预计算，渲染AABB缓存并补足横向0.25外沿。
+- `ShelfItemMesh`由真实CFB RenderUtils.renderItem在局部FIXED、0.3、YP45°上下文捕获各渲染层及顶点，最低Y归零贴板；重放经过原有MultiBufferSource，应用实时矩阵/法线和光照，保留UV/颜色/overlay/顶点自发光，不自行创建GPU着色器。限定minecraft命名空间、精确Item/BlockItem、SimpleBakedModel、原生空覆盖、单pass且无tint/foil；染色、附魔、过期、时钟、指南针、特殊/第三方模型回退原生。纹理图集动画不缓存像素。启用Oculus光影包时回退原生：真实IrisApi.isShaderPackInUse按帧查询、MethodHandle仅初始化解析；API不兼容安全回退，不冻结光影逐物品元数据。
+- 性能验证边界：ShelfRenderCacheTest模拟32×72同项、100帧仅一次builder；覆盖两项/帧、清理重建、32MiB淘汰。ShelfItemMeshTest核对颜色/UV/overlay/当前光照/自发光/旋转法线/贴板与单项上限。该调用计数验证不等于真实CFB全渲染耗时；CPU/GPU、首次构建/稳定/失效的帧时间与分配需授权后在相同视角的1/8/32满架采样，当前不报告虚构毫秒或FPS收益。未新增菜单、网络或玩家配置；无逐帧日志。
+
+- 性能版最终验证：定向架子测试通过；Forge47.4.10独立clean后完整build及verifyProductionJar通过，47.4.28完整兼容构建通过，最终再次独立clean恢复47.4.10。258项测试零失败；生产包含四个缓存/兼容入口，无第三方类混入，SHA-256 `4ac662f4123d59c02f2bc5811f3dfbba296161e90564550e5a483fdd6c37e690`。CodeGraph完整重建558文件，Git忽略及diff检查通过。未启动/部署客户端；光影开启回退、实际FPS和分配采样仍待授权实机验证。
+
 ### 一体式双层冰箱
 
 - 2026-10-18原生采集最终验证：仅将上下合并容器交给Jade ItemCollector，恢复完整常规容器同类/NBT汇总规则。隔离副本定向冰箱7项通过，独立clean后Forge47.4.10完整build与verifyProductionJar通过，225项测试零失败；tmp/fridge-validation/build/libs/icecore-0.1.1.jar SHA-256为b3bf986aeca27614e2c9406f9b2852bdb8f66ccdd5fbd912772ad8fa026712b9。未混入并行描述工作、未改Jade设置或显示上限、未启动/部署客户端。当前包替代下述旧手工投影构建；实机仅需复测上下同类数量汇总、不同NBT分开与取空更新。
