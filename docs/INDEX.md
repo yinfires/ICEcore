@@ -8,7 +8,7 @@ Last updated: 2026-10-10（工作区规则独立维护，补充本地开发与�
 | --- | --- | --- |
 | Spoiled 按天保质期、过期物品、冰箱与餐盘 | [内容实现索引](content-implementation.md)、[时间系统](time-system.md)、[容器兼容](workstation-container-compatibility.md) | 读取“按游戏天保质期与过期物品”；名单来源为根目录 AGENTS.md 记载的配方管理系统，使用配置见 Wiki《保质期与过期物品》 |
 | 农夫乐事砧板输入、加工、成品留存与取回 | [内容实现索引](content-implementation.md)、[工作方块容器兼容](workstation-container-compatibility.md) | 读取“农夫乐事砧板单件输入与成品留存”，核对原生结果重定向、容器元数据和批量取回；操作说明见Wiki《农夫乐事砧板》 |
-| 双格架子、72格储物、世界物品展示及木色提示背景 | [内容实现索引](content-implementation.md) | 读取“双格架子与木色提示背景”，核对模型、同步、Jade及Modern UI背景入口；使用说明见Wiki《架子》 |
+| 双格架子、72格储物、世界物品展示及木色提示背景 | [内容实现索引](content-implementation.md) | 读取“双格架子与木色提示背景”，核对模型、同步、客户端物品显示设置、指令权限、Jade及Modern UI背景入口；配置与全部调试指令见Wiki《架子》 |
 | 一体式双层冰箱、原生冰箱复用、扳手拆放 | [内容实现索引](content-implementation.md)、[冒险模式建造系统](adventure-building-system.md) | 读取“一体式双层冰箱”，核对原生前置、上下配对、库存与强拆确认；长期使用说明见 Wiki《冰箱》 |
 | 物品原始提示隐藏、效果过滤与自定义描述 | [内容实现索引](content-implementation.md)、[全局配置 Wiki](../wiki/全局配置.md) | 读取“物品提示与客户端描述覆盖”；配置、JSON 格式及重载方法见 Wiki |
 | 工作区规则维护、实现/资源/构建/调试通用要求 | [项目工作区规则](../AGENTS.md)、[开发与调试规则](workspace-development-rules.md) | 规则维护读取“文档与规则维护”；实现、资源、构建与调试读取对应章节；必要规则直接维护在本工作区 |

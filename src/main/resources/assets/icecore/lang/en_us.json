@@ -182,5 +182,19 @@
   "icecore.interaction.no": "No",
   "icecore.interaction.denied": "Denied",
   "icecore.interaction.allowed": "Allowed (other rules still apply)",
-  "block.icecore.shelf": "Shelf"
+  "block.icecore.shelf": "Shelf",
+  "config.icecore.shelf_display": "Shelf item display",
+  "config.icecore.shelf_display.enabled": "Show shelf items",
+  "config.icecore.shelf_display.enabled.tooltip": "Only affects ICEcore shelf item displays, not inventories or ingredient racks.",
+  "config.icecore.shelf_display.distance": "Item display distance (blocks)",
+  "config.icecore.shelf_display.distance.tooltip": "Maximum camera distance to the lower block center: 1–64 blocks, inclusive.",
+  "command.icecore.shelf.status": "Shelf items: %s; distance: %s blocks; diagnostic mode: %s (hidden always hides items)",
+  "command.icecore.shelf.save_failed": "Could not save shelf preferences. The current value may apply without persisting; check the log.",
+  "command.icecore.shelf.help": "Shelf: /icecore_render on | off | toggle | distance <1..64> | status",
+  "command.icecore.shelf.help_op": "Shelf: on/off/toggle/distance/status; diagnostics: native/optimized/hidden, stats/query <true|false>, frames start/stop; see the Shelf wiki.",
+  "command.icecore.shelf.mode": "Session diagnostic mode for both rack types: %s; ICEcore shelf preferences still apply.",
+  "command.icecore.shelf.stats": "Detailed statistics for both rack types: %s; output: logs/latest.log; enabling clears caches.",
+  "command.icecore.shelf.query": "Shared Grilling model query cache: %s (also affects other displays using this query).",
+  "command.icecore.shelf.frames_start": "Frame recording requested; detailed statistics disabled. Stop to write logs/icecore-frames/.",
+  "command.icecore.shelf.frames_stop": "Frame recording stop requested. Any active recording is saved asynchronously to logs/icecore-frames/; see the log for the result."
 }

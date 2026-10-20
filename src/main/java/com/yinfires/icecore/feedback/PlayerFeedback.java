@@ -24,6 +24,11 @@ public final class PlayerFeedback {
         }
     }
 
+    /** Local client commands share the same vanilla bottom overlay. */
+    public static void showLocal(net.minecraft.world.entity.player.Player player, Component message) {
+        if(player!=null) player.displayClientMessage(message,true);
+    }
+
     /** Keeps command output available for non-player sources such as the console. */
     public static void show(CommandSourceStack source, Component message) {
         ServerPlayer player = source.getPlayer();

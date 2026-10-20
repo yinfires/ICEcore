@@ -55,6 +55,11 @@ public final class ShelfRenderer implements BlockEntityRenderer<ShelfBlockEntity
     }
     public ShelfRenderer(BlockEntityRendererProvider.Context context) {}
     @Override public void render(ShelfBlockEntity shelf,float partialTick,PoseStack pose,MultiBufferSource buffers,int light,int overlay) {
+        if(!com.yinfires.icecore.config.ICECoreClientConfig.SHELF_DISPLAY_ENABLED.get()) return;
+        var camera=Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+        if(!ShelfDisplayPolicy.visible(com.yinfires.icecore.config.ICECoreClientConfig.SHELF_DISPLAY_ENABLED.get(),
+                com.yinfires.icecore.config.ICECoreClientConfig.SHELF_DISPLAY_DISTANCE.get(),
+                camera.distanceToSqr(shelf.getBlockPos().getX()+.5,shelf.getBlockPos().getY()+.5,shelf.getBlockPos().getZ()+.5))) return;
         ShelfRenderStats.shelf();
         if(com.yinfires.icecore.compat.render.RenderDiagnostics.mode==com.yinfires.icecore.compat.render.RenderDiagnostics.Mode.HIDDEN) return;
         pose.pushPose(); pose.translate(.5,0,.5);
@@ -87,5 +92,5 @@ public final class ShelfRenderer implements BlockEntityRenderer<ShelfBlockEntity
             }
             pose.popPose();ShelfRenderStats.nativeTime(nativeStart);
     }
-    @Override public boolean shouldRender(ShelfBlockEntity shelf,Vec3 camera) { return Vec3.atCenterOf(shelf.getBlockPos()).closerThan(camera,getViewDistance()); }
+    @Override public boolean shouldRender(ShelfBlockEntity shelf,Vec3 camera) { return Vec3.atCenterOf(shelf.getBlockPos()).distanceToSqr(camera)<=(double)getViewDistance()*getViewDistance(); }
 }

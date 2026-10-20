@@ -212,6 +212,10 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 
 ### 双格架子与木色提示背景
 
+- 显示设置交付验证：290项测试零失败，Forge47.4.10独立clean完整build/verifyProductionJar及最终47.4.28完整兼容构建均通过；CodeGraph、主仓库/Wiki差异及指令文档覆盖检查通过。已确认无Minecraft进程，备份原包与客户端配置到tmp/shelf-settings后部署47.4.10基线成品，SHA-256 b443b4f7c66029cec1e8bc9e2c7aaec848f13a24c18b0db3641884b4ac90d8b2。未启动游戏；非OP服务器、配置保存重进、距离与隐藏期间库存更新仍待实机。Wiki未提交推送。
+- 客户端展示设置（2026-10-20）：用户终止后续性能优化与性能验收，未达成或未完成的目标保留历史事实，不宣称120帧闭环。ICECoreClientConfig在icecore-client.toml的shelfDisplay定义enabled=true及distance=64（1..64），沿用Forge原生配置/保存/重载。ShelfRenderer最前方按摄像机到下半部中心的三维距离平方执行包容边界判断，不扫描库存、不重建缓存；关闭或超距优先于native/optimized，hidden仍始终隐藏。仅ICEcore架子使用该设置，原料架不受影响。
+- ShelfDisplayCommands注册共用Brigadier树：根/status、on/off/toggle、distance、help免权限；native/optimized/hidden、stats/query、frames各分支要求本地玩家hasPermissions(2)，普通玩家补全不显示。ShelfRenderEvents动作处理只在日常设置操作时SPEC.save，失败日志加本地提示，不重置诊断。PlayerFeedback.showLocal统一底部反馈，配置和提示维护zh_cn/en_us。调试会话保留到进程结束，统计日志与CSV说明见Wiki《架子》完整指令表。验证入口ShelfDisplayCommandsTest覆盖无OP执行/拒绝/补全、OP全部调试及距离边界；实机保存、非OP服务器、隐藏期间库存变更仍待验证。
+
 - 排序退避非客户端验证：287项测试零失败，Forge47.4.10及47.4.28完整build/verifyProductionJar通过；基线候选tmp/shelf-inspect/phase7/backoff-baseline.jar，SHA-256 5222e4940fc5876f9495ac202f6cd18e13101d4edbc692416aaa9e399c3ff811。Git差异检查通过，客户端仍运行旧候选，未热替换；本改动仅限制失配开销，收益及移动P95验收开放。
 - 第七阶段实机反馈与退避（2026-10-20）：sort-diagnostic.log确认排序Mixin在运行，但稳态/移动均持续零命中，不能把收益归于排序缓存；静止视野每帧28架/172312顶点（旧基线35架/221856顶点），静态提交约0.74–0.80ms；移动窗口约20–35架、静态提交1.47–1.76ms，中位10.18–11.67ms、P95约15–24ms，非固定负载对照。新增SortCacheAdmission：连续32次失配后清空并旁路120帧，之后重新探测；命中重置失配计数，旁路不扫描/复制键，诊断补充bypassed。该调整限制零命中开销，不声称解决透明排序本体。
 - 隐藏面剔除核验：shelf_lower/upper真实模型每半部两层板，展示底面落在8/16/24/32像素板顶，多数不是埋入板内；纹理整体有透明像素，不能仅凭碰撞箱推定完全不透明实体。当前未接入隐藏面删除；后续必须核验实际UV覆盖的不透明性、资源重载及几何包围证明，不能把接触或包围盒相交当作不可见。
@@ -259,7 +263,7 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 - `ShelfSceneCache`将直接VBO与公共缓冲批量资格分开；Oculus子类通过公共getBuffer及Embeddium tryOf/push资格检查进入CPU批量路径，未知消费者仍完整原生回退。只合并相邻同层静态操作，动态槽作为顺序屏障，不再拖回全部72槽；不跨动态槽重排。切换缓冲类别也使缓存失效；VBO仅限单层无回退，着色器不可用在尚未提交时退回原生，避免重复绘制。容量、0.3/FIXED/45度、网络与存档保持不变。
 - Accelerated Rendering参考核验：用户提供`D:/下载/acceleratedrendering-1.0.14-1.20.1-alpha.jar`，元数据Forge>=47.3.19、MC1.20.1、MIT；参考解包/反编译保存在tmp/accelerated-inspect。真实ItemRendererMixin包裹renderModelLists，SimpleBakedModelMixin按buffer graph缓存模型、按颜色层保留网格，beginTransform上传共享位置/法线矩阵，AcceleratedBufferBuilder.addServerMesh提交网格引用与实时颜色/光照/overlay，TransformProgramDispatcher以每组128顶点启动compute；并非仅缓存getModel。Iris兼容FullyBufferedMultiBufferSourceMixin在getBuffer RETURN初始化其加速消费者。此通用入口对架子和幻想乡原料架有参考价值；仍不消除前置森罗查询，透明排序和驱动成本也不能据此视为已解决。
 - 检测到上述加速模组入口class资源时，ICEcore不提前捕获或批量绘制架子，而保留真实CFB→ItemRenderer供该模组接管；不新增硬依赖，不直接写其缓冲或复制compute管线。该保守协作只保证入口让出；2026-10-20试验已出现明显性能退步，不能视为推荐后端或性能优化。未安装时继续ICEcore有界缓存路径。
-- 运行时诊断（仅开发验收）：OP客户端命令`/icecore_render native|optimized|hidden`切换测量路径，`stats true|false`开启/关闭五秒窗口，`query true|false`控制共用查询缓存。默认optimized/query=true/stats=false；只写日志，不发送聊天反馈。统计包括实际源/消费者类型、拒绝原因、模型调用点、顶点、批次、重建/提交累计CPU耗时及帧间隔中位数/P95；切换清空窗口。五秒统计不等于30秒三轮实测，也不是GPU计时或精确分配率。
+- 运行时诊断（仅开发验收）：OP客户端调试命令`/icecore_render native|optimized|hidden`切换测量路径，`stats true|false`开启/关闭五秒窗口，`query true|false`控制共用查询缓存。默认optimized/query=true/stats=false；只写日志，不发送聊天反馈。统计包括实际源/消费者类型、拒绝原因、模型调用点、顶点、批次、重建/提交累计CPU耗时及帧间隔中位数/P95；切换清空窗口。五秒统计不等于30秒三轮实测，也不是GPU计时或精确分配率。
 - 静态区块网格评估未进入默认：现有EmbeddiumChunkBuildOutputMixin只跟踪建造预览代次，不能证明每个架子库存代次在上传后的可见生效时点；上下两格、跨section和顶层外伸还需独立交接。直接requestModelDataUpdate不能保证旧几何与新BER回退不共存。用户已要求停止实机操作，因此不新增未经验证的区块烘焙路径；本轮交付查询与缓冲修复，区块网格未实现，性能目标仍开放。未部署、未启动客户端、未安装参考模组。
 
 - 本轮木框最终验证：定向回归、独立clean后的Forge47.4.10完整build/verifyProductionJar、Forge47.4.28兼容build/verifyProductionJar及最终恢复47.4.10完整build/verifyProductionJar全部通过，268项测试零失败。成品`build/libs/icecore-0.1.1.jar`包含共用布局类、木框资源和Mixin，不含Minecraft/Jade/Modern UI/JUnit/Mockito类；SHA-256为`54b2a3ad3a442b65329dc825ff6fb7559e2faad1cf59ec62aa1872dd39256a06`。Git差异空白检查通过，新源码/测试可跟踪，build/tmp保持忽略；CodeGraph已收录WoodPanelLayout。规则本地链接检查113项，既有两处CozyCafe1.8 JAR参考已不存在（实际资源引用，非规则入口），本轮未新增失效规则链接。已查看修正后真实材质合成；未启动、部署客户端，真实字体/图标/库存/流体/滚动的视觉验收仍待实机。

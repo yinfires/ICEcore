@@ -17,23 +17,50 @@ public final class ShelfRenderEvents {
         if(event.getLevel().isClientSide()) { com.mojang.blaze3d.systems.RenderSystem.recordRenderCall(ShelfSortCache::clear);ShelfSceneCache.unload(event.getLevel(),event.getChunk().getPos()); RackDisplayCache.unload(event.getLevel(),event.getChunk().getPos()); }
     }
     @SubscribeEvent public static void commands(net.minecraftforge.client.event.RegisterClientCommandsEvent event) {
-        var root=net.minecraft.commands.Commands.literal("icecore_render")
-            .requires(source->net.minecraft.client.Minecraft.getInstance().player!=null && net.minecraft.client.Minecraft.getInstance().player.hasPermissions(2));
-        for(var mode:com.yinfires.icecore.compat.render.RenderDiagnostics.Mode.values()) {
-            root.then(net.minecraft.commands.Commands.literal(mode.name().toLowerCase(java.util.Locale.ROOT)).executes(context->{
-                com.yinfires.icecore.compat.render.RenderDiagnostics.mode=mode;ShelfRenderer.clearModelCache();ShelfRenderStats.reset();return 1;
-            }));
+        event.getDispatcher().register(ShelfDisplayCommands.tree(source->isOp(),ShelfRenderEvents::command));
+    }
+    private static boolean isOp() {
+        var player=net.minecraft.client.Minecraft.getInstance().player;return player!=null && player.hasPermissions(2);
+    }
+    private static void feedback(String key,Object... values) {
+        com.yinfires.icecore.feedback.PlayerFeedback.showLocal(net.minecraft.client.Minecraft.getInstance().player,
+                net.minecraft.network.chat.Component.translatable("command.icecore.shelf."+key,values));
+    }
+    private static int command(String action,int value) {
+        var config=com.yinfires.icecore.config.ICECoreClientConfig.SPEC;
+        var enabled=com.yinfires.icecore.config.ICECoreClientConfig.SHELF_DISPLAY_ENABLED;
+        var distance=com.yinfires.icecore.config.ICECoreClientConfig.SHELF_DISPLAY_DISTANCE;
+        switch(action) {
+            case "on","off","toggle","distance" -> {
+                try {
+                    if(action.equals("distance")) distance.set(value);
+                    else enabled.set(action.equals("toggle")?!enabled.get():action.equals("on"));
+                    config.save();
+                } catch(RuntimeException failure) {
+                    com.mojang.logging.LogUtils.getLogger().error("Cannot save shelf display preferences",failure);
+                    feedback("save_failed");return 0;
+                }
+                status();
+            }
+            case "status" -> status();
+            case "help" -> feedback(isOp()?"help_op":"help");
+            case "native","optimized","hidden" -> {
+                com.yinfires.icecore.compat.render.RenderDiagnostics.mode=com.yinfires.icecore.compat.render.RenderDiagnostics.Mode.valueOf(action.toUpperCase(java.util.Locale.ROOT));
+                ShelfRenderer.clearModelCache();ShelfRenderStats.reset();feedback("mode",action);
+            }
+            case "stats" -> {
+                ShelfRenderStats.ENABLED=value!=0;if(value!=0) ShelfRenderer.clearModelCache();ShelfRenderStats.reset();feedback("stats",value!=0);
+            }
+            case "query" -> { com.yinfires.icecore.compat.render.RenderDiagnostics.queryCache=value!=0;ShelfRenderStats.reset();feedback("query",value!=0); }
+            case "frames_start" -> { ShelfFrameRecording.start();feedback("frames_start"); }
+            case "frames_stop" -> { ShelfFrameRecording.stop();feedback("frames_stop"); }
+            default -> throw new IllegalArgumentException(action);
         }
-        root.then(net.minecraft.commands.Commands.literal("stats").then(net.minecraft.commands.Commands.argument("enabled",com.mojang.brigadier.arguments.BoolArgumentType.bool()).executes(context->{
-            ShelfRenderStats.ENABLED=com.mojang.brigadier.arguments.BoolArgumentType.getBool(context,"enabled");if(ShelfRenderStats.ENABLED) ShelfRenderer.clearModelCache();ShelfRenderStats.reset();return 1;
-        })));
-        root.then(net.minecraft.commands.Commands.literal("query").then(net.minecraft.commands.Commands.argument("enabled",com.mojang.brigadier.arguments.BoolArgumentType.bool()).executes(context->{
-            com.yinfires.icecore.compat.render.RenderDiagnostics.queryCache=com.mojang.brigadier.arguments.BoolArgumentType.getBool(context,"enabled");ShelfRenderStats.reset();return 1;
-        })));
-        root.then(net.minecraft.commands.Commands.literal("frames")
-            .then(net.minecraft.commands.Commands.literal("start").executes(context->{ShelfFrameRecording.start();return 1;}))
-            .then(net.minecraft.commands.Commands.literal("stop").executes(context->{ShelfFrameRecording.stop();return 1;})));
-        event.getDispatcher().register(root);
+        return 1;
+    }
+    private static void status() {
+        feedback("status",net.minecraft.network.chat.Component.translatable(com.yinfires.icecore.config.ICECoreClientConfig.SHELF_DISPLAY_ENABLED.get()?"options.on":"options.off"),
+                com.yinfires.icecore.config.ICECoreClientConfig.SHELF_DISPLAY_DISTANCE.get(),com.yinfires.icecore.compat.render.RenderDiagnostics.mode.name().toLowerCase(java.util.Locale.ROOT));
     }
     private ShelfRenderEvents() {}
 }

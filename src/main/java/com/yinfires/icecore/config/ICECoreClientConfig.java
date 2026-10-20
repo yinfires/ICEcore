@@ -8,6 +8,9 @@ public final class ICECoreClientConfig {
     public static final ForgeConfigSpec.BooleanValue HIDE_ORIGINAL_DETAILS;
     public static final ForgeConfigSpec.BooleanValue HIDE_FOOD_EFFECTS;
 
+    public static final ForgeConfigSpec.BooleanValue SHELF_DISPLAY_ENABLED;
+    public static final ForgeConfigSpec.IntValue SHELF_DISPLAY_DISTANCE;
+
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
         builder.push("interface");
@@ -21,6 +24,12 @@ public final class ICECoreClientConfig {
                 .translation("config.icecore.tooltip.hide_original_details").define("hideOriginalDetails", true);
         HIDE_FOOD_EFFECTS = builder.comment("Hide food effect tooltips, including duration, chance and effect attributes.")
                 .translation("config.icecore.tooltip.hide_food_effects").define("hideFoodEffects", true);
+        builder.pop();
+        builder.translation("config.icecore.shelf_display").push("shelfDisplay");
+        SHELF_DISPLAY_ENABLED=builder.comment("Show displayed items on ICEcore shelves only.")
+                .translation("config.icecore.shelf_display.enabled").define("enabled",true);
+        SHELF_DISPLAY_DISTANCE=builder.comment("Maximum item display distance from the camera to the lower block center, in blocks.")
+                .translation("config.icecore.shelf_display.distance").defineInRange("distance",64,1,64);
         builder.pop();
         SPEC = builder.build();
     }

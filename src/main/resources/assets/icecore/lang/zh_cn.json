@@ -182,5 +182,19 @@
   "icecore.interaction.no": "否",
   "icecore.interaction.denied": "禁止",
   "icecore.interaction.allowed": "允许（仍受其它规则限制）",
-  "block.icecore.shelf": "架子"
+  "block.icecore.shelf": "架子",
+  "config.icecore.shelf_display": "架子物品展示",
+  "config.icecore.shelf_display.enabled": "显示架子物品",
+  "config.icecore.shelf_display.enabled.tooltip": "仅控制 ICEcore 架子的物品展示，不影响库存和原料架。",
+  "config.icecore.shelf_display.distance": "物品展示距离（格）",
+  "config.icecore.shelf_display.distance.tooltip": "摄像机到下半部方块中心的最大距离，1～64 格；边界以内显示。",
+  "command.icecore.shelf.status": "架子物品：%s；距离：%s 格；诊断模式：%s（hidden 时始终隐藏）",
+  "command.icecore.shelf.save_failed": "架子显示设置保存失败，当前值可能已生效但未持久保存，请检查日志。",
+  "command.icecore.shelf.help": "架子：/icecore_render on | off | toggle | distance <1..64> | status",
+  "command.icecore.shelf.help_op": "架子：on/off/toggle/distance/status；调试：native/optimized/hidden、stats/query <true|false>、frames start/stop；详见 Wiki《架子》。",
+  "command.icecore.shelf.mode": "两种架子的会话诊断模式：%s；ICEcore 架子仍受显示开关和距离限制。",
+  "command.icecore.shelf.stats": "两种架子详细统计：%s；输出 logs/latest.log，开启会清理缓存。",
+  "command.icecore.shelf.query": "共用森罗模型查询缓存：%s（影响其它使用该查询的物品展示）。",
+  "command.icecore.shelf.frames_start": "已请求开始帧记录；详细统计关闭，停止后写入 logs/icecore-frames/。",
+  "command.icecore.shelf.frames_stop": "已请求停止帧记录；如有活动记录，将异步写入 logs/icecore-frames/，保存结果见日志。"
 }
