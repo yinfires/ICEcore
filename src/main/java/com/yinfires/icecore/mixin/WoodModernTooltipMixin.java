@@ -1,6 +1,7 @@
 package com.yinfires.icecore.mixin;
 
 import com.yinfires.icecore.client.WoodPanel;
+import com.yinfires.icecore.client.WoodPanelLayout;
 import net.minecraft.client.gui.GuiGraphics;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.*;
@@ -19,11 +20,11 @@ public abstract class WoodModernTooltipMixin {
         int screenWidth=net.minecraft.client.Minecraft.getInstance().getWindow().getGuiScaledWidth();
         int screenHeight=net.minecraft.client.Minecraft.getInstance().getWindow().getGuiScaledHeight();
         // This is inside Modern UI's native pose scope, so content follows the same correction.
-        graphics.pose().translate(Math.max(6,Math.min((int)x,screenWidth-width-7))-(int)x,
-                Math.max(6,Math.min((int)y,screenHeight-height-7))-(int)y,0);
-        graphics.pose().pushPose(); graphics.pose().translate(Math.floor(x)-6,Math.floor(y)-6,0);
-        WoodPanel.draw(graphics,0,0,width+13,height+13,1);
-        graphics.pose().popPose();
+        // Match native drawX/drawY truncation. The existing -mScroll pose remains untouched.
+        int contentX=(int)x,contentY=(int)y;
+        graphics.pose().translate(WoodPanelLayout.constrain(contentX,width,screenWidth)-contentX,
+                WoodPanelLayout.constrain(contentY,height,screenHeight)-contentY,0);
+        WoodPanel.drawAround(graphics,contentX,contentY,width,height,1);
         if(titleGap) WoodPanel.separator(graphics,(int)x,(int)y+titleHeight,(int)x+width);
         ci.cancel();
     }

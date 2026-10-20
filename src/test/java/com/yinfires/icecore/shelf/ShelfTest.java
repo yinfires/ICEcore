@@ -103,12 +103,12 @@ final class ShelfTest {
         assertTrue(read("src/main/java/com/yinfires/icecore/mixin/WoodModernTooltipMixin.java").contains("WoodPanel.separator("));
         assertTrue(read("src/main/java/com/yinfires/icecore/mixin/WoodTooltipLayoutMixin.java").contains("WoodPanel.separator("));
     }
-    @Test void woodInteriorContainsContentAndShadowAtEveryGuiScale() {
+    @Test void woodInteriorContainsContentAtEveryGuiScale() {
         for(int width:List.of(10,37,128,303)) for(int height:List.of(8,20,74)) for(int scale=1;scale<=4;scale++) {
-            int outerWidth=width+13,outerHeight=height+13;
-            // Six immutable border pixels, plus only the native one-pixel text shadow.
-            assertEquals((width+1)*scale,(outerWidth-12)*scale);
-            assertEquals((height+1)*scale,(outerHeight-12)*scale);
+            int outerWidth=com.yinfires.icecore.client.WoodPanelLayout.outerSize(width);
+            int outerHeight=com.yinfires.icecore.client.WoodPanelLayout.outerSize(height);
+            assertEquals(width*scale,(outerWidth-12)*scale);
+            assertEquals(height*scale,(outerHeight-12)*scale);
         }
     }
     @Test void optionalBackgroundHooksMatchActualJars() throws Exception {

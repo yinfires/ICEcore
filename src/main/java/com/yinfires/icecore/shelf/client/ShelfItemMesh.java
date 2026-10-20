@@ -11,6 +11,7 @@ final class ShelfItemMesh implements MultiBufferSource {
     static final int MAX_BYTES=256*1024;
     private final List<Part> parts=new ArrayList<>();
     private int vertices;
+    List<Part> parts() { return parts; }
     int bytes() { return vertices*48+parts.size()*64; }
     @Override public VertexConsumer getBuffer(RenderType type) {
         // Preserve buffer request order, including repeated layers.
@@ -46,7 +47,7 @@ final class ShelfItemMesh implements MultiBufferSource {
     static final class TooLarge extends RuntimeException {
         @Override public synchronized Throwable fillInStackTrace() { return this; }
     }
-    private final class Part implements VertexConsumer {
+    final class Part implements VertexConsumer {
         final RenderType type;
         float[] data=new float[192]; int size;
         float x,y,z,u,v,nx,ny,nz; int color=-1,overlayU,overlayV,light;

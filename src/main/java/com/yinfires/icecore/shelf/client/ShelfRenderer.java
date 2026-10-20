@@ -24,7 +24,7 @@ public final class ShelfRenderer implements BlockEntityRenderer<ShelfBlockEntity
     private static final Map<BakedModel,Float> BOTTOMS=new LinkedHashMap<>() {
         @Override protected boolean removeEldestEntry(Map.Entry<BakedModel,Float> entry) { return size()>512; }
     };
-    public static void clearModelCache() { BOTTOMS.clear(); ShelfRenderCache.clear(); }
+    public static void clearModelCache() { BOTTOMS.clear(); ShelfRenderCache.clear(); ShelfSceneCache.clear(); }
     private static float bottom(BakedModel model) {
         PoseStack transform=new PoseStack();
         model.getTransforms().getTransform(ItemDisplayContext.FIXED).apply(false,transform);
@@ -55,19 +55,17 @@ public final class ShelfRenderer implements BlockEntityRenderer<ShelfBlockEntity
         pose.pushPose(); pose.translate(.5,0,.5);
         pose.mulPose(FACING_ROTATIONS[shelf.getBlockState().getValue(ShelfBlock.FACING).get2DDataValue()]);
         pose.translate(-.5,0,-.5);
-        for(var cached:ShelfRenderCache.slots(shelf)) {
+        var remaining=ShelfSceneCache.render(shelf,pose.last(),buffers,light);
+        for(var cached:remaining==null?ShelfRenderCache.slots(shelf):remaining) {
             int slot=cached.index; ItemStack stack=cached.stack;
-            var mesh=ShelfRenderCache.mesh(cached,shelf);
-            if(mesh!=null) {
-                pose.pushPose(); pose.translate(X[slot],Y[slot],Z[slot]);
-                mesh.replay(pose.last(),buffers,light);pose.popPose();continue;
-            }
             pose.pushPose();
+            ShelfRenderStats.model();
             var model=Minecraft.getInstance().getItemRenderer().getModel(stack,shelf.getLevel(),null,0);
             float bottom=BOTTOMS.computeIfAbsent(model,ShelfRenderer::bottom);
             pose.translate(X[slot],Y[slot]-bottom*ITEM_SCALE,Z[slot]);
             pose.mulPose(ITEM_ROTATION);
             pose.scale(ITEM_SCALE,ITEM_SCALE,ITEM_SCALE);
+            ShelfRenderStats.model();
             RenderUtils.renderItem(stack,light,pose,buffers,shelf.getLevel());
             pose.popPose();
         }

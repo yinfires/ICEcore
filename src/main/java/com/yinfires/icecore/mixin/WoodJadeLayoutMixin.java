@@ -8,6 +8,7 @@ import snownee.jade.api.Identifiers;
 import snownee.jade.api.ui.IElement;
 import snownee.jade.impl.Tooltip;
 import com.yinfires.icecore.compat.jade.WoodTitleSeparator;
+import com.yinfires.icecore.client.WoodPanelLayout;
 
 /** Change native layout before Jade computes anchoring, scaling and the background rectangle. */
 @Pseudo
@@ -19,8 +20,7 @@ public abstract class WoodJadeLayoutMixin {
     @Inject(method="recalculateSize",at=@At("HEAD"),remap=false)
     private void icecore$layout(CallbackInfo ci) {
         // The immutable frame occupies exactly six pixels on every side.
-        java.util.Arrays.fill(padding,6);
-        padding[1]=7; // Native text width excludes the one-pixel shadow.
+        java.util.Arrays.fill(padding,WoodPanelLayout.BORDER);
         tooltip.remove(ICECORE_LINE);
         for(int row=0;row<tooltip.size();row++) {
             boolean title=false;

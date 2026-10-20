@@ -18,7 +18,8 @@ final class ShelfRenderCache {
     private static final Map<ShelfBlockEntity,Snapshot> SNAPSHOTS=new WeakHashMap<>();
     private static int bytes,builds,generation;
     private static boolean nativeRequired;
-    static void frame() { builds=0;nativeRequired=ShelfShaderCompatibility.nativeRequired(); }
+    static void frame() { builds=0;nativeRequired=ShelfShaderCompatibility.nativeRequired(); ShelfSceneCache.frame(); ShelfRenderStats.frame(); }
+    static boolean nativeRequired() { return nativeRequired; }
     static void clear() { for(Entry entry:ENTRIES.values()) { entry.resident=false;entry.mesh=null; } ENTRIES.clear(); SNAPSHOTS.clear(); bytes=0; builds=0; generation++; }
     static final class Key {
         final CompoundTag data; final int epoch,hash;
@@ -75,12 +76,15 @@ final class ShelfRenderCache {
         ItemStack stack=slot.stack;
         var renderer=Minecraft.getInstance().getItemRenderer();
         BakedModel model=renderer.getModel(stack,shelf.getLevel(),null,0);
+        ShelfRenderStats.model();
         ShelfItemMesh mesh=null;
         if(eligible(stack,model)) {
             ShelfItemMesh capture=new ShelfItemMesh(); PoseStack local=new PoseStack();
             local.mulPose(Axis.YP.rotationDegrees(45)); local.scale(.3f,.3f,.3f);
             try {
                 RenderUtils.renderItem(stack,0,local,capture,shelf.getLevel());
+                ShelfRenderStats.model();
+                if(ShelfRenderStats.ENABLED) for(var part:capture.parts()) ShelfRenderStats.layer(part.type,part.size/12);
                 capture.finish(); mesh=capture;
             } catch(ShelfItemMesh.TooLarge ignored) { /* bounded capture; native fallback */ }
         }
@@ -101,7 +105,10 @@ final class ShelfRenderCache {
             for(var quad:model.getQuads(null,side==6?null:net.minecraft.core.Direction.values()[side],random))
                 if(quad.isTinted()) return false;
         }
-        var passes=model.getRenderPasses(stack,true);
+        boolean direct=!(stack.getItem() instanceof BlockItem blockItem)
+                || (!(blockItem.getBlock() instanceof net.minecraft.world.level.block.HalfTransparentBlock)
+                && !(blockItem.getBlock() instanceof net.minecraft.world.level.block.StainedGlassPaneBlock));
+        var passes=model.getRenderPasses(stack,direct);
         return passes.size()==1 && passes.get(0)==model;
     }
     private ShelfRenderCache() {}

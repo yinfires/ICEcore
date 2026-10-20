@@ -13,5 +13,8 @@ public final class ShelfRenderEvents {
         if(event.phase==TickEvent.Phase.START) ShelfRenderCache.frame();
     }
     @SubscribeEvent public static void logout(ClientPlayerNetworkEvent.LoggingOut event) { ShelfRenderer.clearModelCache(); }
+    @SubscribeEvent public static void unload(net.minecraftforge.event.level.ChunkEvent.Unload event) {
+        if(event.getLevel().isClientSide()) ShelfSceneCache.unload(event.getLevel(),event.getChunk().getPos());
+    }
     private ShelfRenderEvents() {}
 }

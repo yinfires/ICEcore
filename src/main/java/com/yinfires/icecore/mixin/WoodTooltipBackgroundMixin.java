@@ -13,7 +13,7 @@ public abstract class WoodTooltipBackgroundMixin {
     @Inject(method="renderTooltipBackground(Lnet/minecraft/client/gui/GuiGraphics;IIIIIIIII)V",at=@At("HEAD"),cancellable=true, remap = false)
     private static void icecore$wood(GuiGraphics graphics,int x,int y,int width,int height,int z,int backgroundTop,int backgroundBottom,int borderTop,int borderBottom,CallbackInfo ci) {
         graphics.pose().pushPose(); graphics.pose().translate(0,0,z);
-        WoodPanel.draw(graphics,x-6,y-6,width+13,height+13,1);
+        WoodPanel.drawAround(graphics,x,y,width,height,1);
         graphics.pose().popPose(); ci.cancel();
     }
 }
