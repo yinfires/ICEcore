@@ -9,6 +9,7 @@ import org.lwjgl.system.MemoryUtil;
 /** Optional Embeddium API; never unwrap or bypass a consumer's interception. */
 final class ShelfBulkWriter {
     private static final Bridge BRIDGE=resolve();
+    private static final Object RAW=new Object();
     private record Bridge(MethodHandle of,MethodHandle push,Object format) {}
     private static Bridge resolve() {
         try {
@@ -26,33 +27,22 @@ final class ShelfBulkWriter {
         } catch(ClassNotFoundException absent) { return null; }
         catch(Throwable incompatible) { return null; }
     }
-    static boolean write(VertexConsumer consumer,ByteBuffer data,int count) {
+    // Resolve once per submission. Never retain a consumer across getBuffer/layer switches.
+    static Object resolveWriter(VertexConsumer consumer) {
         if(BRIDGE!=null) {
-            final Object writer;
-            try { writer=(Object)BRIDGE.of.invokeExact(consumer); }
-            catch(Throwable incompatible) { throw new IllegalStateException("Embeddium vertex writer lookup failed",incompatible); }
-            if(writer!=null) {
-                try(MemoryStack stack=MemoryStack.stackPush()) {
-                    BRIDGE.push.invokeExact(writer,stack,MemoryUtil.memAddress(data),count,BRIDGE.format);
-                    return true;
-                } catch(Throwable failure) {
-                    // push may already have consumed vertices: retrying would duplicate geometry.
-                    throw new IllegalStateException("Embeddium bulk vertex submission failed",failure);
-                }
-            }
+            try { Object writer=(Object)BRIDGE.of.invokeExact(consumer);if(writer!=null) return writer; }
+            catch(Throwable failure) { throw new IllegalStateException("Embeddium vertex writer lookup failed",failure); }
         }
-        if(consumer.getClass()==BufferBuilder.class) {
-            ((BufferBuilder)consumer).putBulkData(data);return true;
-        }
-        ShelfRenderStats.reason(ShelfRenderStats.Reason.BULK_WRAPPER);
-        return false;
+        return consumer.getClass()==BufferBuilder.class?RAW:null;
     }
-    static boolean supported(VertexConsumer consumer) {
-        ShelfRenderStats.type("consumer",consumer);
-        if(consumer.getClass()==BufferBuilder.class) return true;
-        if(BRIDGE==null) return false;
-        try { return (Object)BRIDGE.of.invokeExact(consumer)!=null; }
-        catch(Throwable incompatible) { return false; }
+    static void writeResolved(VertexConsumer consumer,Object writer,ByteBuffer data,int count) {
+        if(writer==RAW) { ((BufferBuilder)consumer).putBulkData(data);return; }
+        try(MemoryStack stack=MemoryStack.stackPush()) {
+            BRIDGE.push.invokeExact(writer,stack,MemoryUtil.memAddress(data),count,BRIDGE.format);
+        } catch(Throwable failure) {
+            // A failed push may have consumed vertices. Retrying would duplicate geometry.
+            throw new IllegalStateException("Embeddium bulk vertex submission failed",failure);
+        }
     }
     private ShelfBulkWriter() {}
 }

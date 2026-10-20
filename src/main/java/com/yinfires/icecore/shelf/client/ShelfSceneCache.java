@@ -14,7 +14,7 @@ import java.util.*;
 
 /** Render-thread-owned shelf VBOs. No world/inventory ownership and no stale-revision draws. */
 final class ShelfSceneCache {
-    static final int MAX_SHELVES=256,MAX_BYTES=32*1024*1024;
+    static final int MAX_SHELVES=256,MAX_BYTES=32*1024*1024-com.yinfires.icecore.compat.render.ExactSortCache.MAX_BYTES;
     private static final LinkedHashMap<WeakReference<BlockEntity>,Entry> ENTRIES=new LinkedHashMap<>(32,.75f,true);
     private static final WeakHashMap<BlockEntity,WeakReference<BlockEntity>> KEYS=new WeakHashMap<>();
     private static int bytes,builds,sweep;

@@ -49,6 +49,8 @@ final class ShelfRenderStats {
         if(now-window<5_000_000_000L) return;
         LogUtils.getLogger().info("Shelf render 5s: shelves={}, sceneHits={}, models={}, vertices={}, bufferRequests={}, rebuilds={}, buildMs={}, staticSubmitMs={}, nativeMs={}, gpuDraws={}, bulk={}, fallback={}",
                 shelves,hits,models,vertices,switches,rebuilds,buildNs/1e6,submitNs/1e6,nativeNs/1e6,gpuDraws,bulk,REASONS);
+        LogUtils.getLogger().info("Shelf exact sort cache: hits={}, misses={}, bypassed={}",ShelfSortCache.hits,ShelfSortCache.misses,ShelfSortCache.bypassed);
+        ShelfSortCache.hits=ShelfSortCache.misses=ShelfSortCache.bypassed=0;
         LogUtils.getLogger().info("Shelf geometry slots: static={}, native={}",staticSlots,nativeSlots);staticSlots=nativeSlots=0;
         if(!LAYERS.isEmpty()) LogUtils.getLogger().info("Shelf captured native layers (vertex counts): {}",LAYERS);
         if(frameCount>0) {

@@ -43,10 +43,10 @@ final class ShelfRenderCacheTest {
     }
     @Test void wholeShelfBudgetMatchesPlan() {
         assertEquals(256,ShelfSceneCache.MAX_SHELVES);
-        assertEquals(32*1024*1024,ShelfSceneCache.MAX_BYTES);
+        assertEquals(32*1024*1024,ShelfSceneCache.MAX_BYTES+com.yinfires.icecore.compat.render.ExactSortCache.MAX_BYTES);
         assertTrue(ShelfSceneCache.MAX_BYTES>0);
-        assertTrue(ShelfSceneCache.staticVboEligible(32*1024*1024,256));
-        assertFalse(ShelfSceneCache.staticVboEligible(32*1024*1024+1,256));
+        assertTrue(ShelfSceneCache.staticVboEligible(ShelfSceneCache.MAX_BYTES,256));
+        assertFalse(ShelfSceneCache.staticVboEligible(ShelfSceneCache.MAX_BYTES+1,256));
         assertFalse(ShelfSceneCache.staticVboEligible(1,257));
     }
 }

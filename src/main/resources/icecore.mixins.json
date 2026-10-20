@@ -107,6 +107,7 @@
     "ShelfJadeAccessorMixin"
   ],
   "client": [
+    "EmbeddiumExactSortMixin",
     "DisplayItemColorsAccessor",
     "RackDisplayRendererMixin",
     "RackDisplayLoadMixin",

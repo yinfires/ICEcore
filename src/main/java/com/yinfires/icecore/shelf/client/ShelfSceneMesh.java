@@ -90,6 +90,10 @@ final class ShelfSceneMesh implements AutoCloseable {
         float[] data=new float[0];int size;
         ByteBuffer staging;
         VertexBuffer gpu;
+        private final Matrix4f lastPose=new Matrix4f();
+        private final Matrix3f lastNormal=new Matrix3f();
+        private int lastLight;
+        private boolean prepared;
         Layer(RenderType type) { this.type=type; }
         void append(float[] source,int length,float x,float y,float z) {
             if(size+length>data.length) data=Arrays.copyOf(data,java.lang.Math.max(size+length,java.lang.Math.max(192,data.length*2)));
@@ -110,6 +114,10 @@ final class ShelfSceneMesh implements AutoCloseable {
         void finish(int light,boolean direct) {
             data=Arrays.copyOf(data,size);
             staging=MemoryUtil.memAlloc(size/12*STRIDE);
+            // Encode invariant attributes once into the existing staging allocation.
+            Matrix4f identity=new Matrix4f();Matrix3f normalIdentity=new Matrix3f();
+            for(int i=0;i<size;i+=12) pack(staging,data,i,identity,normalIdentity,light);
+            staging.flip();
             if(direct && opaque(type)) {
                 staging.clear();Matrix4f m=new Matrix4f();Matrix3f n=new Matrix3f();
                 for(int i=0;i<size;i+=12) pack(staging,data,i,m,n,light);
@@ -128,10 +136,12 @@ final class ShelfSceneMesh implements AutoCloseable {
         void submit(PoseStack.Pose pose,MultiBufferSource buffers,int light) {
             VertexConsumer consumer=buffers.getBuffer(type);ShelfRenderStats.buffer();
             ShelfRenderStats.type("consumer",consumer);
-            staging.clear();
-            for(int i=0;i<size;i+=12) pack(staging,data,i,pose.pose(),pose.normal(),light);
-            staging.flip();
-            if(!ShelfBulkWriter.write(consumer,staging,size/12)) {
+            Object writer=ShelfBulkWriter.resolveWriter(consumer);
+            if(writer!=null) {
+                prepare(pose.pose(),pose.normal(),light);
+                ShelfBulkWriter.writeResolved(consumer,writer,staging,size/12);
+            } else {
+                ShelfRenderStats.reason(ShelfRenderStats.Reason.BULK_WRAPPER);
                 // Unknown wrappers retain every native VertexConsumer hook.
                 for(int i=0;i<size;i+=12) {
                     float x=data[i],y=data[i+1],z=data[i+2];var m=pose.pose();var n=pose.normal();
@@ -144,6 +154,47 @@ final class ShelfSceneMesh implements AutoCloseable {
                 }
             }
             ShelfRenderStats.draw(size/12,false);
+        }
+        boolean prepare(Matrix4f m,Matrix3f n,int light) {
+            boolean position=!prepared || !lastPose.equals(m);
+            boolean normals=!prepared || !lastNormal.equals(n);
+            boolean lighting=!prepared || lastLight!=light;
+            if(position || normals || lighting) {
+                // staging is a live native allocation sized once to size/12*STRIDE.
+                // Independent passes avoid per-vertex mode branches and ByteBuffer bounds checks.
+                long base=MemoryUtil.memAddress(staging,0);
+                if(position) {
+                    float m00=m.m00(),m10=m.m10(),m20=m.m20(),m30=m.m30();
+                    float m01=m.m01(),m11=m.m11(),m21=m.m21(),m31=m.m31();
+                    float m02=m.m02(),m12=m.m12(),m22=m.m22(),m32=m.m32();
+                    for(int i=0;i<size;i+=12,base+=STRIDE) {
+                        float x=data[i],y=data[i+1],z=data[i+2];
+                        MemoryUtil.memPutFloat(base,m00*x+m10*y+m20*z+m30);
+                        MemoryUtil.memPutFloat(base+4,m01*x+m11*y+m21*z+m31);
+                        MemoryUtil.memPutFloat(base+8,m02*x+m12*y+m22*z+m32);
+                    }
+                }
+                if(lighting) {
+                    base=MemoryUtil.memAddress(staging,0)+28;
+                    for(int i=11;i<size;i+=12,base+=STRIDE)
+                        MemoryUtil.memPutInt(base,light(light,Float.floatToRawIntBits(data[i])));
+                }
+                if(normals) {
+                    base=MemoryUtil.memAddress(staging,0)+32;
+                    float n00=n.m00(),n10=n.m10(),n20=n.m20();
+                    float n01=n.m01(),n11=n.m11(),n21=n.m21();
+                    float n02=n.m02(),n12=n.m12(),n22=n.m22();
+                    for(int i=8;i<size;i+=12,base+=STRIDE) {
+                        float x=data[i],y=data[i+1],z=data[i+2];
+                        MemoryUtil.memPutByte(base,normal(n00*x+n10*y+n20*z));
+                        MemoryUtil.memPutByte(base+1,normal(n01*x+n11*y+n21*z));
+                        MemoryUtil.memPutByte(base+2,normal(n02*x+n12*y+n22*z));
+                    }
+                }
+                lastPose.set(m);lastNormal.set(n);lastLight=light;prepared=true;
+            }
+            staging.position(0);staging.limit(size/12*STRIDE);
+            return position || normals || lighting;
         }
         @Override public void close() { if(gpu!=null) { gpu.close();gpu=null; } if(staging!=null) { MemoryUtil.memFree(staging);staging=null; } }
     }

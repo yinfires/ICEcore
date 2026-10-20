@@ -9,9 +9,16 @@ import java.util.Set;
 
 /** Prevents optional-mod mixins from loading when their target mod is absent. */
 public final class ICECoreMixinPlugin implements IMixinConfigPlugin {
+    private static boolean verifiedSortClass(String target) {
+        try(var input=ICECoreMixinPlugin.class.getClassLoader().getResourceAsStream(target.replace('.','/')+".class")) {
+            return input!=null && java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(input.readAllBytes()))
+                .equals("155209dc3a68097f9bcb33b4da6a530c6c26330a0f8d994642b79a29b1a83ffa");
+        } catch(java.io.IOException|java.security.NoSuchAlgorithmException incompatible) { return false; }
+    }
     @Override public void onLoad(String mixinPackage) {}
     @Override public String getRefMapperConfig() { return null; }
     @Override public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
+        if (mixinClassName.endsWith("EmbeddiumExactSortMixin")) return verifiedSortClass(targetClassName);
         if (mixinClassName.contains("WoodModernTooltip") || mixinClassName.contains("WoodJade") || mixinClassName.contains("ShelfJadeAccessor")) return present(targetClassName);
         if (mixinClassName.contains("RackDisplay")) return present(targetClassName);
         if (mixinClassName.contains("Spoiled")) return present(targetClassName);

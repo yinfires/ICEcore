@@ -24,7 +24,7 @@ public final class ShelfRenderer implements BlockEntityRenderer<ShelfBlockEntity
     private static final Map<BakedModel,Float> BOTTOMS=new LinkedHashMap<>() {
         @Override protected boolean removeEldestEntry(Map.Entry<BakedModel,Float> entry) { return size()>512; }
     };
-    public static void clearModelCache() { BOTTOMS.clear(); ShelfRenderCache.clear(); ShelfSceneCache.clear(); RackDisplayCache.clear(); ShelfRenderStats.clearEligibility(); }
+    public static void clearModelCache() { ShelfSortCache.clear(); BOTTOMS.clear(); ShelfRenderCache.clear(); ShelfSceneCache.clear(); RackDisplayCache.clear(); ShelfRenderStats.clearEligibility(); }
     private static float bottom(BakedModel model) {
         PoseStack transform=new PoseStack();
         model.getTransforms().getTransform(ItemDisplayContext.FIXED).apply(false,transform);
