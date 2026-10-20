@@ -17,10 +17,11 @@ final class ShelfItemMesh implements MultiBufferSource {
         // Preserve buffer request order, including repeated layers.
         Part part=new Part(type); parts.add(part); return part;
     }
-    void finish() {
+    void finish() { finish(true); }
+    void finish(boolean alignBottom) {
         float bottom=Float.POSITIVE_INFINITY;
         for(Part part:parts) for(int i=0;i<part.size;i+=12) bottom=Math.min(bottom,part.data[i+1]);
-        if(!Float.isFinite(bottom)) bottom=0;
+        if(!alignBottom || !Float.isFinite(bottom)) bottom=0;
         for(Part part:parts) {
             part.data=Arrays.copyOf(part.data,part.size);
             for(int i=0;i<part.size;i+=12) part.data[i+1]-=bottom;

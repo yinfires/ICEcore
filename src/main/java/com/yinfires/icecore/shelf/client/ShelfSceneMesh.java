@@ -20,9 +20,8 @@ final class ShelfSceneMesh implements AutoCloseable {
     private static boolean uploadActive;
     final List<Layer> layers=new ArrayList<>();
     final List<ShelfRenderCache.Slot> fallback=new ArrayList<>();
-    ShelfRenderCache.Slot[] fallbackSlots;
-    int bytes;
-    static boolean preservesLayerOrder(int layerCount,int fallbackCount) { return layerCount==1 && fallbackCount==0; }
+    final List<Object> ordered=new ArrayList<>();
+    int bytes,staticSlots;
     static boolean transparentWithinItemBudget(int bytes) { return bytes<=ShelfItemMesh.MAX_BYTES; }
     static boolean opaque(RenderType type) {
         var atlas=TextureAtlas.LOCATION_BLOCKS;
@@ -42,29 +41,33 @@ final class ShelfSceneMesh implements AutoCloseable {
     }
     void add(ShelfRenderCache.Slot slot,ShelfItemMesh mesh) {
         for(var part:mesh.parts()) if(!supported(part.type) || part.size%48!=0 || (!opaque(part.type) && !transparentWithinItemBudget(part.size/12*STRIDE))) {
-            fallback.add(slot);ShelfRenderStats.reason(ShelfRenderStats.Reason.UNKNOWN_LAYER);return;
+            fallback.add(slot);ordered.add(slot);ShelfRenderStats.reason(ShelfRenderStats.Reason.UNKNOWN_LAYER);return;
         }
-        float x=(float)(ShelfLayout.x(slot.index)/16),y=(float)(ShelfLayout.y(slot.index)/16),z=(float)(ShelfLayout.z(slot.index)/16);
+        float x=slot.rack?0:(float)(ShelfLayout.x(slot.index)/16),y=slot.rack?0:(float)(ShelfLayout.y(slot.index)/16),z=slot.rack?0:(float)(ShelfLayout.z(slot.index)/16);
         // Bound the entire mesh for the no-fog proof, including resource-pack geometry.
         for(var part:mesh.parts()) for(int i=0;i<part.size;i+=12) {
             float px=part.data[i]+x,py=part.data[i+1]+y,pz=part.data[i+2]+z;
+            if(slot.rack) { var point=new Vector3f(px,py,pz).mulPosition(slot.placement.pose());px=point.x;py=point.y;pz=point.z; }
             if(!Float.isFinite(px+py+pz) || px*px+py*py+pz*pz>9) {
-                fallback.add(slot);ShelfRenderStats.reason(ShelfRenderStats.Reason.UNKNOWN_LAYER);return;
+                fallback.add(slot);ordered.add(slot);ShelfRenderStats.reason(ShelfRenderStats.Reason.UNKNOWN_LAYER);return;
             }
         }
         // Conservatively include retained floats, staging bytes and GPU index storage.
         int required=mesh.parts().stream().mapToInt(p->p.size/12*90).sum();
-        if(bytes+required>MAX_BYTES) { fallback.add(slot);ShelfRenderStats.reason(ShelfRenderStats.Reason.MEMORY);return; }
+        if(bytes+required>MAX_BYTES) { fallback.add(slot);ordered.add(slot);ShelfRenderStats.reason(ShelfRenderStats.Reason.MEMORY);return; }
         for(var part:mesh.parts()) {
-            Layer layer=null;
-            for(var candidate:layers) if(candidate.type==part.type) { layer=candidate;break; }
-            if(layer==null) { layer=new Layer(part.type);layers.add(layer); }
-            layer.append(part.data,part.size,x,y,z);
+            Layer layer=nextLayer(part.type);
+            if(slot.rack) layer.appendTransformed(part.data,part.size,slot.placement);
+            else layer.append(part.data,part.size,x,y,z);
         }
-        bytes+=required;
+        bytes+=required;staticSlots++;
     }
-    void finish(int light) { for(var layer:layers) layer.finish(light);fallbackSlots=fallback.toArray(ShelfRenderCache.Slot[]::new);fallback.clear(); }
-    @Override public void close() { for(var layer:layers) layer.close();layers.clear(); }
+    Layer nextLayer(RenderType type) {
+        if(!ordered.isEmpty() && ordered.get(ordered.size()-1) instanceof Layer previous && previous.type==type) return previous;
+        Layer layer=new Layer(type);layers.add(layer);ordered.add(layer);return layer;
+    }
+    void finish(int light,boolean direct) { for(var layer:layers) layer.finish(light,direct); }
+    @Override public void close() { for(var layer:layers) layer.close();layers.clear();ordered.clear(); }
     static int light(int current,int baked) {
         return Math.max(current&65535,baked&65535)|(Math.max(current>>>16,baked>>>16)<<16);
     }
@@ -94,10 +97,20 @@ final class ShelfSceneMesh implements AutoCloseable {
             for(int i=size;i<size+length;i+=12) { data[i]+=x;data[i+1]+=y;data[i+2]+=z; }
             size+=length;
         }
-        void finish(int light) {
+        void appendTransformed(float[] source,int length,PoseStack.Pose pose) {
+            int begin=size;append(source,length,0,0,0);
+            Vector3f v=new Vector3f();
+            for(int i=begin;i<size;i+=12) {
+                v.set(data[i],data[i+1],data[i+2]).mulPosition(pose.pose());
+                data[i]=v.x;data[i+1]=v.y;data[i+2]=v.z;
+                v.set(data[i+8],data[i+9],data[i+10]).mul(pose.normal());
+                data[i+8]=v.x;data[i+9]=v.y;data[i+10]=v.z;
+            }
+        }
+        void finish(int light,boolean direct) {
             data=Arrays.copyOf(data,size);
             staging=MemoryUtil.memAlloc(size/12*STRIDE);
-            if(opaque(type)) {
+            if(direct && opaque(type)) {
                 staging.clear();Matrix4f m=new Matrix4f();Matrix3f n=new Matrix3f();
                 for(int i=0;i<size;i+=12) pack(staging,data,i,m,n,light);
                 staging.flip();

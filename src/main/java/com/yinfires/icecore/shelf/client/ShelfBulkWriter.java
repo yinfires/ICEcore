@@ -48,6 +48,7 @@ final class ShelfBulkWriter {
         return false;
     }
     static boolean supported(VertexConsumer consumer) {
+        ShelfRenderStats.type("consumer",consumer);
         if(consumer.getClass()==BufferBuilder.class) return true;
         if(BRIDGE==null) return false;
         try { return (Object)BRIDGE.of.invokeExact(consumer)!=null; }

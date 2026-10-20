@@ -41,11 +41,15 @@ final class ShelfSceneMeshTest {
         assertEquals(24,layer.size);assertEquals(11,layer.data[0]);assertEquals(22,layer.data[1]);assertEquals(33,layer.data[2]);
         assertEquals(41,layer.data[12]);assertEquals(52,layer.data[13]);assertEquals(63,layer.data[14]);assertEquals(1,source[0]);
     }
-    @Test void cacheBatchKeepsNativeOrderingUnlessOneLayerCoversEverySlot() {
-        assertTrue(ShelfSceneMesh.preservesLayerOrder(1,0));
-        assertFalse(ShelfSceneMesh.preservesLayerOrder(2,0));
-        assertFalse(ShelfSceneMesh.preservesLayerOrder(1,1));
-        assertFalse(ShelfSceneMesh.preservesLayerOrder(0,0));
+    @Test void onlyAdjacentStaticLayersMergeAcrossNativeFallbacks() {
+        var mesh=new ShelfSceneMesh();
+        var first=mesh.nextLayer(null);
+        assertSame(first,mesh.nextLayer(null));
+        Object nativeSlot=new Object();mesh.ordered.add(nativeSlot);
+        var second=mesh.nextLayer(null);
+        assertNotSame(first,second);assertSame(second,mesh.nextLayer(null));
+        assertEquals(java.util.List.of(first,nativeSlot,second),mesh.ordered);
+        assertEquals(2,mesh.layers.size());mesh.close();assertTrue(mesh.ordered.isEmpty());
     }
     @Test void transparentBatchesRetainThePerItemSizeCeiling() {
         assertTrue(ShelfSceneMesh.transparentWithinItemBudget(256*1024));

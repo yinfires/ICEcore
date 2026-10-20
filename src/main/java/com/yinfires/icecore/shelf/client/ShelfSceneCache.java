@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.yinfires.icecore.shelf.ShelfBlockEntity;
 import com.yinfires.icecore.shelf.ShelfBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.client.renderer.*;
 import org.joml.Matrix4f;
 import org.joml.Matrix3f;
@@ -14,10 +15,11 @@ import java.util.*;
 /** Render-thread-owned shelf VBOs. No world/inventory ownership and no stale-revision draws. */
 final class ShelfSceneCache {
     static final int MAX_SHELVES=256,MAX_BYTES=32*1024*1024;
-    private static final LinkedHashMap<WeakReference<ShelfBlockEntity>,Entry> ENTRIES=new LinkedHashMap<>(32,.75f,true);
-    private static final WeakHashMap<ShelfBlockEntity,WeakReference<ShelfBlockEntity>> KEYS=new WeakHashMap<>();
+    private static final LinkedHashMap<WeakReference<BlockEntity>,Entry> ENTRIES=new LinkedHashMap<>(32,.75f,true);
+    private static final WeakHashMap<BlockEntity,WeakReference<BlockEntity>> KEYS=new WeakHashMap<>();
     private static int bytes,builds,sweep;
-    private record Entry(long revision,int light,net.minecraft.core.Direction facing,ShelfSceneMesh mesh) {}
+    private record Entry(long revision,int light,net.minecraft.world.level.block.state.BlockState state,boolean direct,ShelfSceneMesh mesh) {}
+    private static final ShelfRenderCache.Slot[] EMPTY=new ShelfRenderCache.Slot[0];
     private static final Matrix4f MODEL_VIEW=new Matrix4f();
     private static final Matrix3f TRANSPOSE=new Matrix3f();
     private static final Vector3f LIGHT0=new Vector3f(),LIGHT1=new Vector3f(),LOCAL0=new Vector3f(),LOCAL1=new Vector3f();
@@ -52,23 +54,28 @@ final class ShelfSceneCache {
         if(!RenderSystem.isOnRenderThread()) { RenderSystem.recordRenderCall(ShelfSceneCache::clear);return; }
         for(var entry:ENTRIES.values()) entry.mesh.close();ENTRIES.clear();KEYS.clear();bytes=builds=0;
     }
-    static ShelfRenderCache.Slot[] render(ShelfBlockEntity shelf,PoseStack.Pose pose,MultiBufferSource buffers,int light) {
-        ShelfRenderStats.shelf();
+    static ShelfRenderCache.Slot[] render(ShelfBlockEntity shelf,PoseStack.Pose pose,MultiBufferSource buffers,int light,java.util.function.Consumer<ShelfRenderCache.Slot> nativeSlot) {
+        return render(shelf,shelf.renderRevision(),pose,buffers,light,()->ShelfRenderCache.slots(shelf),nativeSlot);
+    }
+    static ShelfRenderCache.Slot[] render(BlockEntity shelf,long revision,PoseStack.Pose pose,MultiBufferSource buffers,int light,
+            java.util.function.Supplier<ShelfRenderCache.Slot[]> snapshot,java.util.function.Consumer<ShelfRenderCache.Slot> nativeSlot) {
+        if(ShelfShaderCompatibility.acceleratedRenderingPresent()) { ShelfRenderStats.reason(ShelfRenderStats.Reason.ACCELERATOR);return null; }
         if(ShelfRenderCache.nativeRequired()) { ShelfRenderStats.reason(ShelfRenderStats.Reason.SHADERS);return null; }
         // Direct GPU draws cannot honor arbitrary MultiBufferSource interception.
-        if(buffers.getClass()!=MultiBufferSource.BufferSource.class) { ShelfRenderStats.reason(ShelfRenderStats.Reason.WRAPPER);return null; }
+        boolean direct=buffers.getClass()==MultiBufferSource.BufferSource.class;
+        ShelfRenderStats.type("source",buffers);
         // Native entity fog expects CPU-transformed vertices. In fog, use that exact path.
         float distance=(float)Math.sqrt(pose.pose().m30()*pose.pose().m30()+pose.pose().m31()*pose.pose().m31()+pose.pose().m32()*pose.pose().m32());
-        if(distance+4>=RenderSystem.getShaderFogStart()) { ShelfRenderStats.reason(ShelfRenderStats.Reason.FOG);return null; }
+        if(direct && distance+4>=RenderSystem.getShaderFogStart()) { ShelfRenderStats.reason(ShelfRenderStats.Reason.FOG);return null; }
         var key=KEYS.computeIfAbsent(shelf,WeakReference::new);
         Entry current=ENTRIES.get(key);
-        var facing=shelf.getBlockState().getValue(ShelfBlock.FACING);
-        if(current!=null && (current.revision!=shelf.renderRevision() || current.light!=light || current.facing!=facing)) {
+        var state=shelf.getBlockState();
+        if(current!=null && (current.revision!=revision || current.light!=light || current.state!=state || current.direct!=direct)) {
             ENTRIES.remove(key);bytes-=current.mesh.bytes;current.mesh.close();current=null;
         }
         if(current==null) {
             if(builds>=1) { ShelfRenderStats.reason(ShelfRenderStats.Reason.BUILD_BUDGET);return null; }
-            var slots=ShelfRenderCache.slots(shelf);
+            var slots=snapshot.get();
             // Warm at most two shared item captures per frame before allocating a whole mesh.
             for(var slot:slots) {
                 ShelfRenderCache.mesh(slot,shelf);
@@ -77,36 +84,36 @@ final class ShelfSceneCache {
             builds++;long start=ShelfRenderStats.start();ShelfSceneMesh mesh=new ShelfSceneMesh();
             try {
                 for(var slot:slots) {
-                    if(slot.entry.mesh==null) { mesh.fallback.add(slot);ShelfRenderStats.reason(ShelfRenderStats.Reason.DYNAMIC); }
+                    if(slot.entry.mesh==null) { mesh.fallback.add(slot);mesh.ordered.add(slot);ShelfRenderStats.reason(ShelfRenderStats.Reason.DYNAMIC); }
                     else mesh.add(slot,slot.entry.mesh);
-                }
-                if(!ShelfSceneMesh.preservesLayerOrder(mesh.layers.size(),mesh.fallback.size())) {
-                    mesh.close();mesh.bytes=0;mesh.fallback.clear();Collections.addAll(mesh.fallback,slots);
                 }
                 while(!ENTRIES.isEmpty() && (ENTRIES.size()>=MAX_SHELVES || bytes+mesh.bytes>MAX_BYTES)) {
                     var iterator=ENTRIES.entrySet().iterator();var oldest=iterator.next();
                     bytes-=oldest.getValue().mesh.bytes;oldest.getValue().mesh.close();iterator.remove();
                 }
                 if(!staticVboEligible(bytes+mesh.bytes,ENTRIES.size()+1)) { mesh.close();ShelfRenderStats.reason(ShelfRenderStats.Reason.MEMORY);return null; }
-                mesh.finish(light);
-                current=new Entry(shelf.renderRevision(),light,facing,mesh);ENTRIES.put(key,current);bytes+=mesh.bytes;
+                mesh.finish(light,direct && mesh.layers.size()==1 && mesh.fallback.isEmpty());
+                current=new Entry(revision,light,state,direct,mesh);ENTRIES.put(key,current);bytes+=mesh.bytes;
             } catch(RuntimeException|Error failure) { mesh.close();throw failure; }
             finally { ShelfRenderStats.build(start); }
-        } else ShelfRenderStats.hit();
-        if(!ShelfSceneMesh.preservesLayerOrder(current.mesh.layers.size(),current.mesh.fallbackSlots.length)) {
-            ShelfRenderStats.reason(ShelfRenderStats.Reason.UNKNOWN_LAYER);return null;
-        }
-        for(var layer:current.mesh.layers) if(layer.gpu==null && !ShelfBulkWriter.supported(buffers.getBuffer(layer.type))) {
+        } else if(current.mesh.staticSlots>0) ShelfRenderStats.hit();
+        for(var layer:current.mesh.layers) if((layer.gpu!=null && !direct) || (layer.gpu==null && !ShelfBulkWriter.supported(buffers.getBuffer(layer.type)))) {
             ShelfRenderStats.reason(ShelfRenderStats.Reason.BULK_WRAPPER);return null;
         }
+        ShelfRenderStats.slots(current.mesh.staticSlots,current.mesh.fallback.size());
         long start=ShelfRenderStats.start();
-        for(var layer:current.mesh.layers) {
-            if(layer.gpu!=null) {
-                try { draw(layer,pose); } catch(NativeDrawUnavailable unavailable) { ShelfRenderStats.reason(ShelfRenderStats.Reason.UNKNOWN_LAYER);return null; }
-            } else layer.submit(pose,buffers,light);
+        for(var operation:current.mesh.ordered) {
+            if(operation instanceof ShelfRenderCache.Slot slot) nativeSlot.accept(slot);
+            else if(operation instanceof ShelfSceneMesh.Layer layer) {
+                if(layer.gpu!=null) {
+                    try { draw(layer,pose); }
+                    catch(NativeDrawUnavailable unavailable) { return null; }
+                }
+                else layer.submit(pose,buffers,light);
+            }
         }
         ShelfRenderStats.submit(start);
-        return current.mesh.fallbackSlots;
+        return EMPTY;
     }
     private static void readLight(com.mojang.blaze3d.shaders.Uniform uniform,Vector3f out) {
         var values=uniform.getFloatBuffer();out.set(values.get(0),values.get(1),values.get(2));

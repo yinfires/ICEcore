@@ -4,6 +4,10 @@ import java.lang.invoke.*;
 
 /** Shader packs may attach per-item metadata outside VertexConsumer. Keep their native path. */
 final class ShelfShaderCompatibility {
+    // Keep ItemRenderer.renderModelLists visible to the accelerator's own model cache,
+    // compute transform and Iris grouping. Never bulk-write its custom consumers.
+    private static final boolean ACCELERATOR=ShelfShaderCompatibility.class.getClassLoader().getResource("com/github/argon4w/acceleratedrendering/AcceleratedRenderingModEntry.class")!=null;
+    static boolean acceleratedRenderingPresent() { return ACCELERATOR; }
     private static boolean failed;
     private static final MethodHandle ACTIVE=resolve();
     private static MethodHandle resolve() {

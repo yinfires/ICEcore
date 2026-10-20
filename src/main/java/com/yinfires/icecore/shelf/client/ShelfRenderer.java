@@ -24,7 +24,7 @@ public final class ShelfRenderer implements BlockEntityRenderer<ShelfBlockEntity
     private static final Map<BakedModel,Float> BOTTOMS=new LinkedHashMap<>() {
         @Override protected boolean removeEldestEntry(Map.Entry<BakedModel,Float> entry) { return size()>512; }
     };
-    public static void clearModelCache() { BOTTOMS.clear(); ShelfRenderCache.clear(); ShelfSceneCache.clear(); }
+    public static void clearModelCache() { BOTTOMS.clear(); ShelfRenderCache.clear(); ShelfSceneCache.clear(); RackDisplayCache.clear(); ShelfRenderStats.clearEligibility(); }
     private static float bottom(BakedModel model) {
         PoseStack transform=new PoseStack();
         model.getTransforms().getTransform(ItemDisplayContext.FIXED).apply(false,transform);
@@ -52,11 +52,19 @@ public final class ShelfRenderer implements BlockEntityRenderer<ShelfBlockEntity
     }
     public ShelfRenderer(BlockEntityRendererProvider.Context context) {}
     @Override public void render(ShelfBlockEntity shelf,float partialTick,PoseStack pose,MultiBufferSource buffers,int light,int overlay) {
+        ShelfRenderStats.shelf();
+        if(com.yinfires.icecore.compat.render.RenderDiagnostics.mode==com.yinfires.icecore.compat.render.RenderDiagnostics.Mode.HIDDEN) return;
         pose.pushPose(); pose.translate(.5,0,.5);
         pose.mulPose(FACING_ROTATIONS[shelf.getBlockState().getValue(ShelfBlock.FACING).get2DDataValue()]);
         pose.translate(-.5,0,-.5);
-        var remaining=ShelfSceneCache.render(shelf,pose.last(),buffers,light);
+        var remaining=com.yinfires.icecore.compat.render.RenderDiagnostics.mode==com.yinfires.icecore.compat.render.RenderDiagnostics.Mode.NATIVE?null:ShelfSceneCache.render(shelf,pose.last(),buffers,light,slot->renderSlot(shelf,slot,pose,buffers,light));
+        if(remaining==null) ShelfRenderStats.slots(0,ShelfRenderCache.slots(shelf).length);
         for(var cached:remaining==null?ShelfRenderCache.slots(shelf):remaining) {
+            renderSlot(shelf,cached,pose,buffers,light);
+        }
+        pose.popPose();
+    }
+    private static void renderSlot(ShelfBlockEntity shelf,ShelfRenderCache.Slot cached,PoseStack pose,MultiBufferSource buffers,int light) {
             int slot=cached.index; ItemStack stack=cached.stack;
             pose.pushPose();
             ShelfRenderStats.model();
@@ -68,8 +76,6 @@ public final class ShelfRenderer implements BlockEntityRenderer<ShelfBlockEntity
             ShelfRenderStats.model();
             RenderUtils.renderItem(stack,light,pose,buffers,shelf.getLevel());
             pose.popPose();
-        }
-        pose.popPose();
     }
     @Override public boolean shouldRender(ShelfBlockEntity shelf,Vec3 camera) { return Vec3.atCenterOf(shelf.getBlockPos()).closerThan(camera,getViewDistance()); }
 }

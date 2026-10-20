@@ -30,7 +30,14 @@ final class ShelfRenderCache {
     }
     static final class Slot {
         final int index; final ItemStack stack; final Key key; Entry entry;
-        Slot(int index,ItemStack stack) { this.index=index;this.stack=stack;key=Key.of(stack); }
+        com.mojang.blaze3d.vertex.PoseStack.Pose placement; int seed; boolean rack;
+        Slot(int index,ItemStack stack) { this(index,stack,false,0,null); }
+        Slot(int index,ItemStack stack,boolean rack,int seed,PoseStack.Pose placement) {
+            this.index=index;this.stack=stack;this.rack=rack;this.seed=seed;this.placement=placement;
+            CompoundTag data=stack.serializeNBT();
+            if(rack) { data.putBoolean("icecore:capture_rack",true);data.putInt("icecore:capture_seed",seed); }
+            key=new Key(data);
+        }
     }
     record Snapshot(long revision,Slot[] slots) {}
     static Slot[] slots(ShelfBlockEntity shelf) {
@@ -47,7 +54,7 @@ final class ShelfRenderCache {
         Entry(ShelfItemMesh mesh,int bytes) { this.mesh=mesh;this.bytes=bytes; }
         int bytes() { return bytes; }
     }
-    static ShelfItemMesh mesh(Slot slot,ShelfBlockEntity shelf) {
+    static ShelfItemMesh mesh(Slot slot,net.minecraft.world.level.block.entity.BlockEntity shelf) {
         if(nativeRequired) return null;
         if(slot.entry!=null && slot.entry.resident) {
             ENTRIES.get(slot.entry.key); // Identity key updates LRU without comparing NBT.
@@ -72,44 +79,51 @@ final class ShelfRenderCache {
         }
         return entry;
     }
-    private static Entry build(Slot slot,ShelfBlockEntity shelf) {
+    private static Entry build(Slot slot,net.minecraft.world.level.block.entity.BlockEntity shelf) {
         ItemStack stack=slot.stack;
         var renderer=Minecraft.getInstance().getItemRenderer();
-        BakedModel model=renderer.getModel(stack,shelf.getLevel(),null,0);
+        BakedModel model=renderer.getModel(stack,shelf.getLevel(),null,slot.seed);
         ShelfRenderStats.model();
         ShelfItemMesh mesh=null;
-        if(eligible(stack,model)) {
+        String rejection=eligibility(stack,model);
+        ShelfRenderStats.eligibility(stack,model,rejection);
+        if(rejection==null) {
             ShelfItemMesh capture=new ShelfItemMesh(); PoseStack local=new PoseStack();
-            local.mulPose(Axis.YP.rotationDegrees(45)); local.scale(.3f,.3f,.3f);
+            if(!slot.rack) { local.mulPose(Axis.YP.rotationDegrees(45)); local.scale(.3f,.3f,.3f); }
             try {
-                RenderUtils.renderItem(stack,0,local,capture,shelf.getLevel());
+                if(slot.rack) renderer.renderStatic(stack,ItemDisplayContext.FIXED,0,net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY,local,capture,shelf.getLevel(),slot.seed);
+                else RenderUtils.renderItem(stack,0,local,capture,shelf.getLevel());
                 ShelfRenderStats.model();
                 if(ShelfRenderStats.ENABLED) for(var part:capture.parts()) ShelfRenderStats.layer(part.type,part.size/12);
-                capture.finish(); mesh=capture;
+                capture.finish(!slot.rack); mesh=capture;
             } catch(ShelfItemMesh.TooLarge ignored) { /* bounded capture; native fallback */ }
         }
         int cost=(mesh==null?0:mesh.bytes())+slot.key.data.sizeInBytes()+128;
         if(cost>ShelfItemMesh.MAX_BYTES) return new Entry(null,slot.key.data.sizeInBytes()+128);
         return new Entry(mesh,cost);
     }
-    private static boolean eligible(ItemStack stack,BakedModel model) {
-        if(!BuiltInRegistries.ITEM.getKey(stack.getItem()).getNamespace().equals("minecraft")
-                || stack.hasFoil() || model.getClass()!=SimpleBakedModel.class
-                || model.isCustomRenderer() || (model.getOverrides().getClass()!=ItemOverrides.class || !model.getOverrides().getOverrides().isEmpty())) return false;
-        // Accept only exact vanilla item implementations. Unknown tint/model behavior stays live.
+    static boolean tintRequiresLiveColor(boolean tinted,boolean registeredHandler) { return tinted && registeredHandler; }
+    static String eligibility(ItemStack stack,BakedModel model) {
+        if(!BuiltInRegistries.ITEM.getKey(stack.getItem()).getNamespace().equals("minecraft")) return "non_vanilla_item";
+        if(stack.hasFoil()) return "foil";
+        if(model.getClass()!=SimpleBakedModel.class) return "model_class";
+        if(model.isCustomRenderer()) return "custom_renderer";
+        if(model.getOverrides().getClass()!=ItemOverrides.class || !model.getOverrides().getOverrides().isEmpty()) return "overrides";
         Class<?> type=stack.getItem().getClass();
-        if(type!=Item.class && type!=BlockItem.class) return false;
+        if(type!=Item.class && type!=BlockItem.class) return "item_class";
+        boolean handler=((com.yinfires.icecore.mixin.DisplayItemColorsAccessor)Minecraft.getInstance().getItemColors())
+                .icecore$colors().containsKey(net.minecraftforge.registries.ForgeRegistries.ITEMS.getDelegateOrThrow(stack.getItem()));
         var random=net.minecraft.util.RandomSource.create(42);
         for(int side=0;side<7;side++) {
             random.setSeed(42);
             for(var quad:model.getQuads(null,side==6?null:net.minecraft.core.Direction.values()[side],random))
-                if(quad.isTinted()) return false;
+                if(tintRequiresLiveColor(quad.isTinted(),handler)) return "color_handler";
         }
         boolean direct=!(stack.getItem() instanceof BlockItem blockItem)
                 || (!(blockItem.getBlock() instanceof net.minecraft.world.level.block.HalfTransparentBlock)
                 && !(blockItem.getBlock() instanceof net.minecraft.world.level.block.StainedGlassPaneBlock));
         var passes=model.getRenderPasses(stack,direct);
-        return passes.size()==1 && passes.get(0)==model;
+        return passes.size()==1 && passes.get(0)==model ? null : "render_passes";
     }
     private ShelfRenderCache() {}
 }

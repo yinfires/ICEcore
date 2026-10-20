@@ -14,7 +14,23 @@ public final class ShelfRenderEvents {
     }
     @SubscribeEvent public static void logout(ClientPlayerNetworkEvent.LoggingOut event) { ShelfRenderer.clearModelCache(); }
     @SubscribeEvent public static void unload(net.minecraftforge.event.level.ChunkEvent.Unload event) {
-        if(event.getLevel().isClientSide()) ShelfSceneCache.unload(event.getLevel(),event.getChunk().getPos());
+        if(event.getLevel().isClientSide()) { ShelfSceneCache.unload(event.getLevel(),event.getChunk().getPos()); RackDisplayCache.unload(event.getLevel(),event.getChunk().getPos()); }
+    }
+    @SubscribeEvent public static void commands(net.minecraftforge.client.event.RegisterClientCommandsEvent event) {
+        var root=net.minecraft.commands.Commands.literal("icecore_render")
+            .requires(source->net.minecraft.client.Minecraft.getInstance().player!=null && net.minecraft.client.Minecraft.getInstance().player.hasPermissions(2));
+        for(var mode:com.yinfires.icecore.compat.render.RenderDiagnostics.Mode.values()) {
+            root.then(net.minecraft.commands.Commands.literal(mode.name().toLowerCase(java.util.Locale.ROOT)).executes(context->{
+                com.yinfires.icecore.compat.render.RenderDiagnostics.mode=mode;ShelfRenderer.clearModelCache();ShelfRenderStats.reset();return 1;
+            }));
+        }
+        root.then(net.minecraft.commands.Commands.literal("stats").then(net.minecraft.commands.Commands.argument("enabled",com.mojang.brigadier.arguments.BoolArgumentType.bool()).executes(context->{
+            ShelfRenderStats.ENABLED=com.mojang.brigadier.arguments.BoolArgumentType.getBool(context,"enabled");if(ShelfRenderStats.ENABLED) ShelfRenderer.clearModelCache();ShelfRenderStats.reset();return 1;
+        })));
+        root.then(net.minecraft.commands.Commands.literal("query").then(net.minecraft.commands.Commands.argument("enabled",com.mojang.brigadier.arguments.BoolArgumentType.bool()).executes(context->{
+            com.yinfires.icecore.compat.render.RenderDiagnostics.queryCache=com.mojang.brigadier.arguments.BoolArgumentType.getBool(context,"enabled");ShelfRenderStats.reset();return 1;
+        })));
+        event.getDispatcher().register(root);
     }
     private ShelfRenderEvents() {}
 }
