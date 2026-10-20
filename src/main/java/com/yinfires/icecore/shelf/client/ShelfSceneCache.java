@@ -97,22 +97,19 @@ final class ShelfSceneCache {
             } catch(RuntimeException|Error failure) { mesh.close();throw failure; }
             finally { ShelfRenderStats.build(start); }
         } else if(current.mesh.staticSlots>0) ShelfRenderStats.hit();
-        for(var layer:current.mesh.layers) if((layer.gpu!=null && !direct) || (layer.gpu==null && !ShelfBulkWriter.supported(buffers.getBuffer(layer.type)))) {
-            ShelfRenderStats.reason(ShelfRenderStats.Reason.BULK_WRAPPER);return null;
-        }
         ShelfRenderStats.slots(current.mesh.staticSlots,current.mesh.fallback.size());
-        long start=ShelfRenderStats.start();
         for(var operation:current.mesh.ordered) {
             if(operation instanceof ShelfRenderCache.Slot slot) nativeSlot.accept(slot);
             else if(operation instanceof ShelfSceneMesh.Layer layer) {
+                long start=ShelfRenderStats.start();
                 if(layer.gpu!=null) {
                     try { draw(layer,pose); }
                     catch(NativeDrawUnavailable unavailable) { return null; }
                 }
                 else layer.submit(pose,buffers,light);
+                ShelfRenderStats.submit(start);
             }
         }
-        ShelfRenderStats.submit(start);
         return EMPTY;
     }
     private static void readLight(com.mojang.blaze3d.shaders.Uniform uniform,Vector3f out) {

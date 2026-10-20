@@ -43,6 +43,9 @@ public final class ShelfRenderer implements BlockEntityRenderer<ShelfBlockEntity
         }
         return Float.isFinite(min)?min:-.5f;
     }
+    // Grilling pushes FIXED context in renderStatic, so its second model lookup is semantically significant.
+    private static final boolean STATIC_CONTEXT=ShelfRenderer.class.getClassLoader().getResource(
+            "cn/breezeth/kaleidoscope_grilling/mixin/ItemRendererContextMixin.class")!=null;
     private static final org.joml.Quaternionf ITEM_ROTATION=Axis.YP.rotationDegrees(45);
     private static final org.joml.Quaternionf[] FACING_ROTATIONS=new org.joml.Quaternionf[4];
     private static final double[] X=new double[72],Y=new double[72],Z=new double[72];
@@ -65,6 +68,7 @@ public final class ShelfRenderer implements BlockEntityRenderer<ShelfBlockEntity
         pose.popPose();
     }
     private static void renderSlot(ShelfBlockEntity shelf,ShelfRenderCache.Slot cached,PoseStack pose,MultiBufferSource buffers,int light) {
+            long nativeStart=ShelfRenderStats.start();
             int slot=cached.index; ItemStack stack=cached.stack;
             pose.pushPose();
             ShelfRenderStats.model();
@@ -73,9 +77,15 @@ public final class ShelfRenderer implements BlockEntityRenderer<ShelfBlockEntity
             pose.translate(X[slot],Y[slot]-bottom*ITEM_SCALE,Z[slot]);
             pose.mulPose(ITEM_ROTATION);
             pose.scale(ITEM_SCALE,ITEM_SCALE,ITEM_SCALE);
-            ShelfRenderStats.model();
-            RenderUtils.renderItem(stack,light,pose,buffers,shelf.getLevel());
-            pose.popPose();
+            if(STATIC_CONTEXT || ShelfShaderCompatibility.acceleratedRenderingPresent() || ShelfRenderCache.nativeRequired()
+                    || com.yinfires.icecore.compat.render.RenderDiagnostics.mode==com.yinfires.icecore.compat.render.RenderDiagnostics.Mode.NATIVE) {
+                ShelfRenderStats.model();
+                RenderUtils.renderItem(stack,light,pose,buffers,shelf.getLevel());
+            } else {
+                Minecraft.getInstance().getItemRenderer().render(stack,ItemDisplayContext.FIXED,false,pose,buffers,light,
+                        net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY,model);
+            }
+            pose.popPose();ShelfRenderStats.nativeTime(nativeStart);
     }
     @Override public boolean shouldRender(ShelfBlockEntity shelf,Vec3 camera) { return Vec3.atCenterOf(shelf.getBlockPos()).closerThan(camera,getViewDistance()); }
 }

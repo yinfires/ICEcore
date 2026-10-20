@@ -47,18 +47,21 @@ public final class RackDisplayCache {
             }
             return state.slots;
         },slot-> {
+            long nativeStart=ShelfRenderStats.start();
             pose.pushPose();
             try {
                 pose.last().pose().mul(slot.placement.pose());pose.last().normal().mul(slot.placement.normal());
                 ShelfRenderStats.model();
                 net.minecraft.client.Minecraft.getInstance().getItemRenderer().renderStatic(slot.stack,ItemDisplayContext.FIXED,light,overlay,pose,buffers,entity.getLevel(),slot.seed);
-            } finally { pose.popPose(); }
+            } finally { pose.popPose();ShelfRenderStats.nativeTime(nativeStart); }
         })!=null;
     }
     public static void item(ItemRenderer renderer,ItemStack stack,ItemDisplayContext context,int light,int overlay,PoseStack pose,MultiBufferSource buffers,Level level,int seed) {
         if(recording==null) {
             ShelfRenderStats.slots(0,1);ShelfRenderStats.model();
-            renderer.renderStatic(stack,context,light,overlay,pose,buffers,level,seed);
+            long start=ShelfRenderStats.start();
+            try { renderer.renderStatic(stack,context,light,overlay,pose,buffers,level,seed); }
+            finally { ShelfRenderStats.nativeTime(start); }
         } else if(!stack.isEmpty()) {
             PoseStack copy=new PoseStack();copy.last().pose().set(pose.last().pose());copy.last().normal().set(pose.last().normal());
             recording.add(new ShelfRenderCache.Slot(recording.size(),stack.copy(),true,seed,copy.last()));

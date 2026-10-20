@@ -13,8 +13,8 @@ final class ShelfRenderStats {
     static void type(String kind,Object value) { if(ENABLED && TYPES.size()<64 && TYPES.add(kind+":"+value.getClass().getName())) LogUtils.getLogger().info("Shelf {}: {}",kind,value.getClass().getName()); }
     private static final long[] FRAMES=new long[16384];
     private static int frameCount;private static long previousFrame;
-    static void reset() { staticSlots=nativeSlots=0;frameCount=0;previousFrame=0;window=0;TYPES.clear();REASONS.clear();LAYERS.clear();shelves=hits=models=vertices=switches=rebuilds=buildNs=submitNs=gpuDraws=bulk=0; }
-    private static long staticSlots,nativeSlots;
+    static void reset() { staticSlots=nativeSlots=nativeNs=0;frameCount=0;previousFrame=0;window=0;TYPES.clear();REASONS.clear();LAYERS.clear();shelves=hits=models=vertices=switches=rebuilds=buildNs=submitNs=gpuDraws=bulk=0; }
+    private static long staticSlots,nativeSlots,nativeNs;
     private static long window,shelves,hits,models,vertices,switches,rebuilds,buildNs,submitNs,gpuDraws,bulk;
     static long start() { return ENABLED?System.nanoTime():0; }
     static void shelf() { if(ENABLED) shelves++; }
@@ -26,8 +26,8 @@ final class ShelfRenderStats {
         boolean handler=((com.yinfires.icecore.mixin.DisplayItemColorsAccessor)net.minecraft.client.Minecraft.getInstance().getItemColors()).icecore$colors()
                 .containsKey(net.minecraftforge.registries.ForgeRegistries.ITEMS.getDelegateOrThrow(stack.getItem()));
         String key=net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem())+":"+model.getClass().getName()+":"+reason;
-        if(ELIGIBILITY.add(key)) LogUtils.getLogger().info("Shelf eligibility: item={}, model={}, overrides={}, colorHandler={}, result={}",
-                net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem()),model.getClass().getName(),model.getOverrides().getClass().getName(),handler,reason==null?"static":reason);
+        if(ELIGIBILITY.add(key)) LogUtils.getLogger().info("Shelf eligibility: item={}, itemClass={}, model={}, overrides={}, colorHandler={}, result={}",
+                net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem()),stack.getItem().getClass().getName(),model.getClass().getName(),model.getOverrides().getClass().getName(),handler,reason==null?"static":reason);
     }
     static void hit() { if(ENABLED) hits++; }
     static void model() { if(ENABLED) models++; }
@@ -37,7 +37,9 @@ final class ShelfRenderStats {
     static void reason(Reason reason) { if(ENABLED) REASONS.merge(reason,1L,Long::sum); }
     static void build(long start) { if(ENABLED) { rebuilds++;buildNs+=System.nanoTime()-start; } }
     static void submit(long start) { if(ENABLED) submitNs+=System.nanoTime()-start; }
-    static void draw(int count,boolean gpu) { if(ENABLED) { vertices+=count;switches++;if(gpu) gpuDraws++;else bulk++; } }
+    static void nativeTime(long start) { if(ENABLED) nativeNs+=System.nanoTime()-start; }
+    static void buffer() { if(ENABLED) switches++; }
+    static void draw(int count,boolean gpu) { if(ENABLED) { vertices+=count;if(gpu) gpuDraws++;else bulk++; } }
     static void frame() {
         if(!ENABLED) return;
         long now=System.nanoTime();
@@ -45,8 +47,8 @@ final class ShelfRenderStats {
         previousFrame=now;
         if(window==0) { window=now;return; }
         if(now-window<5_000_000_000L) return;
-        LogUtils.getLogger().info("Shelf render 5s: shelves={}, sceneHits={}, models={}, vertices={}, bufferRequests={}, rebuilds={}, buildMs={}, submitMs={}, gpuDraws={}, bulk={}, fallback={}",
-                shelves,hits,models,vertices,switches,rebuilds,buildNs/1e6,submitNs/1e6,gpuDraws,bulk,REASONS);
+        LogUtils.getLogger().info("Shelf render 5s: shelves={}, sceneHits={}, models={}, vertices={}, bufferRequests={}, rebuilds={}, buildMs={}, staticSubmitMs={}, nativeMs={}, gpuDraws={}, bulk={}, fallback={}",
+                shelves,hits,models,vertices,switches,rebuilds,buildNs/1e6,submitNs/1e6,nativeNs/1e6,gpuDraws,bulk,REASONS);
         LogUtils.getLogger().info("Shelf geometry slots: static={}, native={}",staticSlots,nativeSlots);staticSlots=nativeSlots=0;
         if(!LAYERS.isEmpty()) LogUtils.getLogger().info("Shelf captured native layers (vertex counts): {}",LAYERS);
         if(frameCount>0) {
@@ -54,7 +56,7 @@ final class ShelfRenderStats {
             LogUtils.getLogger().info("Shelf frame intervals: mode={}, queryCache={}, n={}, medianMs={}, p95Ms={}",com.yinfires.icecore.compat.render.RenderDiagnostics.mode,com.yinfires.icecore.compat.render.RenderDiagnostics.queryCache,frameCount,FRAMES[frameCount/2]/1e6,FRAMES[Math.min(frameCount-1,(int)Math.ceil(frameCount*.95)-1)]/1e6);
         }
         frameCount=0;
-        shelves=hits=models=vertices=switches=rebuilds=buildNs=submitNs=gpuDraws=bulk=0;REASONS.clear();LAYERS.clear();window=now;
+        shelves=hits=models=vertices=switches=rebuilds=buildNs=submitNs=gpuDraws=bulk=0;nativeNs=0;REASONS.clear();LAYERS.clear();window=now;
     }
     private ShelfRenderStats() {}
 }

@@ -10,6 +10,17 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 final class DisplayGeometryTest {
+    @Test void staticBehaviorAcceptsAnyItemIdentityButRejectsDynamicHooks() throws Exception {
+        assertNull(ShelfRenderCache.behaviorRejection(false,true,false,true,true));
+        assertEquals("foil",ShelfRenderCache.behaviorRejection(true,true,false,true,true));
+        assertEquals("model_class",ShelfRenderCache.behaviorRejection(false,false,false,true,true));
+        assertEquals("custom_renderer",ShelfRenderCache.behaviorRejection(false,true,true,true,true));
+        assertEquals("overrides",ShelfRenderCache.behaviorRejection(false,true,false,false,true));
+        assertEquals("client_extension",ShelfRenderCache.behaviorRejection(false,true,false,true,false));
+        String source=java.nio.file.Files.readString(java.nio.file.Path.of("src/main/java/com/yinfires/icecore/shelf/client/ShelfRenderCache.java"));
+        assertFalse(source.contains("getNamespace()"));
+        assertFalse(source.contains("type!=Item.class"));
+    }
     @Test void realGeneratedLayerZeroHasTintIndexWithoutRequiringDynamicColor() {
         SpriteContents sprite=mock(SpriteContents.class);
         when(sprite.width()).thenReturn(16);when(sprite.height()).thenReturn(16);

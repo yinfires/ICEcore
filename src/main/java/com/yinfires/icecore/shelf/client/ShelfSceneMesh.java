@@ -126,7 +126,8 @@ final class ShelfSceneMesh implements AutoCloseable {
             }
         }
         void submit(PoseStack.Pose pose,MultiBufferSource buffers,int light) {
-            VertexConsumer consumer=buffers.getBuffer(type);
+            VertexConsumer consumer=buffers.getBuffer(type);ShelfRenderStats.buffer();
+            ShelfRenderStats.type("consumer",consumer);
             staging.clear();
             for(int i=0;i<size;i+=12) pack(staging,data,i,pose.pose(),pose.normal(),light);
             staging.flip();

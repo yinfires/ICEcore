@@ -212,6 +212,14 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 
 ### 双格架子与木色提示背景
 
+- 第五阶段非客户端验收：最终基线278项测试零失败，47.4.10独立clean完整build、47.4.28兼容完整build、恢复基线clean/build及verifyProductionJar通过。JAR891项，无第三方测试类；SHA-256为fb391a67f2bcece2fad6ffa62b5778a9cdff85d5566a7b0812e2b78d869f1c2c。CodeGraph574文件，差异检查通过。部署前再次检查发现游戏进程已运行，保护门禁在任何复制前停止；尚未部署，新包FPS/外观验收待用户退出后继续。
+
+- 第五阶段混合展示优化（2026-10-20，实机验收开放）：移除静态缓存的minecraft命名空间和精确Item/BlockItem类限制，改为真实SimpleBakedModel、空原生覆盖、无附魔/特殊渲染、默认IClientItemExtensions与无有效染色处理器门禁；未知客户端扩展仍回退。完整NBT/能力、种子和上下文缓存身份保持。现场386件回退主要为普通模组食材/酒类和原版雪球/染料等Item子类；扩大覆盖是否实际命中以新包资格日志为准。
+- 核对真实CFB RenderUtils→renderStatic及Minecraft renderStatic→getModel→render字节码；森罗烧烤ItemRendererContextMixin在renderStatic压入/弹出FIXED上下文，因此当前整合包回退保留第二次上下文内查询。无该上下文模组、光影和加速接管时，同次回退复用已解析模型进入原生render；NATIVE对照始终保留旧调用链。酒馆BottleBlockItem/DrinkBlockItem为普通BlockItem派生，无initializeClient；厨房/酒馆/农艺/农夫乐事实际class审计中带客户端扩展的特殊厨具仍受default extension门禁保护。
+- 移除场景预检时额外getBuffer：每个静态层提交时仅取一次公共消费者，已支持批量写入则push，否则逐顶点走该消费者全部原生钩子；不跨层保留消费者，不绕过Oculus排序。诊断bufferRequests统计静态层实际请求，staticSubmitMs与nativeMs分别计时，资格日志含具体itemClass。没有增加缓存预算、降低数量或把透明层转不透明。
+- 旧包现场稳定每帧35架调用、623静态/386原生实例、772模型查询点、63896缓存顶点和53批次，稳态重建0；约16–17.6ms中位帧耗时，隐藏约5.03ms且受200FPS上限。新包与该基线需同场景三轮30秒对照，目标中位数降低30%且P95不恶化，六架西瓜片与单独原料架另测；CPU分类统计不能代替GPU计时。
+
+
 - 第四阶段非客户端验收：276项测试零失败；Forge47.4.10独立clean完整build、47.4.28兼容build、恢复47.4.10独立clean完整build及verifyProductionJar通过。生产JAR891项，SHA-256为74e5f07d52ab34492c9240827fdb0c8c414f1c5a8d54a36aa895dae001376ae2；无第三方/测试类混入。确认无游戏进程后备份旧客户端包到tmp/shelf-inspect/pre-phase4-client.jar，部署指定客户端mods并验证SHA一致。CodeGraph已收录574文件，UTF-8/注册/差异检查通过。助手未启动游戏，等待用户启动验证；帧率目标尚未验收。
 
 - 2026-10-20第四阶段（实现，实机验收待完成）：修正生成物品layer0的tintIndex=0被误判为动态颜色。`DisplayItemColorsAccessor`按真实Forge的Holder.Reference<Item>→ItemColor注册表识别处理器；无处理器时允许静态捕获，真实染色/特殊模型仍原生回退。`DisplayGeometryTest`直接调用ItemModelGenerator.processFrames，构造真实BakedQuad验证tint语义，不再仅模拟缓存builder。

@@ -16,6 +16,19 @@ final class RackUpstreamTest {
     private static MethodNode method(ClassNode node,String name) {
         return node.methods.stream().filter(m->m.name.equals(name)).findFirst().orElseThrow();
     }
+    @Test void grillingContextRequiresPreservingRenderStaticEntry() throws Exception {
+        try(var zip=new ZipFile("libs/kaleidoscope_grilling-1.1.1-forge1.20.1.jar")) {
+            var node=read(zip.getInputStream(zip.getEntry("cn/breezeth/kaleidoscope_grilling/mixin/ItemRendererContextMixin.class")).readAllBytes());
+            boolean push=false,pop=false;
+            for(var m:node.methods) for(var i:m.instructions) if(i instanceof MethodInsnNode call && call.owner.endsWith("SkewerItemRenderContext")) {
+                push|=call.name.equals("push");pop|=call.name.equals("pop");
+            }
+            assertTrue(push);assertTrue(pop);
+        }
+        String renderer=Files.readString(Path.of("src/main/java/com/yinfires/icecore/shelf/client/ShelfRenderer.java"));
+        assertTrue(renderer.contains("if(STATIC_CONTEXT ||"));
+        assertTrue(renderer.contains("RenderUtils.renderItem(stack,light,pose,buffers,shelf.getLevel())"));
+    }
     @Test void actualRackRendererUsesOnlyTheInterceptedItemEntryAndFixedContext() throws Exception {
         try(var zip=new ZipFile("libs/youkaisfeasts-0.5.0.jar")) {
             var node=read(zip.getInputStream(zip.getEntry("dev/xkmc/youkaishomecoming/content/pot/storage/ingredient/IngredientRackRenderer.class")).readAllBytes());

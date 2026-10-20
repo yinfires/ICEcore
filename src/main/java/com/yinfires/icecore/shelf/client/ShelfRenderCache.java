@@ -103,14 +103,20 @@ final class ShelfRenderCache {
         return new Entry(mesh,cost);
     }
     static boolean tintRequiresLiveColor(boolean tinted,boolean registeredHandler) { return tinted && registeredHandler; }
+    static String behaviorRejection(boolean foil,boolean simple,boolean custom,boolean emptyOverrides,boolean defaultExtension) {
+        if(foil) return "foil";
+        if(!simple) return "model_class";
+        if(custom) return "custom_renderer";
+        if(!emptyOverrides) return "overrides";
+        if(!defaultExtension) return "client_extension";
+        return null;
+    }
     static String eligibility(ItemStack stack,BakedModel model) {
-        if(!BuiltInRegistries.ITEM.getKey(stack.getItem()).getNamespace().equals("minecraft")) return "non_vanilla_item";
-        if(stack.hasFoil()) return "foil";
-        if(model.getClass()!=SimpleBakedModel.class) return "model_class";
-        if(model.isCustomRenderer()) return "custom_renderer";
-        if(model.getOverrides().getClass()!=ItemOverrides.class || !model.getOverrides().getOverrides().isEmpty()) return "overrides";
-        Class<?> type=stack.getItem().getClass();
-        if(type!=Item.class && type!=BlockItem.class) return "item_class";
+        String behavior=behaviorRejection(stack.hasFoil(),model.getClass()==SimpleBakedModel.class,model.isCustomRenderer(),
+                model.getOverrides().getClass()==ItemOverrides.class && model.getOverrides().getOverrides().isEmpty(),
+                net.minecraftforge.client.extensions.common.IClientItemExtensions.of(stack.getItem())
+                        ==net.minecraftforge.client.extensions.common.IClientItemExtensions.DEFAULT);
+        if(behavior!=null) return behavior;
         boolean handler=((com.yinfires.icecore.mixin.DisplayItemColorsAccessor)Minecraft.getInstance().getItemColors())
                 .icecore$colors().containsKey(net.minecraftforge.registries.ForgeRegistries.ITEMS.getDelegateOrThrow(stack.getItem()));
         var random=net.minecraft.util.RandomSource.create(42);
