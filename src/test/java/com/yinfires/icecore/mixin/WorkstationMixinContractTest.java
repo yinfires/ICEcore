@@ -9,6 +9,25 @@ import java.util.zip.ZipFile;
 import static org.junit.jupiter.api.Assertions.*;
 
 final class WorkstationMixinContractTest {
+    @Test void juicerBatchIdentityMatchesNativeConsumptionRatherThanShelfLifeNbt() throws Exception {
+        ClassNode mixin = new ClassNode();
+        new ClassReader(Files.readAllBytes(Path.of("build/classes/java/main/com/yinfires/icecore/mixin/WorkstationJuicerRecipeMixin.class"))).accept(mixin, 0);
+        MethodNode matcher = mixin.methods.stream().filter(m -> m.name.equals("icecore$exactBatch")).findFirst().orElseThrow();
+        var comparisons = java.util.stream.StreamSupport.stream(matcher.instructions.spliterator(), false)
+                .filter(i -> i instanceof MethodInsnNode m && m.owner.equals("net/minecraft/world/item/ItemStack")
+                        && m.desc.equals("(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Z"))
+                .map(i -> ((MethodInsnNode)i).name).toList();
+        assertEquals(List.of("isSameItem", "isSameItem"), comparisons,
+                "NBT-bearing acquired ingredients must match the native item-ID recipe templates");
+        try (ZipFile jar = new ZipFile("libs/kaleidoscope_fragrantorchard-1.0.0-ALPHA-1.20.1.jar")) {
+            ClassNode entity = new ClassNode();
+            new ClassReader(jar.getInputStream(jar.getEntry("com/bmt/kaleidoscope_fragrantorchard/block/entity/JuicerBlockEntity.class"))).accept(entity, 0);
+            MethodNode finish = entity.methods.stream().filter(m -> m.name.equals("finishCrafting")).findFirst().orElseThrow();
+            assertTrue(java.util.stream.StreamSupport.stream(finish.instructions.spliterator(), false)
+                    .anyMatch(i -> i instanceof MethodInsnNode m && m.owner.equals("net/minecraft/world/item/ItemStack") && m.name.equals("m_41656_")),
+                    "Native consumption must retain item-only identity; SRG m_41656_ is isSameItem");
+        }
+    }
     @Test void everyProductionSelectorAndShadowExistsInActualTarget() throws Exception {
         Map<String, ClassNode> targets = new HashMap<>();
         List<Path> jars = new ArrayList<>();
@@ -24,7 +43,10 @@ final class WorkstationMixinContractTest {
         }
         int checked = 0;
         try (var files = Files.list(Path.of("build/classes/java/main/com/yinfires/icecore/mixin"))) {
-            for (Path path : files.filter(p -> p.getFileName().toString().startsWith("Workstation") && p.toString().endsWith(".class")).toList()) {
+            Set<String> additional = Set.of("TavernInvalidRecipeMixin.class", "GrillingOilPressMixin.class",
+                    "GrillingCanolaOnlyMixin.class", "CozyCafeNormalFoodTooltipMixin.class", "CozyCafeContainerClassificationMixin.class");
+            for (Path path : files.filter(p -> (p.getFileName().toString().startsWith("Workstation")
+                    || additional.contains(p.getFileName().toString())) && p.toString().endsWith(".class")).toList()) {
                 ClassNode mixin = new ClassNode(); new ClassReader(Files.readAllBytes(path)).accept(mixin, 0);
                 AnnotationNode annotation = annotations(mixin.visibleAnnotations, mixin.invisibleAnnotations).stream().filter(a -> a.desc.endsWith("/Mixin;")).findFirst().orElseThrow();
                 List<String> names = (List<String>)value(annotation, "targets");
@@ -44,8 +66,9 @@ final class WorkstationMixinContractTest {
                             if (locations instanceof List<?> points) for (Object point : points) {
                                 String invoked = (String)value((AnnotationNode)point, "target");
                                 if (invoked == null) continue;
-                                assertTrue(java.util.stream.StreamSupport.stream(selected.instructions.spliterator(), false).anyMatch(i -> i instanceof MethodInsnNode call
-                                    && invoked.equals("L" + call.owner + ";" + call.name + call.desc)), name + " missing invocation " + invoked);
+                                assertTrue(java.util.stream.StreamSupport.stream(selected.instructions.spliterator(), false).anyMatch(i ->
+                                    i instanceof MethodInsnNode call && invoked.equals("L" + call.owner + ";" + call.name + call.desc)
+                                    || i instanceof FieldInsnNode field && invoked.equals("L" + field.owner + ";" + field.name + ":" + field.desc)), name + " missing member " + invoked);
                             }
                         }
                     }

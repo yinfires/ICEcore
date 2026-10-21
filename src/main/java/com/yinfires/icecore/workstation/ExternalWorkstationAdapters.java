@@ -11,6 +11,9 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import java.util.List;
 
 public final class ExternalWorkstationAdapters {
+    private static final net.minecraft.tags.TagKey<net.minecraft.world.item.Item> MANAGED_FOOD=
+        net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM,
+            net.minecraft.resources.ResourceLocation.parse("icecore:recipe_manager/1790175849511"));
     private ExternalWorkstationAdapters() {}
     public static WorkstationAdapter create(BlockEntity entity) {
         String type = entity.getClass().getName();
@@ -75,7 +78,15 @@ public final class ExternalWorkstationAdapters {
             StockpotBlockEntity p = (StockpotBlockEntity)entity;
             return p.getStatus() == 3 && p.getTakeoutCount() > 0 ? p.getResult().copyWithCount(p.getTakeoutCount()) : ItemStack.EMPTY;
         }
-        public Ingredient carrier() { return entity instanceof PotBlockEntity ? (Ingredient)ExternalWorkstation.get(entity, "carrier") : StockpotProducts.carrier((StockpotBlockEntity)entity); }
+        public Ingredient carrier() {
+            if(entity instanceof PotBlockEntity p) {
+                ItemStack result=p.getResult();
+                if(result.is(MANAGED_FOOD))
+                    return WorkstationContainerCompat.resolveOutputCarrier(result,Ingredient.EMPTY);
+                return (Ingredient)ExternalWorkstation.get(entity,"carrier");
+            }
+            return StockpotProducts.carrier((StockpotBlockEntity)entity);
+        }
         public void takeOutput() {
             if (entity instanceof PotBlockEntity p) {
                 ItemStack result = p.getResult(); result.shrink(1);

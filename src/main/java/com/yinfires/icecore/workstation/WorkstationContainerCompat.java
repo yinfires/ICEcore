@@ -56,6 +56,13 @@ public final class WorkstationContainerCompat {
     private static final int EMPTY_CONTAINER_CACHE_LIMIT = 512;
     private static final int DISCOVERED_CONTAINER_LIMIT = 256;
     private static volatile List<ConfiguredEntry> configured = List.of();
+    private static volatile long revision;
+    public static long revision() { return revision; }
+    private static final TagKey<net.minecraft.world.item.Item> FOOD_BASE_CARRIER=itemTag("icecore","recipe_manager/food_base_carrier");
+    /** Food bases used for extraction are not built-in serving vessels. */
+    public static boolean hasServingVessel(ItemStack filled) {
+        return !filled.is(FOOD_BASE_CARRIER) && resolveEmptyContainer(filled).isPresent();
+    }
     private static final List<ItemStack> discoveredEmptyContainers = new CopyOnWriteArrayList<>();
     private static final Map<String, Optional<ItemStack>> emptyContainerCache = Collections.synchronizedMap(
             new LinkedHashMap<>(64, 0.75f, true) {
@@ -261,6 +268,7 @@ public final class WorkstationContainerCompat {
             discoveredEmptyContainers.clear();
             next.forEach(value -> rememberEmptyContainer(value.entry().empty()));
             emptyContainerCache.clear();
+            revision++;
         }
 
         private static ConfiguredEntry parse(ResourceLocation id, JsonObject json) {

@@ -1,4 +1,10 @@
 {
+  "tooltip.icecore.food_category.main": "Main",
+  "tooltip.icecore.food_category.drink": "Drink",
+  "tooltip.icecore.food_category.dessert": "Dessert",
+  "tooltip.icecore.food_category.ingredient": "Ingredient",
+  "tooltip.icecore.food_price": "Price: %s",
+  "tooltip.icecore.food_plating": "Requires plating",
   "item.icecore.expired_food": "Expired Item",
   "item.icecore.expired_food.name": "Expired %s",
   "tooltip.icecore.expired_food": "Only fit for disposal. No other use.",

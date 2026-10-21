@@ -29,6 +29,7 @@ public final class CozyCafeJeiTooltipHandler {
         }
 
         ItemStack itemStack = event.getItemStack();
+        if (com.yinfires.icecore.tooltip.RecipeManagerTooltips.contains(itemStack)) return;
         if (itemStack.isEmpty() || !isJeiIngredientUnderMouse(itemStack)) {
             return;
         }

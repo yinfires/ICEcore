@@ -44,6 +44,7 @@ public final class ItemTooltipEvents {
         if (!event.getItemStack().isEmpty() && ICECoreClientConfig.hideFoodEffects()) {
             TooltipRules.removeFoodEffects(event.getToolTip());
         }
+        RecipeManagerTooltips.append(event.getItemStack(), event.getToolTip());
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -52,11 +53,15 @@ public final class ItemTooltipEvents {
         boolean keycaps = net.minecraftforge.fml.ModList.get().isLoaded("smartkeyprompts");
         int maxWidth = Math.max(1, Math.min(event.getScreenWidth() - 24,
                 event.getMaxWidth() > 0 ? event.getMaxWidth() : 320));
+        int width = 0;
+        for (var element : elements) if (element.left().isPresent()) width=Math.max(width,net.minecraft.client.Minecraft.getInstance().font.width(element.left().get()));
         for (int i = 0; i < elements.size(); i++) {
             var text = elements.get(i).left().orElse(null);
             if (text instanceof Component component && component.getContents() instanceof DescriptionAction action) {
                 elements.set(i, com.mojang.datafixers.util.Either.right(new DescriptionActionTooltip.Data(action, maxWidth, keycaps)));
             }
+            if (text instanceof Component component && component.getContents() instanceof FoodCategory category)
+                elements.set(i,com.mojang.datafixers.util.Either.right(new FoodCategoryTooltip.Data(category.text(),Math.min(width,maxWidth),i+1<elements.size())));
         }
     }
 
@@ -80,10 +85,12 @@ public final class ItemTooltipEvents {
         @SubscribeEvent
         public static void factories(net.minecraftforge.client.event.RegisterClientTooltipComponentFactoriesEvent event) {
             event.register(DescriptionActionTooltip.Data.class, ItemTooltipEvents::layout);
+            event.register(FoodCategoryTooltip.Data.class, FoodCategoryTooltip::new);
         }
         private static void reload(ResourceManager resources) {
             ACTION_LAYOUTS.clear();
             DESCRIPTIONS.reload(FMLPaths.CONFIGDIR.get().resolve("icecore/item_descriptions.json"));
+            RecipeManagerTooltips.reload(FMLPaths.CONFIGDIR.get().resolve("icecore/recipe_manager_items.json"));
         }
     }
 }

@@ -77,7 +77,9 @@ public final class MixingBowlJeiPlugin implements IModPlugin {
                 layout.addSlot(RecipeIngredientRole.OUTPUT, x, y)
                         .addItemStack(recipe.results().get(i).stack());
                 if (!recipe.results().get(i).effectiveCarrier().isEmpty()) {
-                    carrierItems.addAll(java.util.List.of(recipe.results().get(i).effectiveCarrier().getItems()));
+                    for(var candidate:recipe.results().get(i).effectiveCarrier().getItems())
+                        if(carrierItems.stream().noneMatch(existing->ItemStack.isSameItemSameTags(existing,candidate)))
+                            carrierItems.add(candidate.copyWithCount(1));
                 }
             }
             if (!carrierItems.isEmpty()) {

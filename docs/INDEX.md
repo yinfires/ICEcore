@@ -6,6 +6,7 @@ Last updated: 2026-10-10（工作区规则独立维护，补充本地开发与�
 
 | 任务类型 | 必读文档 | 读取范围 |
 | --- | --- | --- |
+| 配方管理器同步与16类设备转换 | [配方管理器同步](recipe-manager-sync.md)、[工作方块容器兼容](workstation-container-compatibility.md) | 读取命令、旧脚本清理、设备数量/时长、葡萄杯桶容量和截图待测清单；生成成功不代表游戏可制作 |
 | Spoiled 按天保质期、过期物品、冰箱与餐盘 | [内容实现索引](content-implementation.md)、[时间系统](time-system.md)、[容器兼容](workstation-container-compatibility.md) | 读取“按游戏天保质期与过期物品”；名单来源为根目录 AGENTS.md 记载的配方管理系统，使用配置见 Wiki《保质期与过期物品》 |
 | 农夫乐事砧板输入、加工、成品留存与取回 | [内容实现索引](content-implementation.md)、[工作方块容器兼容](workstation-container-compatibility.md) | 读取“农夫乐事砧板单件输入与成品留存”，核对原生结果重定向、容器元数据和批量取回；操作说明见Wiki《农夫乐事砧板》 |
 | 双格架子、72格储物、世界物品展示及木色提示背景 | [内容实现索引](content-implementation.md) | 读取“双格架子与木色提示背景”，核对模型、同步、客户端物品显示设置、指令权限、Jade及Modern UI背景入口；配置与全部调试指令见Wiki《架子》 |
@@ -45,4 +46,4 @@ Last updated: 2026-10-10（工作区规则独立维护，补充本地开发与�
 - 每个新文档必须注明用途，并在此处给出“何时读取”和“读取范围”。
 - 具体实现事实写入 `content-implementation.md` 或从其中链接的专题文档；不要把同一事实复制到多处。
 - 规范错误、可复用经验及其防复发闭环统一写入 `workspace-errors-and-lessons.md`；不得散落到实现文档或仅保留在对话中。
-- 根目录 `AGENTS.md` 与整个 `docs/` 目录允许 Git 跟踪、提交与推送；`tmp/`、`tool/` 仍为不受 Git 跟踪的本地辅助目录；`wiki/` 是项目根目录下单独管理的 GitHub Wiki 仓库，不纳入主仓库跟踪。
+- 根目录 `AGENTS.md` 与整个 `docs/` 目录允许 Git 跟踪、提交与推送；`tmp/` 与普通 `tool/` 内容不跟踪，用户要求的 `tool/recipe-sync/sync.mjs`、`sync.test.mjs` 精确放行；`wiki/` 是项目根目录下单独管理的 GitHub Wiki 仓库，不纳入主仓库跟踪。

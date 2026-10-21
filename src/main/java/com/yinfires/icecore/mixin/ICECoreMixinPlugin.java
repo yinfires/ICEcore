@@ -29,7 +29,7 @@ public final class ICECoreMixinPlugin implements IMixinConfigPlugin {
         if (mixinClassName.contains("PonderItemTooltip") || mixinClassName.contains("JeiItemModNameTooltip")) return present(targetClassName);
         if (mixinClassName.contains("FoodTooltip")) return present(targetClassName);
         if (mixinClassName.contains("CookeryStockpot")) return present(targetClassName);
-        if (mixinClassName.contains("GrillingOilPress")) return present(targetClassName);
+        if (mixinClassName.contains("GrillingOilPress") || mixinClassName.contains("GrillingCanolaOnly")) return present(targetClassName);
         if (mixinClassName.contains("GrillingSkewer")) return present(targetClassName);
         if (mixinClassName.contains("GrillingJade")) return present(targetClassName) && present("snownee.jade.api.ITooltip");
         if (mixinClassName.contains("GeckoLib")) return present(targetClassName);

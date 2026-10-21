@@ -39,6 +39,9 @@ public final class MixingBowlBlockEntity extends BlockEntity implements Containe
     private final long[] inputSequence = new long[9];
     private final NonNullList<ItemStack> outputs = NonNullList.withSize(9, ItemStack.EMPTY);
     private final List<Ingredient> carriers = new ArrayList<>();
+    private net.minecraft.resources.ResourceLocation outputRecipe;
+    private Object carrierRecipeSnapshot;
+    private long carrierRevision = -1;
     private final FluidTank fluid = new FluidTank(1000) {
         @Override protected void onContentsChanged() { if (!loading) changed(); }
     };
@@ -137,6 +140,7 @@ public final class MixingBowlBlockEntity extends BlockEntity implements Containe
 
     public Ingredient requiredOutputCarrier() {
         if (stage != Stage.OUTPUT) return Ingredient.EMPTY;
+        refreshOutputCarriers();
         for (int i = 8; i >= 0; i--) if (!outputs.get(i).isEmpty()) return carriers.get(i);
         return Ingredient.EMPTY;
     }
@@ -147,6 +151,7 @@ public final class MixingBowlBlockEntity extends BlockEntity implements Containe
 
     public ItemStack takeOutput(ItemStack held, java.util.function.Predicate<ItemStack> receive) {
         if (stage != Stage.OUTPUT) return ItemStack.EMPTY;
+        refreshOutputCarriers();
         for (int i = 8; i >= 0; i--) if (!outputs.get(i).isEmpty()) {
             Ingredient carrier = carriers.get(i);
             if (!carrier.isEmpty() && !carrier.test(held)) return ItemStack.EMPTY;
@@ -185,6 +190,8 @@ public final class MixingBowlBlockEntity extends BlockEntity implements Containe
                 .filter(value -> value.matches(container, fluid.getFluid(), level)).findFirst();
         stirringTicks = 0; progress = 0;
         if (recipe.isPresent()) {
+            outputRecipe=recipe.get().getId();carrierRecipeSnapshot=recipe.get();
+            carrierRevision=WorkstationContainerCompat.revision();
             clear(inputs);
             clear(inputContainers); clearInputSequence();
             fluid.setFluid(FluidStack.EMPTY);
@@ -199,6 +206,21 @@ public final class MixingBowlBlockEntity extends BlockEntity implements Containe
             stage = Stage.OUTPUT;
         } else stage = Stage.INPUT;
         changed();
+    }
+
+    private void refreshOutputCarriers() {
+        if(level==null)return;
+        var recipe=outputRecipe==null?null:level.getRecipeManager().byKey(outputRecipe).orElse(null);
+        long revision=WorkstationContainerCompat.revision();
+        if(recipe==carrierRecipeSnapshot && revision==carrierRevision)return;
+        carrierRecipeSnapshot=recipe;carrierRevision=revision;
+        for(int i=0;i<outputs.size();i++) {
+            if(outputs.get(i).isEmpty())continue;
+            if(recipe instanceof MixingBowlRecipe mixing && i<mixing.results().size()
+                    && ItemStack.isSameItemSameTags(outputs.get(i),mixing.results().get(i).stack()))
+                carriers.set(i,mixing.results().get(i).effectiveCarrier());
+            else if(recipe!=null)carriers.set(i,WorkstationContainerCompat.resolveOutputCarrier(outputs.get(i),carriers.get(i)));
+        }
     }
 
     private void changed() {
@@ -220,6 +242,7 @@ public final class MixingBowlBlockEntity extends BlockEntity implements Containe
         tag.put("Fluid", fluid.writeToNBT(new CompoundTag()));
         CompoundTag out = new CompoundTag(); ContainerHelper.saveAllItems(out, outputs); tag.put("Outputs", out);
         tag.putString("Stage", stage.name()); tag.putInt("Stirring", stirringTicks); tag.putInt("Progress", progress);
+        if(outputRecipe!=null)tag.putString("OutputRecipe",outputRecipe.toString());
         ListTag carrierList = new ListTag(); for(Ingredient carrier:carriers) carrierList.add(StringTag.valueOf(carrier.toJson().toString())); tag.put("Carriers",carrierList);
     }
     @Override public void load(CompoundTag tag) {
@@ -249,6 +272,8 @@ public final class MixingBowlBlockEntity extends BlockEntity implements Containe
             if(tag.contains("Outputs")) ContainerHelper.loadAllItems(tag.getCompound("Outputs"),outputs);
             try { stage=Stage.valueOf(tag.getString("Stage")); } catch(Exception ignored){stage=Stage.INPUT;}
             stirringTicks=tag.getInt("Stirring"); progress=tag.getInt("Progress"); carriers.clear();
+            outputRecipe=tag.contains("OutputRecipe")?net.minecraft.resources.ResourceLocation.tryParse(tag.getString("OutputRecipe")):null;
+            carrierRecipeSnapshot=null;carrierRevision=-1;
             ListTag list=tag.getList("Carriers",8);
             for(int i=0;i<9;i++) {
                 Ingredient saved = i < list.size()

@@ -13,6 +13,7 @@ public final class WorkstationSlotState {
     private ItemStack[] observed = new ItemStack[0];
     private long next = 1;
     private CompoundTag pending;
+    private long containerRevision = -1;
 
     public void reconcile(int size, IntFunction<ItemStack> items) {
         if (order.length != size) {
@@ -28,6 +29,10 @@ public final class WorkstationSlotState {
             }
             next = WorkstationItemOrder.restore(order, pending.getLongArray("Order"), pending.getLong("Next"), i -> !items.apply(i).isEmpty());
             pending = null;
+        }
+        if(containerRevision!=WorkstationContainerCompat.revision()) {
+            for(int i=0;i<size;i++)containers[i]=required(items.apply(i));
+            containerRevision=WorkstationContainerCompat.revision();
         }
         for (int i = 0; i < size; i++) {
             ItemStack item = items.apply(i);
@@ -50,7 +55,7 @@ public final class WorkstationSlotState {
         if (next == Long.MAX_VALUE) next = WorkstationItemOrder.restore(order, new long[0], 1, i -> !observed[i].isEmpty());
         return next++;
     }
-    public void load(CompoundTag tag) { pending = tag.contains("ICEcoreSlots") ? tag.getCompound("ICEcoreSlots").copy() : null; order = new long[0]; }
+    public void load(CompoundTag tag) { pending = tag.contains("ICEcoreSlots") ? tag.getCompound("ICEcoreSlots").copy() : null; order = new long[0]; containerRevision=-1; }
     public void save(CompoundTag tag) {
         if (pending != null) { tag.put("ICEcoreSlots", pending.copy()); return; }
         CompoundTag data = new CompoundTag(); data.putLongArray("Order", order); data.putLong("Next", next);

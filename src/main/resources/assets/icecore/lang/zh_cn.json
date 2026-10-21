@@ -1,4 +1,10 @@
 {
+  "tooltip.icecore.food_category.main": "主食",
+  "tooltip.icecore.food_category.drink": "饮品",
+  "tooltip.icecore.food_category.dessert": "点心",
+  "tooltip.icecore.food_category.ingredient": "食材",
+  "tooltip.icecore.food_price": "售价：%s",
+  "tooltip.icecore.food_plating": "需要盘装",
   "item.icecore.expired_food": "过期物品",
   "item.icecore.expired_food.name": "过期的%s",
   "tooltip.icecore.expired_food": "只能丢弃，别无用途。",
