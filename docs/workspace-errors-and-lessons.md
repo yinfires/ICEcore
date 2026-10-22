@@ -121,6 +121,12 @@ Last updated: 2026-09-27
 
 ### ERR-20261005-01：内存诊断未提前核对采样工具与输出边界
 
+- 2026-10-22正常包移植任务复发补充：初期工具输出再次超限，另误将Forge源码patch解到根目录patches，并直接以.jar传Expand-Archive；已核验绝对路径后将整个新建patches移动到tmp/rack-native-compat/forge-patch-reference，未改已有文件。新测试尝试mock ItemRenderer触发其注册表静态初始化，改用真实ShelfItemMesh回放行为加编译ASM入口检查，保留动态资格判断与原生回退门禁。独立clean后test暴露6项既有契约依赖createMcpToSrg却未声明；完整build生成映射后309项测试通过。防线落实build.gradle test dependsOn createMcpToSrg，后续独立clean→test验证；临时参考只放tmp，最终Git状态及JAR条目检查拒绝patches/上游类进入成品。适用边界为本机JAR诊断、普通JUnit和生产映射契约；不以构建成功声称实机性能达标，状态继续观察。
+
+- 2026-10-22临时兼容包验收遗漏复发：用户报告包仍请求幻想乡0.5.0，成品META-INF/mods.toml证实versionRange精确锁定[0.5.0]。根因是上轮只检查Mixin和字节码兼容，四条目差异白名单没有覆盖运行依赖，导致Forge在Mixin运行前拒绝0.5.1+1；上轮静态通过不能代表可加载。正确做法为临时派生包同步改写精确依赖为[0.5.1+1]。更强防线已落实tmp/rack-native-compat/package.ps1：改写前要求唯一旧依赖块，生成后重新读取成品依赖块，精确断言新版并拒绝残留[0.5.0]；最终差异允许范围增加且只增加META-INF/mods.toml。验证方法为实际执行打包门禁、逐ZIP条目差异核验、独立verifyProductionJar及新版成员/选择器检查。适用边界为当前0.5.1+1临时包，不扩展正式包版本范围；状态为依赖声明已修正，实机启动仍待用户验证。
+
+- 2026-10-22原料架临时兼容任务复发（既有累计再加1）：首批完整CodeGraph元数据与多文档输出再次截断，后续Windows字面通配符查询失败。根因是首批未落实既有整批长度门禁，影响为无效阅读和证据缺失风险。已按UTF-8独立回读生效规则、构建章节和原料架条目；后续文档/反编译输出先构造唯一out，超过6000字符直接拒绝，源码路径通配改用目录配-g。强化可执行防线为tmp/rack-native-compat/CheckCompat.java直接以ASM检查新版真实JAR的保留Mixin选择器、Shadow与INVOKE/FIELD目标，并对派生包逐ZIP条目校验，仅允许配置和三份class变化；不据截断文本认定新版兼容。验证：超限BatchedItemRenderer读取被拒绝后分段完成，11个选择器与直接成员检查通过，完整build、临时包生产映射检查及四条目差异检查通过。适用边界为本地文档/工具输出与临时派生包；状态继续观察，实机启动未验证。
+
 - 2026-10-22咖啡馆任务复发（既有累计再加1）：规划初期完整工具元数据及多文档输出截断，实施时又从包名猜测CozyRegistry路径、在PowerShell数组表达式内串接多命令导致解析失败；编译捕获Placebo传递接口缺失与旧厨房编译依赖中没有新版竹匾类。根因是未在调用前执行整批长度与真实类路径门禁。已改为唯一字符串6000字符拒绝、构建日志落tmp短尾，按真实JAR导入registry.CozyRegistry，补充客户端真实Placebo仅编译依赖，竹匾仅引用已验证BaseBlockEntity。防线升级：CafeTableContractTest逐版读取CozyCafe1.9/1.10实际注入和字段，WorkstationMixinContractTest纳入本次菜单与竹匾入口，保留完整编译检查传递依赖。后续同类任务先读取真实import/父类再写引用，不把旧版编译类存在性等同于新版运行目标存在性。验证为定向契约与编译通过，完整构建继续；适用于本地工具输出与可选模组API核对，状态观察中，未以截断内容宣称验收。
 - 2026-10-21截图修复复发（累计再加1）：混合源码/搜索输出多次截断，部分已知文件仍猜路径，PowerShell误用花括号展开、双引号中的JavaScript转义导致命令拆分。原防线只记在规则、未对每个批次执行长度门禁；后续输出先生成单一out并检查6000字符，超限拒绝，工具发现只取名称，文件定位先用现存目录；含引号脚本使用PowerShell here-string或临时脚本文件，禁止用JSON反斜杠充当Shell转义。已对后续日志批次执行门禁并通过；状态继续观察，不能将截断输出作为读完证据。
 - 2026-10-21配方同步复发（既有累计再加1）：恢复任务时输出完整工具元数据并合并多个文档，未执行6000字符门禁；另从类名猜测兼容类路径、将通配符放入Windows字面路径导致读取失败。后续先构造单批字符串、超限直接拒绝并缩小范围；真实入口以CodeGraph和现存文件确定。防线升级到工具回归：WorkstationMixinContractTest同时校验新增Tavern、Grilling及CozyCafe选择器，包含真实FIELD引用，禁止仅按Workstation前缀漏检。同步工具JAR资源读取使用复制.zip并Expand-Archive到tmp缓存；不再自行解析压缩文件格式。验证为工具4项测试、真实JAR注入契约测试通过以及实际超限拒绝；适用于本地文档/字节码/工具元数据读取，状态继续观察，整套同步未验收。

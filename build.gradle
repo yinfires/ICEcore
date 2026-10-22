@@ -85,6 +85,7 @@ dependencies {
 }
 
 tasks.named('test', Test).configure {
+    dependsOn 'createMcpToSrg', 'extractSrg'
     useJUnitPlatform()
 }
 
