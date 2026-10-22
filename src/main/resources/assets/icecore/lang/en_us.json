@@ -1,4 +1,6 @@
 {
+  "message.icecore.cafe.inventory_full": "Inventory full; make room first",
+  "message.icecore.cafe.no_plating": "This item needs no plate; serve it directly",
   "tooltip.icecore.food_category.main": "Main",
   "tooltip.icecore.food_category.drink": "Drink",
   "tooltip.icecore.food_category.dessert": "Dessert",

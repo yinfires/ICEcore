@@ -1,5 +1,20 @@
 # ICEcore 内容实现索引
 
+### CozyCafe上菜、桌面器皿与竹匾背包取出（2026-10-22）
+
+- 装盘统一入口 `compat.cozycafe.CafeServingRules`：正式成品标签内的非饮料且无真实器皿才强制装盘，面包/蛋糕/串类基底不算器皿；未知兼容食物直接上菜。提示复用同一判定，原生装盘配置关闭时不强制。保留FoodClassificationUtils真实碗分类，不以它决定直接上菜许可。非饮料甜品同样可走原生装盘上菜。
+- 装盘台补齐 CozyCafePlatingStationMixin 的handlePlating入口：已有餐盘时按同一CafeServingRules接收面包、蛋糕、串类，拒绝已有器皿、饮料与未知食物的额外装盘；空台放盘仍走原生流程，成品调用原生createPlatedFood，保留盘内NBT与保质期。空手取盘复用正常背包事务，满背包留台并通过PlayerFeedback提示。
+- `CozyCafeTableMixin`在原生成功上菜后记录实际食物、是否使用上菜盘、饮料类别和精确返还物，保留原生扣料、付款、品质与保质期入口。吃完/关店将返还物留桌，原生tick不再弹出器皿或无依据产生脏盘。空手清桌复用WorkstationInventoryTransfer；满背包保留。待清桌暂停下一订单等待处罚，未清桌不接新顾客。
+- 自定义状态使用icecoreTableReturn/icecoreTablePending/icecoreTableDrink/icecoreTablePlated保存，复用原生NBT与更新包；旧存档仅迁移已有droppedItem，不凭空造器皿。菜单通过CafeTableAccess接入ContainerContentAccess，非空菜单拦截普通破坏与扳手强拆，订单图标不算库存。
+- `client.CafeTableRendering`保留原生方块食物/ItemRenderer入口；无需装盘非饮料居中，立体模型0.9比例、图标竖直0.5比例，饮料器皿完整沿用原生饮料位置、-20度朝向、非方块X轴-90度与0.65缩放，继续调用GeneralUtils.renderFood。CafeMenuModels以Forge模型数据隐藏原菜单几何，仅无需装盘非饮料正在展示时隐藏菜单，按2026-10-22最新要求，非饮料返还器皿隐藏菜单、饮料返还保留菜单；客户端NBT内容变化请求模型数据刷新，无逐帧资源I/O或注册表扫描。四道超大菜仅在咖啡馆显示图标，需求渲染不再改写GROUND上下文，保持原生尺寸与动画；CafeModelBounds按模型身份/上下文缓存最终顶点最低点，生成图标裁剪透明UV留白，512模型上限、资源烘焙失效，不逐帧读资源或扫描顶点；冷切火腿片的item模型覆盖为原生generated图标，不改实际方块。
+- 装盘食物位置依据已成功上菜的tablePlated状态：CafeTableRendering.displayCourse仅在原生Renderer的getCurrentCourse读取处为实际餐盘选择中央主菜分支（2），实际饮料选择饮料分支（1）。不改服务端订单/课程推进，原生中央位置、朝向、比例和renderFood入口保留；甜品及其它课程装盘也不会落到侧边。CafeDisplayRegressionTest枚举原生课程0..4验证实际餐盘始终中央，并由两版JAR契约核验新重定向。
+- 装盘模型共用CafePlateRendering（菜单与新增CozyCafePlatingRendererMixin装盘台入口）：真实餐盘几何X/Z=1..15、Y=0..2，方块模型最大水平跨度限制为12/16，且不超过原尺寸0.9，按实际顶点包围盒居中；底部贴菜单盘顶2/16或装盘台盘顶1.15，额外0.001防止重面。装盘台盘顶来自原生renderPlate的y=.65、X180度与ItemRenderer中心平移。方块改用原生BlockRenderDispatcher.renderSingleBlock及传入packedLight，不以菜单位置的世界AO采样渲染非世界方块。四道例外图标同样按真实最低点落盘；餐盘几何与游戏光照仍待实机复验。
+- 手持/物品展示餐盘模型补齐CozyCafePlateItemModelMixin：在原生ServingPlateModel五参getQuads处保留盘子几何和原生手持显示变换，仅替换完整方块食物的合成姿态。复用CafeDisplayRules.plateScale与CafeModelBounds，最大宽深12/16、比例不超过.9，真实底部贴盘顶2/16+.001，与菜单/装盘台一致。原生overrides每次新建合成模型，故使用CafePlateItemCache共享缓存（2048键上限，按盘/食物模型、render type、面分组，资源烘焙清空）；自定义state/modelData不缓存。非方块保持原生物品合成，四道图标例外不改成方块。两版真实JAR注入和shadow契约加入默认测试；手持左右手、GUI、物品展示的实机效果仍待验。
+- 2026-10-22普通物品盘底复发修正：以上早期仅BlockItem及renderSingleBlock描述由本条更新。CafePlatedFoodModels作为菜单、装盘台、ServingPlateModel共同几何源；普通物品先应用X90、FIXED和中心平移，方块采用放置几何，再对最终顶点统一限制宽深12/16、居中并归零minY；三入口只加各自盘顶+.001。原生ItemRenderer保留传入光照，归一模型覆盖getRenderPasses返回自身，避免Forge委托回原模型丢失拟合。南瓜派解析farmersdelight:pumpkin_pie，农夫乐事apple_pie/chocolate_pie/sweet_berry_cheesecake映射同ID已注册方块，来源为真实FD1.3.4 blockstates和template_pie；其它BlockItem沿其真实方块。四道例外仍用图标几何。归一模型缓存512键、合成缓存2048键，资源烘焙同步清空；无逐帧资源读取。新增CafePlatedFoodModelsTest实际处理带负底部/偏移/显示变换的quad，验证最终minY、居中、盘沿和渲染pass不退回源模型。普通物品、三明治、整派实机待验。
+- `WorkstationBambooTrayPickupMixin`核对厨房1.5.1的onTakeOut与BaseBlockEntity.refresh，保留选槽/单件/整组规则，先模拟正常背包容量，仅扣实际接收量；空槽重置原生加工状态。不生成掉落物、不直接覆盖手持。编译仍沿用厨房1.4.1，Mixin可选守卫按目标类存在性加载。
+- 高频成本：菜单每tick只进行固定数量字段/空栈判断，返还解析仅成功上菜时执行并复用有界容器缓存；渲染每菜单O(1)，无额外网络轮询。竹匾交互最多扫描36格背包，容量不足不发送额外同步。
+- 验证：两版CozyCafe（1.9/1.10）真实JAR注入/字段契约、厨房目标JAR契约和非掉落边界检查通过；Forge47.4.10独立clean后完整build、47.4.28兼容build通过，307项测试零失败，包含定向装盘矩阵、模型变换/缓存与真实JAR回归，均通过verifyProductionJar；最终恢复47.4.10构建。Placebo8.6.3仅作编译接口依赖，不打包。未启动或部署客户端，四向模型/菜单隐藏、杯碗瓶模型与清桌交互实机待验，不能以编译代替视觉验收。
+
 Last updated: 2026-10-05
 
 ## 使用与维护
@@ -198,6 +213,8 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 ## 实现条目
 
 ### 农夫乐事砧板单件输入与成品留存
+- 2026-10-22平面物品镜像修正：在最终模型选择（含厨房替换）后，对`!model.isGui3d()`的物品在单件种子旋转之后补偿局部YP 180°，再进入原生ItemRenderer.render(FIXED)。Minecraft的generated.json自带FIXED Y=180°，此前XN平放只保证模型原始+Z朝上，实际应用FIXED后正面朝下、图案左右镜像；仅改外层水平旋转不能消除镜像。三维模型、中心/缩放/层偏移、空项索引和原生插板工具入口不变。每件平面物品增加一次模型属性判断与固定旋转，无新增tick、扫描、I/O、缓存或网络。
+- `CuttingBoardItemsTest`直接调用实际渲染方法，捕获原生render调用前矩阵，再应用Minecraft类路径真实generated.json的FIXED变换及原生居中平移；四向验证三个不对称UV标记点和正面法线，覆盖原料、多成品、厨房桥接开关、三维模型及空项索引。旧变换负对照明确正面朝下且UV左右反向；删除旧独立四元数与轴字符串方向断言。验证：4项实际渲染测试及4项砧板契约通过；独立clean后Forge47.4.10完整build、verifyProductionJar通过，全部297项测试0失败。CodeGraph已收录新增测试；未部署或启动客户端，四向图案/叠层/三维模型实机待复测。
 
 - 2026-10-17水平朝向再纠正：用户实测左右反向，保留正面朝上的XN平放，仅将水平改为YP。真实砧板原生renderer使用YP与负toYRot，炒锅朝向不等于砧板纹理朝向。四向测试同时检查正面法线和左右基向量；砧板仍批量取出，正常背包插入不排除选中快捷栏格。
 - 2026-10-17方向纠正：用户实测输入物品反面朝上；SRG映射与真实炒锅render确认平放是Axis.XN而非XP，朝向是Axis.YN而非YP。砧板原料/成品共用展示改为YN→XN，保留位置、缩放、模型替换。CuttingBoardContractTest读取真实炒锅轴字段，并用四向四元数检查物品正面法线朝上；不影响汤锅或其它工作方块。
@@ -615,12 +632,12 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 | 字段 | 内容 |
 | --- | --- |
 | 功能领域 | 开发者构建流程 |
-| 使用行为 | IDEA 的 Gradle 构建任务和 `gradlew.bat` 共用项目内的 Gradle 8.8 分发缓存；已有完整缓存时，手动构建 JAR 不需要访问 Gradle 分发下载地址。 |
-| 配置入口 | `gradle/wrapper/gradle-wrapper.properties` |
-| 实现链路 | Gradle Wrapper 使用 `PROJECT` 作为分发与压缩包基目录 → 从 `.gradle/wrapper/dists` 查找 Gradle 8.8 → 启动本地分发执行项目任务；`.gradle/` 仍由 `.gitignore` 忽略，不将本机缓存提交到 Git。 |
-| 资源位置 | `.gradle/wrapper/dists/gradle-8.8-bin/`（本地构建缓存） |
-| 验证方法 | 使用 `gradlew.bat --offline --version` 确认 Wrapper 可离线启动，再执行 `gradlew.bat clean build`；核对 Git 状态不包含 `.gradle/`。 |
-| 最后修改 | 2026-08-19，修正 IDEA 手动构建时因用户目录残缺缓存而重复下载 Gradle。 |
+| 使用行为 | IDEA Gradle 构建默认离线读取当前 Gradle 缓存，ForgeGradle 固定为 6.0.54，网络调用设10秒超时；需要更新依赖时在线执行 `gradlew.bat build -PicecoreOnline=true`，随后在 IDEA 重载 Gradle。 |
+| 配置入口 | `settings.gradle`、`build.gradle`、`gradle.properties` |
+| 实现链路 | settings 阶段、插件解析之前设置 Gradle offline；`icecoreOnline=true` 才启用在线解析；ForgeGradle 版本固定，Gradle/JDK HTTP 连接及读取超时为10000ms。Gradle Wrapper 分发使用 `PROJECT` 缓存 `.gradle/wrapper/dists`；`.gradle/` 由 `.gitignore` 忽略。 |
+| 资源位置 | `.gradle/wrapper/dists/gradle-8.8-bin/` 与用户 `GRADLE_USER_HOME`（依赖缓存） |
+| 验证方法 | 默认执行 `gradlew.bat build` 并在初始化断言 `startParameter.offline` 为真；完整构建、测试及 `verifyProductionJar` 通过。 |
+| 最后修改 | 2026-10-21，修正 IDEA 构建反复访问远程仓库。 |
 
 ### 模组加载骨架
 

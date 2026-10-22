@@ -1,4 +1,7 @@
 pluginManagement {
+    // Apply before plugin resolution, including builds launched through IDEA.
+    gradle.startParameter.offline = !providers.gradleProperty('icecoreOnline')
+            .map { it.toBoolean() }.getOrElse(false)
     repositories {
         gradlePluginPortal()
         maven {

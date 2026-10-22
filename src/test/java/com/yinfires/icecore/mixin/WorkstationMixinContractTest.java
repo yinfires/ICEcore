@@ -44,7 +44,8 @@ final class WorkstationMixinContractTest {
         int checked = 0;
         try (var files = Files.list(Path.of("build/classes/java/main/com/yinfires/icecore/mixin"))) {
             Set<String> additional = Set.of("TavernInvalidRecipeMixin.class", "GrillingOilPressMixin.class",
-                    "GrillingCanolaOnlyMixin.class", "CozyCafeNormalFoodTooltipMixin.class", "CozyCafeContainerClassificationMixin.class");
+                    "GrillingCanolaOnlyMixin.class", "CozyCafeNormalFoodTooltipMixin.class", "CozyCafeContainerClassificationMixin.class",
+                    "CozyCafePlatingStationMixin.class", "CozyCafePlatingRendererMixin.class", "CozyCafePlateItemModelMixin.class", "CozyCafeTableMixin.class", "CozyCafeTableRendererMixin.class");
             for (Path path : files.filter(p -> (p.getFileName().toString().startsWith("Workstation")
                     || additional.contains(p.getFileName().toString())) && p.toString().endsWith(".class")).toList()) {
                 ClassNode mixin = new ClassNode(); new ClassReader(Files.readAllBytes(path)).accept(mixin, 0);

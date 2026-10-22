@@ -63,7 +63,7 @@ Last updated: 2026-10-10
 - 交付仅使用完整 `build` 完成且 `verifyProductionJar` 通过的 `build/libs` 成品；不能交付重混淆完成前的JAR或IDE开发包。检查已有客户端包时可执行 `verifyProductionJar -PproductionJar=<绝对路径>`，并比较SHA-256；该任务只读目标包，拒绝仍含映射表中Minecraft开发方法名的生产包。
 - PowerShell 调用 Gradle 时，将 `-D` JVM 系统属性作为完整单引号参数传递，例如 `'-Dnet.minecraftforge.gradle.check.certs=false'`；避免点号参数被拆分为任务名。先核对日志中的任务图，再判断编译结果。
 - 窄验证优先，按风险扩大到完整构建；`clean` 单独执行成功后，再以新的 Gradle 进程执行 `test` 或 `build`，禁止合并在同一命令。纯文档修改使用 UTF-8、内容、引用与 Git 边界检查。
-- IDEA 与命令行使用同一个 Gradle user home；同步反复下载时核对用户 `GRADLE_USER_HOME` 与 IDEA 设置中的 Gradle user home（`gradle.settings.xml` 的 `serviceDirectoryPath`）。不一致时通过 IDEA 设置修改，不直接编辑运行中的配置 XML；版本更新或首次依赖下载属于正常现象，不把历史缓存位置硬编码成项目要求。
+- IDEA 与命令行使用同一个 Gradle user home；同步反复下载时核对用户 `GRADLE_USER_HOME` 与 IDEA 设置中的 Gradle user home（`gradle.settings.xml` 的 `serviceDirectoryPath`）。不一致时通过 IDEA 设置修改，不直接编辑运行中的配置 XML。项目默认在 settings 插件解析前启用离线模式，且固定 ForgeGradle 版本；新增依赖、插件或显式更新时使用 `-PicecoreOnline=true` 在线解析，并保留连接/读取超时。`gradlew.bat build -PicecoreOnline=true` 后可从 IDEA 重载 Gradle，再恢复默认离线构建。
 - 部署新 JAR 前确认目标 Minecraft 客户端/服务端进程已退出，禁止热替换已发现或加载的模组 JAR，避免半旧内容导致假性类缺失。
 - 只有用户明确授权后才启动客户端；授权调试时按构建、退出旧进程、复制 JAR、启动、核对日志/崩溃报告时间戳、定位根因、最小修复的顺序验证。构建成功不能代替实机验收。
 - 服务端发行包排除 world、logs、libraries、本地缓存以及用户/封禁/白名单等运行时数据，只保留必要配置、mods、脚本、图标和启动文件；用户明确要求备份运行数据时另行处理。

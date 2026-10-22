@@ -16,13 +16,13 @@ Last updated: 2026-09-27
 
 - 静态物品缓存不得以quad.isTinted直接拒绝普通生成模型；必须核验真实颜色处理器。sceneHits不得把负缓存回退列表算成几何命中，验收同时检查静态槽、原生槽、提交顶点和前台帧耗时。见ERR-20260924-01第四轮性能复发。
 
-- 容器兼容必须检查真实菜单/能力消费者是否绕过getter，物品use返还须核对主手槽回写时序；保质期冰箱合并容器与CozyCafe脏盘覆盖回归见ERR-20261019-01。
+- 咖啡馆装盘须同时覆盖装盘台生产者、提示与菜单消费者，需求渲染不得替换原生显示上下文；容器兼容必须检查真实菜单/能力消费者是否绕过getter，物品use返还须核对主手槽回写时序；保质期冰箱合并容器与CozyCafe脏盘覆盖回归见ERR-20261019-01。
 
 - Jade常规容器合并只替换容器来源，沿用原生ItemCollector与ContainerItemIterator的空槽过滤、同类/NBT计数和客户端显示规则；不得手工逐格构造ViewGroup或修改数量配置。见ERR-20260924-01的2026-10-18冰箱复发。
 - 垃圾桶等持物左键交互必须覆盖startAttack与continueAttack，并将投入后主手变空的同一次按压持续认领到松键；Forge取消输入仍可能播放方块敲击粒子，不能仅断言setCanceled。真实Minecraft字节码/SRG与生命周期测试见ERR-20261018-01。
 - Dist.CLIENT事件订阅只限定物理侧，不代表事件来自客户端世界；单人游戏服务端事件也会进入。垃圾桶PutPermission必须在两侧防挖监听器首先放行，客户端监听器必须检查level.isClientSide；直接调用两监听器的回归测试见ERR-20261018-01复发。
 - 将原生双侧交互改为服务端权威执行时，必须核对动画状态是否进入更新包，以及客户端加载后启动链；调用服务端AnimationState.start不代表客户端渲染可见。垃圾桶动画同步与时限门禁见ERR-20261018-02。
-- 2026-10-17砧板方向防线升级：四向展示须同时验证正面法线及左右基向量，原生目标方块朝向与参考厨具方向分别核验；仅验证朝上不能证明左右正确。详见ERR-20260924-01最新复发。
+- 2026-10-22砧板镜像防线升级：四向展示须调用实际渲染方法，并叠加最终模型FIXED相机变换，验证不对称UV标记点及正面法线；不得只以外层旋转的法线/基向量证明最终图案正确。详见ERR-20260924-01最新复发。
 - 原生内容必须复用完整执行/绘制链路，包括提示框及Jade标准展示；调用底层绘图工具或复刻颜色不算复用。咖啡馆Tooltip须经GuiGraphics.renderTooltip→Forge Pre→Modern UI接管；见ERR-20261017-01复发升级。
 
 - CozyCafe电脑页面提示复用原生ClientBoundCafeCannotOpenPacket→setErrorMessage区域；通用PlayerFeedback规则不适用于页面反馈。新增原因必须在真实JAR与客户端映射双向核对，CafeHoursCompatibilityTest禁止页面路径引入overlay/title/chat。见ERR-20261017-01。
@@ -120,6 +120,8 @@ Last updated: 2026-09-27
 - 状态：已关闭；首次记录 2026-10-10，复发次数 0。本次仅修改文档。
 
 ### ERR-20261005-01：内存诊断未提前核对采样工具与输出边界
+
+- 2026-10-22咖啡馆任务复发（既有累计再加1）：规划初期完整工具元数据及多文档输出截断，实施时又从包名猜测CozyRegistry路径、在PowerShell数组表达式内串接多命令导致解析失败；编译捕获Placebo传递接口缺失与旧厨房编译依赖中没有新版竹匾类。根因是未在调用前执行整批长度与真实类路径门禁。已改为唯一字符串6000字符拒绝、构建日志落tmp短尾，按真实JAR导入registry.CozyRegistry，补充客户端真实Placebo仅编译依赖，竹匾仅引用已验证BaseBlockEntity。防线升级：CafeTableContractTest逐版读取CozyCafe1.9/1.10实际注入和字段，WorkstationMixinContractTest纳入本次菜单与竹匾入口，保留完整编译检查传递依赖。后续同类任务先读取真实import/父类再写引用，不把旧版编译类存在性等同于新版运行目标存在性。验证为定向契约与编译通过，完整构建继续；适用于本地工具输出与可选模组API核对，状态观察中，未以截断内容宣称验收。
 - 2026-10-21截图修复复发（累计再加1）：混合源码/搜索输出多次截断，部分已知文件仍猜路径，PowerShell误用花括号展开、双引号中的JavaScript转义导致命令拆分。原防线只记在规则、未对每个批次执行长度门禁；后续输出先生成单一out并检查6000字符，超限拒绝，工具发现只取名称，文件定位先用现存目录；含引号脚本使用PowerShell here-string或临时脚本文件，禁止用JSON反斜杠充当Shell转义。已对后续日志批次执行门禁并通过；状态继续观察，不能将截断输出作为读完证据。
 - 2026-10-21配方同步复发（既有累计再加1）：恢复任务时输出完整工具元数据并合并多个文档，未执行6000字符门禁；另从类名猜测兼容类路径、将通配符放入Windows字面路径导致读取失败。后续先构造单批字符串、超限直接拒绝并缩小范围；真实入口以CodeGraph和现存文件确定。防线升级到工具回归：WorkstationMixinContractTest同时校验新增Tavern、Grilling及CozyCafe选择器，包含真实FIELD引用，禁止仅按Workstation前缀漏检。同步工具JAR资源读取使用复制.zip并Expand-Archive到tmp缓存；不再自行解析压缩文件格式。验证为工具4项测试、真实JAR注入契约测试通过以及实际超限拒绝；适用于本地文档/字节码/工具元数据读取，状态继续观察，整套同步未验收。
 
@@ -143,11 +145,13 @@ Last updated: 2026-09-27
 - 2026-10-18垃圾桶任务复发：规划阶段合并工具描述、多文档与大范围搜索导致工具明确截断；实施阶段计数后追加其它输出再次截断。事实证据为该任务工具truncated标记；根因是整批门禁未覆盖追加正文，影响为阅读不完整风险。已按锁定方法重读真实反编译源码并以两版JAR ASM检查原生整组、槽位、反馈及全部生产注入选择器；后续每个底层返回只能有一个先计数的批次，6000字符需至少4000token预算，构建日志落tmp只回读短尾。另曾误将只接受ServerPlayer的区域调整查询用于Player，编译报类型不兼容；纠正为实际双侧持物标记查询，客户端/服务端都保留调整工具优先。禁止猜测辅助类名，查询真实定义后才写调用；TrashCanInteractionTest固定主手持物拦截及服务器校验，WorkstationMixinContractTest覆盖真实JAR选择器。适用边界为工具输出及跨侧接口调用；状态继续观察，不以静态验证替代实机。
 - 同任务SRG语义复核：曾把shrink(count)误判为不会减少输入，并把f_11724_/f_11725_当作物品框声；实际output.tsrg明确m_41774_=shrink、f_11724_=BARREL_CLOSE、f_11725_=BARREL_OPEN。根因是未在解释字节码行为前逐项解码字段/方法，影响为非必要扣减修改和取出声识别错误；已移除扣减重定向，原生扣减完整保留，取出声按BARREL_CLOSE识别。防线：语义判断前必须核对实际SRG符号，TrashCanInteractionTest固定BARREL_CLOSE及无扣减重定向，真实JAR测试保留原生两处shrink调用检查；修改后重新完整build及生产校验。适用边界为生产字节码语义与音效兼容；静态已纠正，实机待授权。
 
-- 2026-10-17 砧板任务复发：规划和实施合并工具描述、多文档及JAR输出，工具明确报告truncated；实施读取还在单段断言后追加输出，违反整批门禁。根因是预算与整批边界未落实，影响为局部规则证据不完整，不能据此宣称已读完。正确做法：锁定源码后按单独完整批次回读，实际API以JAR契约验证；每个文档/源码调用只输出一个统一计数的批次，超过6000字符拒绝，预算至少4000token，工具发现仅名称。防线验证：本任务后段调用使用6000字符拒绝门禁，新增CuttingBoardContractTest与现有真实JAR选择器测试验证实现而非依赖截断文本。适用边界为工具/规则/源码输出；状态继续观察，复发计数在既有累计基础上加1，不以本次静态验证宣称已关闭。
+- 2026-10-17 砧板任务复发：规划和实施合并工具描述、多文档及JAR输出，工具明确报告truncated；实施读取还在单段断言后追加输出，违反整批门禁。根因是预算与整批边界未落实，影响为局部规则证据不完整，不能据此宣称已读完。正确做法：锁定源码后按单独完整批次回读，实际API以JAR契约验证；每个文档/源码调用只输出一个统一计数的批次，超过6000字符拒绝，预算至少4000token，工具发现仅名称。防线验证：本任务后段调用使用6000字符拒绝门禁，新增CuttingBoardContractTest与现有真实JAR选择器测试验证实现而非依赖截断文本。适用边界为工具/规则/源码输出；状态继续观察，复发计数在既有累计基础上加1，不以本次静态验证宣称已关闭。- 2026-10-22砧板后续任务输出防线再复发（累计再加1）：规划初轮完整工具元数据及大范围文档输出、实施完整构建的警告输出触发truncated。根因是已有6000字符门禁未覆盖工具发现与构建进程结果。影响为证据缺失，未据截断输出宣称构建通过。正确做法及强化防线：工具发现仅输出名称；长文档先定位再计数分片；完整构建从启动时重定向tmp/cutting-board-build.log，后续只读取短尾和精确错误匹配。已以该日志重新执行构建并检查结果，关键模型与渲染证据另由实际render回归覆盖。适用边界为工具、文档与构建输出，状态观察中，实机未验。
 
 - 2026-10-17 扳手依赖任务复发（累计至少15次）：规划首轮合并完整工具描述和多文档造成截断，实施阶段又在单段长度断言后追加其它段，低token预算导致截断。根因是门禁未覆盖整个底层返回值；影响为阅读证据不完整。正确做法与升级防线：每个底层工具调用仅输出一个统一计数的批次，最多6000字符、至少4000 token预算；超限拒绝并拆分，工具发现只输出名称。验证：本次关键代码与规则已按锁定范围重读，构建日志落tmp后仅读取短尾部；适用边界为文档、代码、工具与日志输出，状态继续观察，不能以局部断言宣称防线闭环。
 
 - 2026-10-17 同任务JUnit夹具复发：Mockito模拟BlockState/Block同样触发注册表初始化，JUnit XML明确记录Cannot instrument class Block和Not bootstrapped，导致5项测试无法执行。根因是误以为模拟方块类型不会加载静态依赖；影响仅为验证失败。正确做法：遵守生效规则中的普通JUnit引导限制；防线扩展到模拟对象，禁止mock方块/方块状态以绕过游戏引导，邻格遍历使用可控判定回调测试，真实列表/标签与拆除调用由规则契约覆盖，实机行为单独验收。已移除失败夹具，BuildingDependencyTest与BuildingInteractionContractTest共8项通过；适用边界为非游戏测试进程，完整构建与实机结论分别记录，状态为夹具已修正、实机待授权。
+
+- 2026-10-22纠正任务输出防线再次触发：合并读取规则/索引及工具描述超过预算，未在每个返回前执行字符门禁，发生截断。原仅按行限制的防线失效；后续所有文档与字节码批次先构造字符串，超过6000字符即拒绝，预算至少4000，不混入其它输出；本轮已改为锁定文件小范围与真实测试结果，不能将先前截断视为完整阅读。状态：输出约束持续生效。
 
 #### 2026-10-17 交互限制任务：长输出防线复发补充
 - 2026-10-18描述四分区规划复发：首批完整工具元数据与多文档、宽关键词结果超过预算并出现truncated，旧门禁未在首批输出执行；本轮重复目标delete/add补丁亦被apply_patch整批拒绝，无部分写入。根因仍为整批输出门禁未前置及重复补丁目标；影响为阅读证据不完整和无效工具调用。正确做法：缩小UTF-8范围重读相关条目，工具只发现实际所需参数，先构造单批并拒绝超6000字符；同一路径只使用一次Update或写入，新增测试文件先确认父目录。防线继续沿用并加强开发规则的单批长度检查，JAR入口改由直接ASM回归验证；实际超限批次被拒绝，描述窄测试已通过，不据截断输出建立API结论。适用边界为工具发现、文档/字节码读取及补丁构造，状态继续观察。
@@ -773,22 +777,22 @@ Last updated: 2026-09-27
 - 适用边界：适用于 ICEcore 仍在整理的当前版本条目；正式对外发布后日期以实际发布日期为准，后续纯文字润色不应反复改动已确定的发布日期。
 - 关联项：[更新日志编写要求](changelog-guidelines.md)、[根目录更新日志](../CHANGELOG.md)、[项目工作区规则](../AGENTS.md)。
 
-### ERR-20260819-05：IDEA 构建依赖残缺的全局 Gradle 分发缓存
+### ERR-20260819-05：IDEA 构建重复下载与插件仓库停滞
 
 - 类型：规范错误
-- 状态：已关闭
+- 状态：2026-10-21防线已升级并通过完整构建，继续观察
 - 首次发生：2026-08-19
-- 最近复发：无
-- 复发次数：0
-- 触发场景：在 IDEA 中手动执行 ICEcore 的 Gradle 构建任务生成模组 JAR 时，Gradle 仍尝试下载 8.8 分发包。
-- 事实证据：原 `gradle/wrapper/gradle-wrapper.properties` 使用 `distributionBase=GRADLE_USER_HOME`、`distributionPath=wrapper/dists` 和 `https://services.gradle.org/distributions/gradle-8.8-bin.zip`；当前用户缓存 `C:\Users\yinfire\.gradle\wrapper\dists\gradle-8.8-bin\dl7vupf4psengwqhwktix4v1` 只有 0 字节的 `.part` 与 `.lck` 文件，没有 `gradle-8.8` 分发目录。`.idea/gradle.xml` 将项目链接到 IDEA 的 Gradle 集成，因此手动构建会再次经过 Wrapper。
-- 根因：项目 Wrapper 把 Gradle 分发放在用户全局缓存中；该缓存下载中断后没有可启动的本地分发，IDEA 每次构建都会重新尝试下载。
-- 影响：网络不可用或下载地址不可达时，IDEA 手动构建 JAR 被无关的 Gradle 分发下载阻塞；不同项目的全局缓存状态还会互相影响。
-- 正确做法：将 Wrapper 分发与压缩包基目录设为项目的 `.gradle/wrapper/dists`，并在当前工作区预置完整的 Gradle 8.8 本地分发；不写入绝对路径，也不把本地缓存提交到 Git。
-- 防复发措施：已将 `gradle/wrapper/gradle-wrapper.properties` 固定为 `PROJECT` 分发缓存；`.gradle/` 已在 `.gitignore` 中忽略；`docs/content-implementation.md` 新增构建入口、缓存位置和离线验证方法。
-- 验证：使用 `gradlew.bat --offline --version` 确认 Wrapper 从项目 `.gradle/wrapper/dists` 启动；使用 `gradlew.bat clean build` 确认基线构建通过；检查 `git status --short --ignored`，确认 `.gradle/` 被忽略且没有新增跟踪文件。
-- 适用边界：适用于当前工作区及已经准备好项目本地 Gradle 8.8 分发的 IDEA/命令行构建；全新克隆若没有复制本地分发，首次仍需通过网络或其它受控方式准备 Gradle 8.8，项目配置本身不携带 Gradle 二进制。
-- 关联项：[IDEA 与 Gradle 本地构建](content-implementation.md#idea-与-gradle-本地构建)、`gradle/wrapper/gradle-wrapper.properties`。
+- 最近复发：2026-10-21
+- 复发次数：1
+- 触发场景：IDEA手动构建JAR仍访问远程仓库，而用户预期直接用已有本机缓存构建。
+- 事实证据：2026-10-21 IDEA日志显示项目由Gradle 8.8启动，`D:\GradleHome` 含Gradle 8.8及ForgeGradle 6.0.54缓存；`.idea/gradle.xml` 未指定独立Gradle user home，IDEA全局设置与进程 `GRADLE_USER_HOME` 均指向 `D:\GradleHome`。项目插件版本原为动态范围 `[6.0,6.2)`，Gradle不保证离线解析；ForgeGradle检查还可能发起网络连接。
+- 根因：Wrapper分发缓存已修复，但只把命令行写成offline不足以约束IDEA Gradle Tooling API；动态插件版本保留远程解析空间，ForgeGradle环境检查也可能联网。
+- 影响：IDEA构建因网络检查或重复解析停滞，不能及时产出JAR。
+- 正确做法：在 `settings.gradle` 的 `pluginManagement` 阶段、插件解析之前默认设置offline；固定为本机已缓存的ForgeGradle 6.0.54；只在明确更新依赖时传入 `-PicecoreOnline=true`，并保留有限连接/读取超时。
+- 防复发措施：设置阶段offline门禁、固定插件版本、Gradle HTTP及ForgeGradle HTTPS 10秒超时；在线更新必须显式开启，完成后恢复默认离线使用。详见 [IDEA 与 Gradle 本地构建](content-implementation.md#idea-与-gradle-本地构建)。
+- 验证：默认 `gradlew.bat build` 的初始化断言确认offline标记，完整Forge 47.4.10构建、测试和 `verifyProductionJar` 通过；`.gradle/`继续被忽略。
+- 适用边界：对已有所需依赖缓存的本机IDEA/Wrapper构建生效；新增依赖、插件版本升级、首次克隆缺缓存时显式在线解析。
+- 关联项：[IDEA 与 Gradle 本地构建](content-implementation.md#idea-与-gradle-本地构建)、`settings.gradle`、`build.gradle`、`gradle.properties`。
 
 ### EXP-20260819-01：CozyCafe 菜单结果音效不能依赖状态值变化
 
@@ -1137,6 +1141,7 @@ Last updated: 2026-09-27
 - 2026-10-17 砧板方向复发：用户实测输入物品展示反面；当前代码Axis.XP/YP与实际炒锅f_252495_(XN)、f_252392_(YN)不符，output.tsrg可复现核对。根因是反编译轴字段未映射核验，旧测试只检查90°而未校验正负轴；影响是输入与成品展示翻面、朝向错误。正确做法为本次砧板展示改YN→XN，保留其余变换。防线升级：CuttingBoardContractTest直接读取实际炒锅字段、拒绝XP/YP，并对四个朝向验证正面法线朝上；以后参考变换必须同时核对轴正负和乘法顺序。验证为定向测试、完整build和生产映射检查，实机四向需用户复测；适用边界为本次炒锅同款砧板物品展示，未改其它已存实现。状态为方向已修正、实机待验，计入原记录复发而非新增重复条目。
 
 - 2026-10-17左右方向再次复发，原记录累计复发再加1：用户确认正面修正后左右反向。事实证据为砧板当前YN水平旋转，而实际砧板renderItemLayingDown使用f_252436_(YP)；旧检查仅法线朝上，不能区分左右。根因是将参考炒锅朝向等同于目标砧板纹理方向，影响为水平左右错误。正确做法保留XN平放、水平适配为YP，上一条禁止YP的结论被本条取代。防线升级：CuttingBoardContractTest核对真实砧板YP字段、真实炒锅XN字段，并验证四向正面法线与左右基向量；生效规则明确要求目标/参考方向分别核验。验证：定向测试通过，最终build与生产映射校验完成后记录于实现索引；适用边界为本次砧板物品展示，状态静态修正、实机仍待用户复测。
+- 2026-10-22平面砧板镜像复发，原记录累计复发再加1：用户确认普通平面物品仍呈镜像。事实证据：CuttingBoardItems使用XN平放，ItemRenderer通过ForgeHooksClient.handleCameraTransforms应用模型FIXED，而Minecraft generated.json的fixed.rotation=[0,180,0]；完整组合使图标原始+Z朝下、UV右向反转。根因：此前测试独立构造外层四元数，没有执行实际渲染函数或应用模型相机变换，水平YP修正仅改变朝向，未消除镜像。影响：原料和成品平面图案左右颠倒。正确做法：最终模型非gui3d时在单件种子旋转之后增加局部YP 180°，仍走原生FIXED渲染；三维模型不变。防复发：生效规则升级为完整变换检查，CuttingBoardItemsTest调用实际render，读取类路径真实generated.json并验证四向不对称UV标记点/法线、原料/成品、厨房桥接、三维及空槽；旧变换负对照验证朝下与左右反向。适用边界：普通generated平面物品，特殊自定义相机变换/自定义渲染器不据此保证。状态：修正已实现，定向测试与最终构建结果见内容实现索引；实机待用户复测，不以静态通过宣称实机闭环。
 
 
 ### ERR-20260925-01：外部流体兼容遗漏桶装/倒出音效回退
@@ -1295,6 +1300,21 @@ Last updated: 2026-09-27
 - 状态：已修正；游戏内补全未启动客户端验证。
 
 ### ERR-20261019-01：保质期容器绑定与原生返还时序遗漏
+
+- 同轮验证补充：整派资源契约不能假设所有派继承template_pie；真实巧克力派为block/block父级并自带elements。检查实际模型几何或父模型链，不能以同类命名猜共用父级。
+
+- 2026-10-22普通物品与整派复发（追加1次）：用户截图显示普通食物和三明治仍穿盘/盖边。原防线仅测试BlockItem拟合，普通物品被block方法返回false及item mixin的instanceof过滤放回原生固定高度；整派物品为普通item，不能仅按BlockItem判断有无方块。Forge BakedModelWrapper的getRenderPasses委托也可能让归一几何失效，必须返回归一模型自身；ItemRenderer在applyTransform后固定中心平移-.5，归一模型必须反向补偿，测试完整渲染矩阵而非仅归一quad。修正三入口共用CafePlatedFoodModels，对最终旋转后的所有几何计算minY和宽深，方块/普通物品一律拟合；真实FD1.3.4 pumpkin_pie/apple_pie等blockstates证明整派模型来源。防线：CafePlatedFoodModelsTest直接转换真实BakedQuad，覆盖负底部、偏移、FIXED变换、方块/普通物品、pass保留，JAR契约保持两版入口检查；资源缓存512/2048键并重载失效。适用边界静态baked物品/方块，自定义无quad渲染无法用静态边界证明；不得宣称实机已验。状态：47.4.10与47.4.28完整构建、307项回归和生产JAR检查通过，实机待验。
+
+- 2026-10-22手持餐盘复发（追加1次）：用户截图放置蛋糕已有盘沿，手持蛋糕仍盖盘。证据：ServingPlateModel.getQuads对方块使用原尺寸与yoffset=-.1，独立于GeneralUtils展示入口；上一防线只覆盖世界菜单/装盘台，遗漏原生item overrides合成。正确做法：在原生合成模型保留plateModel和原显示上下文，方块食物改为同一plateScale、真实bounds居中及盘顶+.001；共享2048键缓存且资源重载失效，不在每帧/每个新合成实例重做顶点转换。防线：两版CafeTableContractTest和WorkstationMixinContractTest加入ServingPlateModel字段、五参getQuads入口契约，既有数值测试覆盖盘沿与最低点；每次改餐盘布局必须检查菜单、装盘台及物品合成三入口。适用边界为完整baked方块模型，普通图标保持原生；手持视觉待实机复验。状态：47.4.10独立clean完整构建与306项回归通过，手持实机待验。
+
+- 2026-10-22盘底/光照与菜单语义追加：截图显示完整蛋糕方块过大、变暗，用户进一步明确冲突指底部穿盘。真实GeneralUtils.renderFood以菜单/装盘台坐标tesselateBlock采样世界AO；旧逻辑固定y=.1或1.11，无视模型minY和盘顶，允许底面穿盘。改用原生renderSingleBlock并传入展示packedLight，按实际block bounds居中、最大水平12/16、比例不超过.9、底部盘顶+.001；菜单和装盘台共同重定向，真实餐盘资源1..15与0..2及装盘台FIXED变换作为尺寸证据。默认测试覆盖方块范围和盘状态，JAR契约覆盖两入口。用户最新要求覆盖此前计划：非饮料返还隐藏菜单，饮料返还保留菜单，统一CafeDisplayRules并测餐盘/饮料/空桌。测试不直接引用compileOnly CozyCafe类型，纯规则与JAR契约分开；首次编译/运行暴露缺失依赖已修正。适用边界：静态baked模型，无quad模型使用保守单位边界；真实亮度、底部与盘沿需授权实机检查。状态：47.4.10独立clean完整构建与305项回归通过，实机视觉待验。
+
+- 2026-10-22装盘位置再次复发（追加1次）：截图显示餐盘居中而食物偏至饮料侧。真实Renderer只对getCurrentCourse()==2使用中央变换，其它课程统一侧边；前次新增甜品装盘许可后仍原样依赖课程，遗漏实际餐盘与订单类别可分离。修正仅重定向渲染读取，依据成功上菜保存的tablePlated选择原生中央分支，不改变服务端课程；实际饮料保留侧边。防线升级：枚举0..4课程调用真实displayCourse并验证餐盘/饮料/原生回退三种结果，两版CozyCafe真实JAR检查getCurrentCourse调用点。适用边界为已记录上菜状态的现有菜单，视觉效果待实机复验。状态：代码与自动防线修正，未启动客户端。
+
+- 2026-10-22装盘与展示复发升级（追加1次）：用户实测面包/蛋糕无法装盘、已有器皿仍可装盘、冷肉需求图标过大、桌面图标悬空与返还菜单消失。真实CozyCafe1.9/1.10的PlatingStationBlockEntity.handlePlating仍独立限制MAIN且非bowlFood，原防线仅覆盖上菜消费者，遗漏装盘生产者。需求Renderer原生使用GROUND，旧重定向切换FIXED；generated的GROUND为0.5、FIXED为1，叠加外层1.5后造成两倍尺寸。固定.25/.45抬高未计算相机变换与透明像素；pending无条件隐藏菜单、返还物另走直立路径造成姿态/菜单回归。
+  - 正确做法与防线：装盘台、提示、菜单共用CafeServingRules；盘内存储使用原生createPlatedFood，取回先模拟背包；不拦截需求renderStatic上下文。CafeModelBounds按实际applyTransform和ItemRenderer中心平移后的最低顶点计算贴底，对generated正反面按非透明像素UV裁剪；按模型/上下文缓存、512模型上限、资源重载清空。饮料返还完整复用真实原生饮料分支变换及GeneralUtils入口；pending保留菜单，客户端NBT刷新模型数据。
+  - 可执行验证：CafeTableContractTest逐项核对两版真实装盘台注入与字段、原生GROUND和四道generated模型无display覆盖；CafeDisplayRegressionTest执行统一装盘矩阵、最终变换最低点和缓存命中/失效；WorkstationMixinContractTest默认扫描新增装盘台。实际tag与器皿解析仍复用现有服务；不以模拟矩阵证明整合包运行分类。测试初始化须按项目现有Minecraft bootstrap入口，不在无Forge加载器环境静态mock容器解析器（会触发Bindings空模块层）。适用边界：CozyCafe1.9/1.10及当前模型；动态自定义渲染器无baked几何时保守不补偏移，视觉/交互四向、透明留白、饮料倾斜仍待授权实机验收。状态：实现与自动防线升级，运行验收未完成。
+- 2026-10-22上菜生命周期防线补充：真实1.10 handleServe先shrink手持再RETURN，故最后一张盘消耗后不能再用hand.is判断是否装盘；本次实现首轮在检查时发现该假设，已改为入口捕获incomingPlate，成功后才提交。原生tick在换餐弹出droppedItem且closeMenu清eatingItem，必须在完成与关闭入口先迁移待取器皿，并暂停未清桌订单等待。防复发：CafeTableContractTest检查两版真实生产方法、返回物非掉落与入口捕获边界，普通破坏和扳手路径共同执行非空菜单保护，竹匾先模拟容量再扣实收数量。自动验证不代表完整实机生命周期已验收；碗/杯/瓶/茶杯、满背包和关店重载继续列待验。
 
 - 触发与证据：用户反馈冰箱不保鲜、创造提示闪显、餐盘取下脏盘消失。CFB16.0.15 getCombinedContainer直接读取container字段，未调用getContainer；CozyCafe1.10 ServingPlateItem.use在第二次Inventory.add前shrink主手，原生use返回已空plateStack。
 - 根因与影响：只核验注入目标存在，未核对消费者实际调用链及原生使用结果回写，产生暂停绑定遗漏及同手槽返还覆盖；仅Player创造标志不能覆盖客户端模式同步顺序。

@@ -1,4 +1,6 @@
 {
+  "message.icecore.cafe.inventory_full": "背包已满，请腾出空间",
+  "message.icecore.cafe.no_plating": "此物品无需装盘，可直接上菜",
   "tooltip.icecore.food_category.main": "主食",
   "tooltip.icecore.food_category.drink": "饮品",
   "tooltip.icecore.food_category.dessert": "点心",

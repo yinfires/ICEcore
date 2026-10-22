@@ -42,7 +42,7 @@ public final class RecipeManagerTooltips {
         }
         if(entry.price()!=null) {
             lines.add(index++,Component.translatable("tooltip.icecore.food_price",entry.price()).withStyle(ChatFormatting.GRAY));
-            if(!com.yinfires.icecore.workstation.WorkstationContainerCompat.hasServingVessel(stack))
+            if(com.yinfires.icecore.compat.cozycafe.CafeServingRules.requiresPlate(stack, entry.category().equals("drink")))
                 lines.add(index,Component.translatable("tooltip.icecore.food_plating").withStyle(ChatFormatting.GRAY));
         }
     }

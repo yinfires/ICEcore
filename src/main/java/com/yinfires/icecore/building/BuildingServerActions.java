@@ -120,6 +120,11 @@ public final class BuildingServerActions {
         int contentFingerprint = structureContentFingerprint(level, state, keyPosition);
         boolean hasContent = structureHasContent(level, state, keyPosition);
         if (hasContent) {
+            if (level.getBlockEntity(keyPosition) instanceof com.yinfires.icecore.compat.cozycafe.CafeTableAccess) {
+                clearRemovalConfirmation(player);
+                PlayerFeedback.show(player, net.minecraft.network.chat.Component.translatable("icecore.build.container_not_empty"));
+                return false;
+            }
             if (!player.isShiftKeyDown()) {
                 clearRemovalConfirmation(player);
                 PlayerFeedback.show(player, net.minecraft.network.chat.Component.translatable("icecore.build.container_not_empty"));

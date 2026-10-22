@@ -34,6 +34,8 @@ public final class CuttingBoardItems {
             pose.mulPose(Axis.ZP.rotationDegrees(i * angle));
             var model = cookery
                     ? CuttingBoardCookeryModel.model(entity, item) : renderer.getModel(item, entity.getLevel(), null, 0);
+            // FIXED generated-item transforms turn the sprite around; keep its front facing up.
+            if (!model.isGui3d()) pose.mulPose(Axis.YP.rotationDegrees(180));
             renderer.render(item, ItemDisplayContext.FIXED, false, pose, buffer, light, overlay, model);
             pose.popPose();
         }

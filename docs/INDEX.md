@@ -6,6 +6,7 @@ Last updated: 2026-10-10（工作区规则独立维护，补充本地开发与�
 
 | 任务类型 | 必读文档 | 读取范围 |
 | --- | --- | --- |
+| CozyCafe上菜、装盘、桌面器皿清桌与竹匾背包取出 | [内容实现索引](content-implementation.md)、[容器兼容](workstation-container-compatibility.md) | 读取2026-10-22上菜条目，核对共享装盘判定、待取器皿持久化、禁止非空菜单强拆、正常背包容量模拟和两版真实JAR契约 |
 | 配方管理器同步与16类设备转换 | [配方管理器同步](recipe-manager-sync.md)、[工作方块容器兼容](workstation-container-compatibility.md) | 读取命令、旧脚本清理、设备数量/时长、葡萄杯桶容量和截图待测清单；生成成功不代表游戏可制作 |
 | Spoiled 按天保质期、过期物品、冰箱与餐盘 | [内容实现索引](content-implementation.md)、[时间系统](time-system.md)、[容器兼容](workstation-container-compatibility.md) | 读取“按游戏天保质期与过期物品”；名单来源为根目录 AGENTS.md 记载的配方管理系统，使用配置见 Wiki《保质期与过期物品》 |
 | 农夫乐事砧板输入、加工、成品留存与取回 | [内容实现索引](content-implementation.md)、[工作方块容器兼容](workstation-container-compatibility.md) | 读取“农夫乐事砧板单件输入与成品留存”，核对原生结果重定向、容器元数据和批量取回；操作说明见Wiki《农夫乐事砧板》 |
