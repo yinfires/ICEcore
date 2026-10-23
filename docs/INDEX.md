@@ -1,11 +1,12 @@
 # ICEcore 文档索引
 
-Last updated: 2026-10-10（工作区规则独立维护，补充本地开发与调试要求）
+Last updated: 2026-10-23（顾客与共享经营机制）
 
 本文件是 `docs/` 的唯一阅读入口。开始任务时先确定任务类型，只读取对应文档；禁止为了“了解项目”而全量读取目录。
 
 | 任务类型 | 必读文档 | 读取范围 |
 | --- | --- | --- |
+| CozyCafe顾客类型、口味点餐、共享声望、小费、每日客流与H查询 | [顾客与经营机制](cafe-customer-flow-design.md)、[内容实现索引](content-implementation.md)、[使用说明](../wiki/咖啡馆顾客与经营.md) | 已接入；读取本次规则、服务端配置、持久化、真实组件适配和自动/实机验证边界；替代原未实现客流方案 |
 | CozyCafe上菜、装盘、桌面器皿清桌与竹匾背包取出 | [内容实现索引](content-implementation.md)、[容器兼容](workstation-container-compatibility.md) | 读取2026-10-22上菜条目，核对共享装盘判定、待取器皿持久化、禁止非空菜单强拆、正常背包容量模拟和两版真实JAR契约 |
 | 配方管理器同步与16类设备转换 | [配方管理器同步](recipe-manager-sync.md)、[工作方块容器兼容](workstation-container-compatibility.md) | 读取命令、旧脚本清理、设备数量/时长、葡萄杯桶容量和截图待测清单；生成成功不代表游戏可制作 |
 | Spoiled 按天保质期、过期物品、冰箱与餐盘 | [内容实现索引](content-implementation.md)、[时间系统](time-system.md)、[容器兼容](workstation-container-compatibility.md) | 读取“按游戏天保质期与过期物品”；名单来源为根目录 AGENTS.md 记载的配方管理系统，使用配置见 Wiki《保质期与过期物品》 |
@@ -18,7 +19,7 @@ Last updated: 2026-10-10（工作区规则独立维护，补充本地开发与�
 | 任意任务开工、规范错误复盘、经验沉淀 | [工作区规范错误与经验总结](workspace-errors-and-lessons.md) | 每次先读“生效中的防复发规则”；仅在任务命中相应类别或需要写入时读具体记录与模板 |
 | CozyCafe电脑页面提示、操作失败与开店限制 | [项目规则](../AGENTS.md)、[内容实现索引](content-implementation.md)、[错误与经验](workspace-errors-and-lessons.md) | 读取页面反馈例外、营业时间条目和ERR-20261017-01；复用完整原生电脑提示和Modern UI接管，不使用通用底部反馈或底层自绘 |
 | Yuushya入世声明、CozyCafe营业时间与夜间关店 | [内容实现索引](content-implementation.md) | 读取“Yuushya 入世声明与 CozyCafe 营业时间”；时间语义见 time-system.md，长期使用说明见Wiki菜单与顾客座位页 |
-| 咖啡馆客流量设计、每日额度、开店快照与多人生成节奏 | [客流量计算方案](cafe-customer-flow-design.md)、[内容实现索引](content-implementation.md) | 先读设计的额度来源、快照边界、计时上限与接纳规则；设计尚未实现，当前行为仍以实现索引中的 CozyCafe 条目为准 |
+| 咖啡馆客流量设计、每日额度、开店快照与多人生成节奏 | [客流量计算方案](cafe-customer-flow-design.md)、[内容实现索引](content-implementation.md) | 已接入；读取额度来源、快照边界、计时上限与接纳规则；显示修正与实机验收边界见对应实现条目 |
 | 厨具统一、雪克杯饮料扩展、料理台食品迁移 | [厨具统一静态核对](kitchen-unification-audit.md) | 读取雪克杯输入/倒出限制及寿司、拼盘、团子串三例；区分静态审计与未完成的运行验收 |
 | 工作方块桶、瓶、碗兼容，容器返还、盛取、提示或声音 | [工作方块容器兼容](workstation-container-compatibility.md) | 读取共用服务、数据包格式、解析优先级、交互矩阵、槽位元数据和验证要求；禁止在新工作方块重复写死容器逻辑 |
 | SmartKeyPrompts / KubeJS 自定义按键提示 | [KubeJS 提示编写方法](smartkeyprompts-kubejs.md) | 接口绑定、END 转发、缓存生命周期、类过滤与 Rhino 验证；版本变化重新核对 |

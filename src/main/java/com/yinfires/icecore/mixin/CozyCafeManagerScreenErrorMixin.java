@@ -33,6 +33,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Pseudo
 @Mixin(targets = "io.github.chakyl.cozycafe.gui.CafeManagerScreen", remap = false)
 public abstract class CozyCafeManagerScreenErrorMixin implements com.yinfires.icecore.compat.cozycafe.client.CafeFeedbackResources {
+    @Shadow private net.minecraft.world.item.ItemStack hoveredItemToRender;
+    @Redirect(method="m_88315_(Lnet/minecraft/client/gui/GuiGraphics;IIF)V",at=@At(value="INVOKE",target="Lnet/minecraft/client/gui/GuiGraphics;m_280677_(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;II)V"))
+    private void icecore$itemTooltip(GuiGraphics graphics, Font font, java.util.List<Component> ignored,
+            java.util.Optional<net.minecraft.world.inventory.tooltip.TooltipComponent> image,int x,int y){
+        graphics.renderTooltip(font,hoveredItemToRender,x,y);
+    }
     @Shadow private Component errorMessage;
     @Shadow private int errorDisplayTicks;
     @Shadow private ImageButton toggleOpenButton;
@@ -49,6 +55,12 @@ public abstract class CozyCafeManagerScreenErrorMixin implements com.yinfires.ic
     private void icecore$validMenuSeatHud(Byte code, CallbackInfo callback) {
         icecore$errorStarted = System.nanoTime();
         icecore$cachedError = null;
+        if (code != null && (code == 7 || code == 8)) {
+            errorMessage = Component.translatable(code == 7 ? "icecore.cafe.no_customers" : "icecore.cafe.requires_main");
+            errorDisplayTicks = 120;
+            callback.cancel();
+            return;
+        }
         if (code != null && (code.byteValue() == 5 || code.byteValue() == 6)) {
             errorMessage = Component.translatable(code.byteValue() == 5
                     ? "icecore.cozycafe.no_valid_menu_seat" : "icecore.cozycafe.closed_hours");

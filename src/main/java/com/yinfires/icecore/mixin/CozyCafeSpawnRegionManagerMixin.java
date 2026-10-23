@@ -88,34 +88,26 @@ public abstract class CozyCafeSpawnRegionManagerMixin extends BlockEntity {
     private void icecore$allowRegionOpening(ServerPlayer player, CallbackInfoReturnable<Boolean> cir) {
         if (!(level instanceof ServerLevel serverLevel)
                 || !CozyCafeSpawnRegionService.hasValidRegion(serverLevel, worldPosition)) return;
-        int stars = getStarsFromReputation();
-        int required = CozyCafe.CONFIG.menuSizePerStar.get();
-        if (menu == null || (stars == 0 && menu.size() < required)) {
-            EvilPacketsIHateThem.sendToPlayer(new ClientBoundCafeCannotOpenPacket((byte) 1), player); cir.setReturnValue(false);
-        } else if (menu.size() < required * stars) {
-            EvilPacketsIHateThem.sendToPlayer(new ClientBoundCafeCannotOpenPacket((byte) 2), player); cir.setReturnValue(false);
-        } else if (CozyCafe.CONFIG.dailyLimit.get() && dayLastOpened == GeneralUtils.getDay(level)) {
-            EvilPacketsIHateThem.sendToPlayer(new ClientBoundCafeCannotOpenPacket((byte) 3), player); cir.setReturnValue(false);
-        } else if (hasNearbyOpenManagers()) {
-            EvilPacketsIHateThem.sendToPlayer(new ClientBoundCafeCannotOpenPacket((byte) 4), player); cir.setReturnValue(false);
-        } else if (!CozyCafeSeatingService.hasAnyValidMenu(serverLevel,
-                getFirstPos(getBlockState(), worldPosition), getSecondPos(getBlockState(), worldPosition))) {
-            // This mixin exits canBeOpened early for custom entrances, so the common RETURN hook
-            // is not guaranteed to run.  Apply the same structural menu/seat check here; route
-            // warmup is deliberately not part of opening validation.
-            EvilPacketsIHateThem.sendToPlayer(new ClientBoundCafeCannotOpenPacket((byte) 5), player);
-            cir.setReturnValue(false);
-        } else {
-            // The common RETURN hook performs the single structural menu-seat validation and starts
-            // bounded route warmup. A custom entrance replaces only the missing-sign condition.
-            cir.setReturnValue(true);
+        CafeManagerBlockEntity manager=(CafeManagerBlockEntity)(Object)this;
+        byte failure=com.yinfires.icecore.compat.cozycafe.customer.CafeCustomers.openingFailure(manager);
+        if(failure<0){
+            ((com.yinfires.icecore.compat.cozycafe.customer.CafeCustomerManagerAccess)manager).icecore$restoreCustomerRoutes();
+            if(CozyCafeSeatingService.snapshotMenus(serverLevel,worldPosition).isEmpty())failure=5;
         }
+        if(failure>=0)EvilPacketsIHateThem.sendToPlayer(new ClientBoundCafeCannotOpenPacket(failure),player);
+        cir.setReturnValue(failure<0);
     }
 
     @Inject(method = "setOpen(ZZ)V", at = @At("HEAD"), cancellable = true, remap = false)
     private void icecore$setOpenWithoutSign(boolean value, boolean forceClose, CallbackInfo ci) {
         if (!(level instanceof ServerLevel serverLevel)
                 || !CozyCafeSpawnRegionService.hasValidRegion(serverLevel, worldPosition)) return;
+        CafeManagerBlockEntity manager=(CafeManagerBlockEntity)(Object)this;
+        if(value&&!open){
+            if(com.yinfires.icecore.compat.cozycafe.customer.CafeCustomers.openingFailure(manager)>=0){ci.cancel();return;}
+            if(!CozyCafeSeatingService.hasRouteSnapshot(serverLevel,worldPosition))((com.yinfires.icecore.compat.cozycafe.customer.CafeCustomerManagerAccess)manager).icecore$restoreCustomerRoutes();
+            com.yinfires.icecore.compat.cozycafe.customer.CafeCustomers.opened(manager);
+        }else if(!value&&open)com.yinfires.icecore.compat.cozycafe.customer.CafeCustomers.closed(manager);
         open = value;
         setChanged();
         level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);

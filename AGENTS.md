@@ -4,6 +4,8 @@
 
 ## 项目边界
 
+- 用户未明确要求时，不得自行新增玩家可见文本，包括界面文字、提示行与实体头顶名称；实现所需的内部状态不得擅自转为额外展示。
+
 - 项目固定为 Minecraft 1.20.1 Forge 模组；mod ID 为 `icecore`，Java 包根为 `com.yinfires.icecore`，Java 目标版本为 17。
 - 客户端固定路径为 `D:\Minecraft\PCL启动器\.minecraft\versions\异次元餐厅`；NPC/任务/教程等可自定义内容统一写入客户端目录，模组只提供方法。
 - 配方管理系统固定位置为 `D:\Minecraft\Mod Develop\recipe-manager`；物品分类与配方以其 `public/data/recipe-manager.json` 正式数据为准，基础食材、加工品和成品菜按正式标签识别。

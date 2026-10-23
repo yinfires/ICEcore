@@ -45,6 +45,7 @@ public final class ICECore {
         }
         modBus.addListener(ModMixing::clientSetup);
         if (ModList.get().isLoaded("cozycafe")) {
+            com.yinfires.icecore.compat.cozycafe.customer.CafeCustomerEvents.register();
             com.yinfires.icecore.compat.cozycafe.seating.CozyCafeSeatingEvents.register();
         }
         if (ModList.get().isLoaded("cozycafe") && ModList.get().isLoaded("kaleidoscope_tavern")) {

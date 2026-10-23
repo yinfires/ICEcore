@@ -84,15 +84,26 @@ public final class CozyCafeSeatingService {
     public static boolean buildRouteSnapshot(CafeManagerBlockEntity manager, BlockPos first, BlockPos second,
                                              List<BlockPos> entrances) {
         if (!(manager.getLevel() instanceof ServerLevel level)) return false;
+        return restoreRouteSnapshot(manager,indexedMenus(level,first,second),entrances);
+    }
+
+    public static boolean isRouteWarming(CafeManagerBlockEntity manager){
+        return manager.getLevel() instanceof ServerLevel level&&ROUTE_WARMUPS.containsKey(new ManagerKey(level.dimension().location(),manager.getBlockPos()));
+    }
+
+    /** Restore only persisted opening seats; dispatch retries never rescan a spatial range. */
+    public static boolean restoreRouteSnapshot(CafeManagerBlockEntity manager,List<BlockPos> positions,List<BlockPos> entrances){
+        if (!(manager.getLevel() instanceof ServerLevel level)) return false;
         // Opening validation is structural only.  A missing/temporarily unavailable entrance
         // must not turn an otherwise valid menu+seat pair into the "no valid seat" HUD reason.
         // Route warmup handles reachability after the cafe has opened.
         List<BlockPos> safeEntrances = entrances.stream().filter(pos -> isSafeStandingPoint(level, pos)).distinct().toList();
         Map<BlockPos, MenuRoutes> menus = new ConcurrentHashMap<>();
-        indexedMenus(level, first, second).forEach(pos -> {
+        positions.forEach(pos -> {
+            if(!level.hasChunkAt(pos))return;
             BlockEntity blockEntity = level.getBlockEntity(pos);
             if (!(blockEntity instanceof CafeMenuBlockEntity menu)) return;
-            SeatInfo info = inspect(level, menu.getBlockPos(), menu.getBlockState(), true);
+            SeatInfo info = inspect(level, menu.getBlockPos(), menu.getBlockState(), false);
             if (info == null) return;
             List<Approach> approaches = approachCandidates(level, menu, info.position);
             // Keep structurally valid menus in the snapshot even when no safe approach or
@@ -160,6 +171,11 @@ public final class CozyCafeSeatingService {
             if (level == null || entry.getValue().tick(level)) ROUTE_WARMUPS.remove(entry.getKey(), entry.getValue());
             break;
         }
+    }
+
+    public static List<BlockPos> snapshotMenus(ServerLevel level, BlockPos manager) {
+        RouteSnapshot snapshot = ROUTE_SNAPSHOTS.get(new ManagerKey(level.dimension().location(), manager));
+        return snapshot == null ? List.of() : List.copyOf(snapshot.menus.keySet());
     }
 
     public static void clearRouteSnapshot(ServerLevel level, BlockPos manager) {
@@ -288,8 +304,12 @@ public final class CozyCafeSeatingService {
 
     public static boolean hasReadyRoute(CafeMenuBlockEntity menu) {
         if (!(menu.getLevel() instanceof ServerLevel level) || menu.getCafeManager() == null) return false;
-        RouteSnapshot snapshot = ROUTE_SNAPSHOTS.get(new ManagerKey(level.dimension().location(), menu.getCafeManager()));
-        MenuRoutes routes = snapshot == null ? null : snapshot.menus.get(menu.getBlockPos());
+        return hasReadyRoute(level,menu.getCafeManager(),menu.getBlockPos());
+    }
+
+    public static boolean hasReadyRoute(ServerLevel level,BlockPos manager,BlockPos menu){
+        RouteSnapshot snapshot = ROUTE_SNAPSHOTS.get(new ManagerKey(level.dimension().location(),manager));
+        MenuRoutes routes = snapshot == null ? null : snapshot.menus.get(menu);
         return routes != null && !routes.routes.isEmpty();
     }
 
@@ -877,7 +897,10 @@ public final class CozyCafeSeatingService {
                     selected = new Approach(pendingInbound.approach, pendingInbound.type);
                     routes.add(pendingInbound);
                     MenuRoutes pool = snapshot.menus.get(menu);
-                    if (pool != null) pool.routes = List.copyOf(routes);
+                    if (pool != null) {
+                        pool.routes = List.copyOf(routes);
+                        com.yinfires.icecore.compat.cozycafe.customer.CafeCustomers.seatChanged(level,menu);
+                    }
                 }
                 pendingInbound = null;
                 entranceIndex++;

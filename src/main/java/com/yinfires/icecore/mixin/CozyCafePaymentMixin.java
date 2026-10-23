@@ -19,6 +19,20 @@ import java.util.List;
 @Pseudo
 @Mixin(targets = "io.github.chakyl.cozycafe.blockentities.CafeMenuBlockEntity", remap = false)
 public abstract class CozyCafePaymentMixin {
+    @org.spongepowered.asm.mixin.Shadow private int waitTime;
+    @org.spongepowered.asm.mixin.Unique private int icecore$actualWait;
+    @org.spongepowered.asm.mixin.Unique private boolean icecore$alreadyPaid;
+
+    @org.spongepowered.asm.mixin.injection.Inject(method="handlePayment(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/player/Player;Lio/github/chakyl/cozycafe/data/CafeMenuItem;Lnet/minecraft/world/item/ItemStack;)V",at=@At("HEAD"),cancellable=true)
+    private void icecore$removeSpeedPrice(org.spongepowered.asm.mixin.injection.callback.CallbackInfo ci) {
+        var visit=((com.yinfires.icecore.compat.cozycafe.customer.CafeCustomerVisit)this).icecore$visit();
+        icecore$alreadyPaid=visit.isEmpty()||visit.getBoolean("Settled");
+        if(icecore$alreadyPaid){ci.cancel();return;}
+        icecore$actualWait=waitTime;
+        waitTime=io.github.chakyl.cozycafe.blockentities.CafeMenuBlockEntity.getMaxWaitTime();
+    }
+    @org.spongepowered.asm.mixin.injection.Inject(method="handlePayment(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/player/Player;Lio/github/chakyl/cozycafe/data/CafeMenuItem;Lnet/minecraft/world/item/ItemStack;)V",at=@At("RETURN"))
+    private void icecore$restoreWait(org.spongepowered.asm.mixin.injection.callback.CallbackInfo ci) {if(!icecore$alreadyPaid)waitTime=icecore$actualWait;}
     @Redirect(method = "handlePayment(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/player/Player;Lio/github/chakyl/cozycafe/data/CafeMenuItem;Lnet/minecraft/world/item/ItemStack;)V",
             at = @At(value = "INVOKE", target = "Lnet/minecraftforge/common/ForgeConfigSpec$BooleanValue;get()Ljava/lang/Object;"),
             remap = false)
@@ -32,10 +46,8 @@ public abstract class CozyCafePaymentMixin {
     private List<ItemStack> icecore$depositSharedCurrency(int amount, BlockPos position, Player player,
                                                          @Coerce Object menuItem, ItemStack servedStack) {
         BlockEntity self = (BlockEntity) (Object) this;
-        if (amount > 0 && self.getLevel() instanceof ServerLevel level) {
-            CurrencyService.add(amount, "cozycafe", "cozycafe",
-                    CurrencyService.sourceAt(level, position.getCenter(), player));
-        }
+        com.yinfires.icecore.compat.cozycafe.customer.CafeCustomers.settle(
+                (io.github.chakyl.cozycafe.blockentities.CafeMenuBlockEntity)(Object)this,amount,icecore$actualWait);
         return List.of();
     }
 }

@@ -28,6 +28,10 @@ public abstract class CozyCafeClearCafeMixin implements CozyCafeManagerStateAcce
     private void icecore$rejectClearWhileOpen(CallbackInfo callback) {
         if (isOpen()) {
             callback.cancel();
+            return;
+        }
+        if (com.yinfires.icecore.compat.cozycafe.customer.CafeCustomers.hasUnfinished((io.github.chakyl.cozycafe.blockentities.CafeManagerBlockEntity)(Object)this)) {
+            callback.cancel();
         }
     }
 }

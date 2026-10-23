@@ -14,7 +14,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class ICECoreNetwork {
-    private static final String PROTOCOL_VERSION = "13";
+    private static final String PROTOCOL_VERSION = "14";
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             ResourceLocation.fromNamespaceAndPath(ICECore.MOD_ID, "main"),
             () -> PROTOCOL_VERSION,
@@ -35,6 +35,10 @@ public final class ICECoreNetwork {
             return;
         }
         registered = true;
+        CHANNEL.messageBuilder(com.yinfires.icecore.compat.cozycafe.customer.CafeCustomerSnapshot.class, 26, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(com.yinfires.icecore.compat.cozycafe.customer.CafeCustomerSnapshot::encode)
+                .decoder(com.yinfires.icecore.compat.cozycafe.customer.CafeCustomerSnapshot::new)
+                .consumerMainThread(com.yinfires.icecore.compat.cozycafe.customer.CafeCustomerSnapshot::handle).add();
         CHANNEL.messageBuilder(com.yinfires.icecore.spoilage.ClientBoundShelfLifePacket.class, 25, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(com.yinfires.icecore.spoilage.ClientBoundShelfLifePacket::encode)
                 .decoder(com.yinfires.icecore.spoilage.ClientBoundShelfLifePacket::new)
@@ -125,6 +129,7 @@ public final class ICECoreNetwork {
     public static void sendToPlayer(com.yinfires.icecore.interaction.ClientBoundInteractionPacket packet, ServerPlayer player) {
         CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);
     }
+    public static void sendToPlayer(com.yinfires.icecore.compat.cozycafe.customer.CafeCustomerSnapshot packet,ServerPlayer player){CHANNEL.send(PacketDistributor.PLAYER.with(()->player),packet);}
 
     public static void sendToServer(ServerBoundAddMenuItemPacket packet) {
         CHANNEL.sendToServer(packet);

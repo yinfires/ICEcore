@@ -5,6 +5,9 @@
   "compatibilityLevel": "JAVA_17",
   "plugin": "com.yinfires.icecore.mixin.ICECoreMixinPlugin",
   "mixins": [
+    "CozyCafeCustomerManagerMixin",
+    "CozyCafeCustomerMenuMixin",
+    "CozyCafeCustomerIdentityMixin",
     "WorkstationCuisineRoeBaseMixin",
     "WorkstationCuisineRoeModelMixin",
     "WorkstationCuisineModelAliasMixin",
@@ -125,6 +128,8 @@
     "ShelfJadeAccessorMixin"
   ],
   "client": [
+    "CozyCafeCustomerRendererMixin",
+    "CozyCafeNativeScrollerMixin",
     "CozyCafeTableRendererMixin",
     "CozyCafePlatingRendererMixin",
     "CozyCafePlateItemModelMixin",
@@ -200,7 +205,8 @@
     "WoodJadeBackgroundMixin",
     "WoodJadeLayoutMixin",
     "WoodJadeTitleMixin",
-    "WoodOverlayBackgroundMixin"
+    "WoodOverlayBackgroundMixin",
+    "CozyCafeCustomerItemMixin"
   ],
   "injectors": {
     "defaultRequire": 1

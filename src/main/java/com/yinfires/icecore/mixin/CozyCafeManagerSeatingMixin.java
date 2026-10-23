@@ -36,6 +36,7 @@ public abstract class CozyCafeManagerSeatingMixin extends BlockEntity {
     @Inject(method = "canBeOpened(Lnet/minecraft/server/level/ServerPlayer;)Z", at = @At("RETURN"), cancellable = true, remap = false)
     private void icecore$requireValidMenuAndSeat(ServerPlayer player, CallbackInfoReturnable<Boolean> callback) {
         if (!callback.getReturnValueZ() || !(level instanceof ServerLevel serverLevel)) return;
+        if (CozyCafeSeatingService.hasRouteSnapshot(serverLevel,worldPosition))return;
         CafeManagerBlockEntity manager = (CafeManagerBlockEntity) (Object) this;
         java.util.List<BlockPos> entrances = CozyCafeSpawnRegionService.entranceCandidates(serverLevel, worldPosition);
         if (entrances.isEmpty()) entrances = CozyCafeSeatingService.defaultEntrance(manager);
@@ -49,7 +50,7 @@ public abstract class CozyCafeManagerSeatingMixin extends BlockEntity {
 
     @Inject(method = "setOpen(ZZ)V", at = @At("RETURN"), remap = false)
     private void icecore$clearRoutesWhenClosed(boolean value, boolean forceClose, CallbackInfo callback) {
-        if (!value && level instanceof ServerLevel serverLevel) {
+        if (!value && level instanceof ServerLevel serverLevel && !com.yinfires.icecore.compat.cozycafe.customer.CafeCustomers.owns((CafeManagerBlockEntity)(Object)this)) {
             CozyCafeSeatingService.clearRouteSnapshot(serverLevel, worldPosition);
         }
     }

@@ -1,5 +1,20 @@
 # ICEcore 内容实现索引
 
+### CozyCafe顾客类型、共享声望与每日客流（2026-10-23）
+
+- 启动冲突修正：删除新增的重复菜单提示Mixin，合并回既有CozyCafeNormalFoodTooltipMixin，菜单行与背包槽均捕获真实物品栈并走原生ItemStack提示入口，finally清理。错误报告证实同调用点Redirect独占冲突；CafeCustomerUpstreamTest新增扫描全部已注册CozyCafe Redirect的重复占用检查，并对两版JAR核验两处捕获与显示入口。修正后Forge47.4.10独立clean/build通过，324项测试零失败、零跳过，生产映射校验通过；JAR确认无已移除类。客户端启动复测待用户执行，未部署。
+
+- 显示修正：电脑页面不额外绘制总声望；电脑菜单和选菜提示通过正常ItemStack提示入口保留原生名称、物品描述与Modern UI居中标题，去除CozyCafe页面追加价格/分类/碗瓶说明。入口为CozyCafeManagerScreenErrorMixin、CozyCafeNormalFoodTooltipMixin；CafeCustomerKeys.Events在RenderNameTagEvent禁止顾客名牌，不改实体名称，Jade照常读取，覆盖已有实体。双版JAR契约及原生物品上下文/名牌DENY回归纳入CafeCustomerUpstreamTest；游戏视觉仍待验收。
+
+- 验证结果：显示修正后47.4.10独立clean/build、47.4.28兼容build和恢复47.4.10完整build均通过，323项测试零失败、零跳过，生产JAR映射通过；官方最新版本查询超时，仅声明已验证版本。
+
+- 当前机制与验收边界见[咖啡馆顾客、声望与每日客流](cafe-customer-flow-design.md)，该文替代原未实现客流方案。顾客类型、正式标签口味、独立声望、课程、小费、共享每日额度和H查询均已接入；星级仅展示，旧声望不迁移。
+- 实例内容位于指定客户端`config/icecore/cafe_customers.json`；模组只提供服务端权威能力。主世界`icecore_cafe_customers` SavedData保存账户、营业、快照、接纳及结算状态。OP2命令为`/icecore cafe`，使用说明见Wiki《咖啡馆顾客与经营》。
+- 入口为`compat.cozycafe.customer`及新增Customer/NativeScroller Mixin；生成继续调用原生空用户名同步入口，订单、吃饭、清桌、付款与离场继续复用CozyCafe及既有座位链路。Jade沿用实体CustomName，UI复用WoodPanel与真实CozyCafe滚动组件。
+- 停接只关新客；旧场、在途与跨日顾客不清除，未清器皿阻止下一道点单和新客。菜单缓存、皮肤加载预算、同步版本及付款溢出处理详见专题。
+- 自动验证见`CafeCustomerRulesTest`、`CafeCustomerPersistenceTest`、`CafeCustomerUpstreamTest`及既有营业/清桌/生产映射测试；实机项目仍待明确授权，不以构建通过替代视觉或多人验收。
+
+
 ### CozyCafe上菜、桌面器皿与竹匾背包取出（2026-10-22）
 
 - 装盘统一入口 `compat.cozycafe.CafeServingRules`：正式成品标签内的非饮料且无真实器皿才强制装盘，面包/蛋糕/串类基底不算器皿；未知兼容食物直接上菜。提示复用同一判定，原生装盘配置关闭时不强制。保留FoodClassificationUtils真实碗分类，不以它决定直接上菜许可。非饮料甜品同样可走原生装盘上菜。
@@ -562,7 +577,7 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 ### Yuushya 入世声明与 CozyCafe 营业时间
 
 - Yuushya 2.3.0：`YuushyaJoinMessageMixin` 在真实 `lambda$init$4(ServerPlayer)` HEAD 取消声明生成与发送，不过滤普通聊天。
-- CozyCafe 1.10：所有维度电脑使用主世界时间，日内 `[12000,24000)`（18:00–次日06:00）禁止营业。`CozyCafeHoursMixin` 在电脑服务端 tick HEAD 使用 `setOpen(false,false)` 停止新客，已有顾客保留原订单、用餐、结算及正常离场。06:00仅恢复手动开店资格，原菜单/座位和每日限制保持。首次夜间加载立即关闭；前进跨关店点（包括整个夜间、多天）也关闭；倒退不触发跨越，夜间状态仍限制。手动白天开店重新记录观察时间。
+- CozyCafe 1.10：所有维度电脑使用主世界时间，日内 `[12000,24000)`（18:00–次日06:00）禁止营业。`CozyCafeHoursMixin` 在电脑服务端 tick HEAD 使用 `setOpen(false,false)` 停止新客，已有顾客保留原订单、用餐、结算及正常离场。06:00仅恢复手动开店资格，原菜单/座位保留，每日限制由2026-10-23共享营业场次接管。首次夜间加载立即关闭；前进跨关店点（包括整个夜间、多天）也关闭；倒退不触发跨越，夜间状态仍限制。手动白天开店重新记录观察时间。
 - 开店资格、setOpen和分配入口均受服务端限制，页面开店失败使用 `ClientBoundCafeCannotOpenPacket((byte)6)` → `CozyCafeManagerScreenErrorMixin` → 电脑原生 errorMessage 状态（120tick兼容计数、6秒单调时钟兜底、末1秒淡出）及Open按钮上方居中提示及 `icecore.cozycafe.closed_hours` 双语翻译。不新增命令或配置文件。
 - `CozyCafePendingSpawnMixin` 在异步皮肤查询前捕获电脑实例、时间与营业代次，finalizeSpawn HEAD 复验电脑移除/卸载、当前营业状态、跨关店点和旧代次。仅拒绝 MENU 新客，SIGN 离场保持；取消只释放同UUID菜单预留、重置旅行计时并清空临时电脑引用。现有validate仅对尚未入世的pending_spawn在电脑关闭时释放预留；walking/seated顾客保持。`CozyCafeAdmissionAccess` / `CozyCafePendingAdmission` 为包外桥接。
 - 性能：每个已加载电脑每tick O(1)，无新增世界/注册表扫描、I/O、网络轮询或日志。仅开闭变化沿用原生方块/招牌和现有展板同步；每个待生成顾客只保留一份电脑引用及两个long，入世或取消时清除，原异步任务生命周期保持。
@@ -579,7 +594,7 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 | 功能领域 | CozyCafe 1.9 电脑、ICEcore 命名区域和 Kaleidoscope Tavern 1.2.0 展板联动 |
 | 玩家行为 | 手持酒馆黑板或任意 `kaleidoscope_tavern:sandwich_board` 展板，Shift 右键咖啡馆电脑可绑定整叠；放置后立即显示咖啡馆名称，并在名称换行后空一行显示绿色营业中或红色停业中。电脑改名、开业和停业会事件式同步多个展板。拆除展板清空链接与文字，非冒险模式手动提交文字会解绑；冒险模式不能与任何支持展板互动。顾客进店与离场使用同一门逻辑，可打开关闭的木门和栅栏门并保持开启，不打开铁门。 |
 | 配置与命令 | OP 2 手持普通木棍并对准电脑执行 `/icecore cozycafe spawn-region set <区域名>` 或 `clear`；数据位于世界 `data/icecore_cozycafe_ranges.json`，格式版本 2 可读取版本 1。命名区域只负责进出点，不改变菜单识别范围。 |
-| 实现链路 | `compat.cozycafe.spawn.CozyCafeSpawnRegionService` 在区域最低 Y 层缓存最多 65536 个均匀采样的可站立候选点；管理器生成和菜单离场分别随机取点，有效区域仅替代 CozyCafe 的标志校验与位置，菜单、声望、每日限制和顾客数量仍走原流程。`compat.cozycafe.board` 使用物品 NBT、方块实体 ForgeData 和 O(1) 电脑反向索引管理绑定；放置、区块加载及电脑状态变化时校验和同步。客户端 Tavern 渲染 Mixin 复用原宽度、行高、对齐与发光规则，名称布局使用 256 项 LRU 缓存并单独绘制翻译后的状态色。 |
+| 实现链路 | `compat.cozycafe.spawn.CozyCafeSpawnRegionService` 在区域最低 Y 层缓存最多 65536 个均匀采样的可站立候选点；管理器生成和菜单离场分别随机取点，有效区域仅替代 CozyCafe 的标志校验与位置，菜单保留原生存储，顾客类型、声望、每日限制和人数由2026-10-23共享经营服务接管。`compat.cozycafe.board` 使用物品 NBT、方块实体 ForgeData 和 O(1) 电脑反向索引管理绑定；放置、区块加载及电脑状态变化时校验和同步。客户端 Tavern 渲染 Mixin 复用原宽度、行高、对齐与发光规则，名称布局使用 256 项 LRU 缓存并单独绘制翻译后的状态色。 |
 | 可选兼容 | 两个真实参考 JAR 仅作为 `libs/` 本地 compileOnly 依赖，不打包；Mixin 插件按模组存在性筛选目标，展板事件仅在 CozyCafe 与 Kaleidoscope Tavern 同时存在时注册。 |
 | 性能与生命周期 | 无世界 tick 扫描；进出区域只在首次使用或区域修订后重建有界缓存，使用前最多复验 8 个候选点；顾客每 5 tick 仅检查脚边 3×2×3 方块；展板同步只遍历该电脑的已知绑定并不强制加载区块。停服清空运行时缓存。 |
 | 验证方法 | 数据 v1→v2 迁移和生产选择器 JUnit；双语 JSON 解析；Forge 47.4.10 `test`、`clean build`、生产 JAR 内容与外部依赖排除检查。客户端视觉、门路径与多人完整流程待明确授权后实机验证。 |
@@ -592,10 +607,10 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 | 功能领域 | CozyCafe 1.9 菜单接待资格、真实顾客巡路、乘坐与离场，以及家具模组座椅兼容 |
 | 玩家行为 | CozyCafe 的 `cafe_menu` 统一称为“菜单”。菜单仅在其朝向正前一格的下方一格放置有效且面向菜单的座椅时接客；无方向凳子不限制朝向。开店时没有任何有效“菜单与座位”组合会保持停业并提示“无有效的菜单与座位”。顾客从入口以真实实体走到座椅旁、坐下并始终面向菜单；需求物品仍显示在菜单上方。订单等待时长不变，只在顾客坐下且需求生成后开始；坐下后的点单准备阶段不会提前消耗等待时间。 |
 | 座椅兼容 | 内置按真实方块类型适配 Another Furniture、Let's Do Furniture、Handcrafted、MrCrayfish's Furniture: Refurbished、Paladin's Furniture 和 Valhelsia Furniture；不按注册名猜测。整合包可通过 `#icecore:cozycafe_seats` 方块标签增加座椅，无方向属性按凳子处理，标准水平 `facing` 必须面向菜单。 |
-| 实现链路 | 原版开店条件通过后，管理器只按实际识别范围建立菜单—座椅结构快照；结构组合为零时复用 CozyCafe 管理界面 HUD 原因码 5。结构有效即正常开业，入口到接待点的双向路线随后在服务端主线程按每 tick 最多一次 A* 预热；某菜单第一条路线就绪后才允许生成顾客。每个菜单固定一个紧邻座椅的正交或斜对角接待点，自定义进出区域最多抽取 16 个代表入口、每菜单最多保留 4 条路线。顾客只提交一次到该接待点的路径，到达判定命中的同一 tick 停止导航并入座，不存在独立菜单旁回退或二段停顿；只有导航提前结束或持续无位移时才向同一终点执行最多 3 次局部恢复。 |
+| 实现链路 | 共享经营开店条件通过后，管理器按实际识别范围建立菜单—座椅结构快照；结构组合为零时复用 CozyCafe 管理界面 HUD 原因码 5。结构有效即正常开业，入口到接待点的双向路线随后在服务端主线程按每 tick 最多一次 A* 预热；某菜单第一条路线就绪后才允许生成顾客。每个菜单固定一个紧邻座椅的正交或斜对角接待点，自定义进出区域最多抽取 16 个代表入口、每菜单最多保留 4 条路线。顾客只提交一次到该接待点的路径，到达判定命中的同一 tick 停止导航并入座，不存在独立菜单旁回退或二段停顿；只有导航提前结束或持续无位移时才向同一终点执行最多 3 次局部恢复。 |
 | 冲突、失效与存档 | 预留座位会安全移除原家具座位实体或驱离乘客，并在预留期间拒绝再次右键占座。顾客沿用 ICEcore 固定 NPC 的通行语义：不可推动、无实体碰撞但仍可被准星选中，因此入场与离场顾客可在狭窄通道互相穿过；开门只请求一次局部恢复，不再固定频率重算。菜单保存顾客 UUID、座椅坐标、单一接待点和阶段，区块重载后重建预留；离场先回到保存的接待点再向出口寻路。旧版仅有菜单模型而没有 UUID 的状态直接清理，不迁移或结算。 |
 | 座位姿态 | 锚点保存并直接应用顾客最终脚部世界坐标，不再混用家具座位实体 Y 与乘客相对偏移。Another Furniture、Handcrafted、Refurbished、Valhelsia 和 Let's Do 分别按目标实例 JAR 的座位实体公式换算；开放标签使用稳定默认值且不反射任意 `height` 字段。 |
-| 性能与生命周期 | 菜单方块实体按区块加载/卸载和放置/拆除维护维度索引；开店通常只筛选索引，不扫描整个自定义长方体。路线预热每 tick 最多调用一次寻路器，不存在菜单×入口×接近点在同一 tick 的 A* 矩阵。营业中仅进行 O(1) 绑定检查和必要的局部路径恢复；关店或服务器停止时清除快照、预热任务和运行时预留。 |
+| 性能与生命周期 | 菜单方块实体按区块加载/卸载和放置/拆除维护维度索引；开店通常只筛选索引，不扫描整个自定义长方体。路线预热每 tick 最多调用一次寻路器，不存在菜单×入口×接近点在同一 tick 的 A* 矩阵。营业中仅进行 O(1) 绑定检查和必要的局部路径恢复；2026-10-23起关店保留已有顾客所需快照与预留，服务器停止时清理运行时缓存，重载后按菜单持久化数据恢复。 |
 | 代码与资源入口 | `compat.cozycafe.seating.CozyCafeSeatingService`、`CozyCafeSeatAnchorEntity`、`CozyCafeSeatingEvents`，以及 `CozyCafeManagerSeatingMixin`、`CozyCafeMenuSeatingMixin`、`CozyCafeCustomerSeatingMixin`、`CozyCafeNavigateToMenuMixin`、`CozyCafeMenuRendererSeatingMixin`；标签为 `data/icecore/tags/blocks/cozycafe_seats.json`。 |
 | 验证方法 | 使用 CozyCafe 1.9 与目标实例六个家具模组 JAR 的 `mods.toml`、类签名和字节码核对菜单、顾客导航、到达、关闭、座位类型与朝向入口；源码回归测试同时禁止在顾客 AI 高频路径中对 Java 17 `Stream.toList()` 的不可变结果执行原地排序。运行 `compileJava`、`test`、`processResources --rerun-tasks`、Forge 47.4.10 `clean build`，并核对最终 JAR 的实体、Mixin、标签和双语翻译。客户端仍需逐模组验证正确/错误朝向、入口到座位净空、玩家抢座、多顾客、拆椅、关业和重载。 |
 | 最后修改 | 2026-09-06，重写为结构通过即开业、路线分 tick 预热、单一接待点同 tick 入座和无碰撞顾客通行；座位锚点改用最终世界坐标，消除家具高度语义叠加；修复顾客 AI 对不可变候选列表原地排序造成的服务端 tick 崩溃。 |

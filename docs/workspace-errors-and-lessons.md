@@ -6,6 +6,10 @@ Last updated: 2026-09-27
 
 ## 生效中的防复发规则
 
+- 新增或调整Redirect必须检查全部已注册Mixin对同一目标/方法/调用点的独占冲突，单个选择器存在不代表可组合；CafeCustomerUpstreamTest.registeredCafeRedirectsNeverClaimTheSameCall覆盖全部已注册CozyCafe Redirect。见ERR-20260822-02的2026-10-23复发。
+
+- 用户未明确要求时不新增玩家可见文本，含界面文字、提示行和实体名牌；显示修改须核对明确授权的展示位置。咖啡馆仅保留Jade顾客名，电脑不额外绘制总声望；CafeCustomerUpstreamTest锁定正常物品提示及顾客名牌DENY，见ERR-20261023-01。
+
 - 配方生成成功不代表展示和执行正确：必须核对JEI结果为空的配方清理、所属命名空间语言覆盖、容器候选去重及Jade重复提供器；截图回归见ERR-20261021-02。原生流体装桶须先核对方块交互的FluidUtil回退，禁止因配方extract仅支持杯子而新增替代领取逻辑。奶桶映射必须沿真实设备注入入口核对注册ID，不能跨设备假设牛奶相同；榨汁果汁杯容量统一250mB并回归全部杯装条目。
 
 - 配方容量诊断必须分别核对原料、流体、工具/盛取物、结果种类和结果数量；不得把输出展开超限报告成输入超限。特殊调料瓶九件输入回归见ERR-20261021-01。
@@ -120,6 +124,13 @@ Last updated: 2026-09-27
 - 状态：已关闭；首次记录 2026-10-10，复发次数 0。本次仅修改文档。
 
 ### ERR-20261005-01：内存诊断未提前核对采样工具与输出边界
+
+- 2026-10-23崩溃修复补充：删除重复Mixin后，CodeGraph watcher及sync仍返回旧类；完整index成功后当前MCP查询仍能返回已删除路径，属于索引视图残留，不能将其视为文件或产物存在证据。本轮以Test-Path=false、注册配置无该条目及独立clean后JAR条目检查确认移除；新增跨Mixin冲突测试直接读取配置和编译类，避免依赖索引完成校验。适用边界为当前CLI/MCP索引视图一致性，索引状态仍观察。
+
+- 2026-10-23显示修正规划复发：首批多文档输出再次被工具截断；调用CodeGraph context时误用query参数，改为task；Windows字面通配路径查询失败后改用rg文件列表定位。后续单批taskOutput超过6000字符即拒绝并缩小范围，不据截断内容作实现结论。适用边界及状态沿用本记录；本轮工具门禁拒绝超限后已拆分读取。
+
+- 2026-10-23顾客机制任务复发（既有累计再加1）：恢复实施时再次输出完整工具描述和多段反编译/文档，工具明确报告truncated；另以Windows字面通配符查Java文件失败，Wiki模板中的反引号造成脚本解析失败，改用apply_patch直接写Markdown；最后验证曾误用formal.tags，按正式文件data.tags重验九个标签通过。根因是未对整批返回预先实施已有6000字符门禁，影响为证据遗漏风险和重复读取。已改为每次唯一taskOutput、超限直接拒绝、至少4000token预算，构建落tmp日志仅读短尾，路径通配只用于-g。更强可执行防线为新增CafeCustomerUpstreamTest逐版读取真实1.9/1.10 JAR，检查全部新增注入选择器、Shadow字段/方法及直接INVOKE目标；不依赖截断字节码作为兼容证据。验证：新增真实JAR契约、抽样与持久化定向测试通过，独立clean后的基线build通过；后续变更继续完整构建。适用边界为本地工具/文档输出及外部模组兼容，不以静态通过声明实机效果；CodeGraph sync报告up-to-date仍漏掉新增customer目录，按既有经验执行完整index后查询CafeCustomerData成功，不能只看sync退出码。状态继续观察。
+
 
 - 2026-10-22正常包移植任务复发补充：初期工具输出再次超限，另误将Forge源码patch解到根目录patches，并直接以.jar传Expand-Archive；已核验绝对路径后将整个新建patches移动到tmp/rack-native-compat/forge-patch-reference，未改已有文件。新测试尝试mock ItemRenderer触发其注册表静态初始化，改用真实ShelfItemMesh回放行为加编译ASM入口检查，保留动态资格判断与原生回退门禁。独立clean后test暴露6项既有契约依赖createMcpToSrg却未声明；完整build生成映射后309项测试通过。防线落实build.gradle test dependsOn createMcpToSrg，后续独立clean→test验证；临时参考只放tmp，最终Git状态及JAR条目检查拒绝patches/上游类进入成品。适用边界为本机JAR诊断、普通JUnit和生产映射契约；不以构建成功声称实机性能达标，状态继续观察。
 
@@ -445,6 +456,18 @@ Last updated: 2026-09-27
 
 ## 记录
 
+### ERR-20261023-01：顾客机制额外添加未经确认的文字展示
+
+- 触发场景：顾客机制落地后，用户截图要求移除电脑额外总声望与顾客头顶名称，并明确未声明时不得自行添加文本。
+- 事实证据：CozyCafeManagerScreenErrorMixin原icecore$sharedReputation在背景TAIL绘制文字；实体虽setCustomNameVisible(false)，原生MobRenderer仍可在鼠标指向时显示CustomName。截图QQ20261023-155018.png、QQ20261023-155222.png分别展示两处结果。电脑菜单还通过无ItemStack上下文的列表重载追加Price/Category，未沿正常物品提示。
+- 根因：将内部共享数值和供Jade读取的实体名称扩大为额外视觉展示；误将非强制可见等同于任何情况下都不显示名牌，缺少消费者边界核对。
+- 影响：出现用户未要求的界面文字、重复名称及页面专用重复说明；正常物品标题缺少完整上下文，Modern UI居中判定可能失效。
+- 正确做法：移除额外总声望绘制；保留实体名称但在Forge名牌事件对顾客设置DENY；两菜单提示调用正常ItemStack重载，保留物品描述、Forge与Modern UI接管。
+- 防复发措施：AGENTS.md与开工生效规则新增未经明确要求不得添加玩家可见文本；CafeCustomerUpstreamTest对两版JAR验证提示注入，并检查正常物品上下文、移除额外声望入口及名牌DENY、不改实体名称；已有Jade名称链与Modern UI原生入口回归继续执行。
+- 验证方法：定向真实JAR/页面/提示契约、Forge47.4.10完整build与生产映射检查；实机检查电脑无额外文字、长名称居中、既有顾客悬停无名牌且Jade名称有效。
+- 适用边界：所有未经用户明确指定的新增可见文本；服务端账户及用户明确要求的H查询内容保留。Wiki不增加纯视觉开发过程说明。
+- 状态：定向验证、Forge47.4.10独立clean/build、47.4.28兼容build及恢复47.4.10交付build通过，323项测试零失败、生产映射校验通过；未启动客户端，视觉验收待完成。
+
 ### ERR-20261018-02：垃圾桶服务端取放未同步原生客户端动画
 
 - 触发场景：垃圾桶左右键取放已生效，用户报告两者均不播放原生动画。
@@ -674,6 +697,8 @@ Last updated: 2026-09-27
 - 关联项：[冒险模式建造系统](content-implementation.md#冒险模式建造系统)、`BuildingClientEvents`、`RenderChunkRegionMixin`、`ERR-20260820-02`。
 
 ### ERR-20260822-02：Mixin 注入目标未按生产名称核对导致客户端启动崩溃
+
+- 2026-10-23复发升级（累计再加1）：用户错误报告16.43.51客户端崩溃；latest.log第527行明确报告CozyCafeMenuScreenTooltipMixin的icecore$itemTooltip被已有CozyCafeNormalFoodTooltipMixin的icecore$normal占用，后续0/1注入失败。根因是只对新增Mixin逐个验证目标存在，未检查已注册Mixin组合，重复Redirect在真实启动时独占冲突；普通编译与双版JAR单体契约无法暴露。影响为资源加载阶段客户端退出，上一轮构建通过不能证明可启动。正确做法是删除重复类与注册，把正常ItemStack提示统一到已有CozyCafeNormalFoodTooltipMixin，覆盖背景菜单行与背包槽两处；通过原生getTooltipFromItem调用捕获当前栈，最终走正常物品提示并finally清除临时引用。防线升级为CafeCustomerUpstreamTest扫描注册配置中全部CozyCafe Mixin，按目标类、目标方法、Redirect调用目标及ordinal检查独占重复；双版真实JAR契约同时覆盖捕获调用与两处显示，保留require=2/allow=2，禁止用require=0或提升priority掩盖冲突。验证：定向真实JAR、所有Cafe Redirect冲突、工作方块与页面测试通过；独立clean/build及生产检查结果同步到实现索引。适用边界为本项目CozyCafe同一调用点Redirect组合；不以静态通过代替未授权的客户端复测。状态：Forge47.4.10独立clean/build通过，324项测试零失败、零跳过，生产映射与JAR移除旧类检查通过；实机待用户复测，未启动或部署。
 
 - 2026-10-16 同类生产映射验收遗漏补充：用户报告19:28启动失败，ModItems.registerSeedBags抛ResourceLocation.getPath NoSuchMethodError。客户端包SHA256为189DBC325D22E5B619054D68BCDA090EB058221EC0341A2EE61B70D19DF1518B，当前生产包为21B2F7132C22E0CD892A8E8D3E3DAAC9A1E2DA2A6CB61477AF8CEAA1BA04FEF7；javap分别确认开发getPath和生产m_135815_，客户端包还残留其它Minecraft开发调用。无法从报告证明错误包的生成/复制途径，不归因于特定操作。原门禁只检查生产Mixin选择器和文件存在，未检查实际交付包方法引用。升级：build.gradle新增verifyProductionJar，依赖reobfJar并接入check，依据真实TSRG扫描最终常量池；可指定外部包做只读反向验证。正确包通过，用户错误包实际被拒绝；开发规则增加交付及哈希核对要求。适用边界为ForgeGradle生产方法重混淆，继承成员、字段及Mixin加载仍由现有契约补充。静态防线已落实，客户端复测待用户执行。
 
