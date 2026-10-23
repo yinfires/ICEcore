@@ -25,6 +25,7 @@
     "WorkstationJuicerRecipeMixin",
     "WorkstationJuicerLidMixin",
     "WorkstationJuicerReloadMixin",
+    "WorkstationJuicerServerSoundMixin",
     "WorkstationSkewerSyncMixin",
     "ShelfLifeItemStackMixin",
     "ShelfLifeInventoryMixin",

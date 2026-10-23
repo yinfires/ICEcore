@@ -6,6 +6,8 @@ Last updated: 2026-09-27
 
 ## 生效中的防复发规则
 
+- 客户端专属事件注册必须限制物理侧；`@OnlyIn` 不保护公共入口的方法引用。混合碗/烤炉注册遵循 MixingClient 的 CLIENT 订阅入口，修改公共初始化后运行 MixingClientIsolationTest；见 ERR-20261023-02。
+
 - 新增或调整Redirect必须检查全部已注册Mixin对同一目标/方法/调用点的独占冲突，单个选择器存在不代表可组合；CafeCustomerUpstreamTest.registeredCafeRedirectsNeverClaimTheSameCall覆盖全部已注册CozyCafe Redirect。见ERR-20260822-02的2026-10-23复发。
 
 - 用户未明确要求时不新增玩家可见文本，含界面文字、提示行和实体名牌；显示修改须核对明确授权的展示位置。咖啡馆仅保留Jade顾客名，电脑不额外绘制总声望；CafeCustomerUpstreamTest锁定正常物品提示及顾客名牌DENY，见ERR-20261023-01。
@@ -124,6 +126,9 @@ Last updated: 2026-09-27
 - 状态：已关闭；首次记录 2026-10-10，复发次数 0。本次仅修改文档。
 
 ### ERR-20261005-01：内存诊断未提前核对采样工具与输出边界
+- 本轮服务端进程控制补充：非TTY exec启动后stdin已关闭，write_stdin无法提交stop。已核对当前Forge生产JAR中Main注册的关闭钩子和Main$1调用MinecraftServer.m_7570_(true)，通过仅作用于核验PID的临时Java Attach代理请求System.exit(0)，执行原生关闭钩子保存世界；不使用Stop-Process强杀服务器。后续交互式服务端测试必须以tty=true启动，并在测试早期验证stdin可提交命令；普通启动脚本保持前台控制台。适用边界为当前exec会话的交互进程生命周期。
+- 2026-10-23建筑服务端整理复发（累计再加1）：开工组合文档及长行搜索未先计数，工具明确返回截断；首次服务器控制台轮询也超出预算。根因是既有6000字符门禁未覆盖组合读取和运行进程输出。已改为文档分段构造唯一out并检查长度；服务端诊断以落盘latest.log的限定末尾及错误筛选为准，不把截断控制台当完整证据。后续验收必须同时核对Done、端口监听、KubeJS脚本零错误和正常停服保存，避免仅凭部分输出宣称启动成功。适用边界为整合包服务端装配与日志读取；状态继续观察。
+- 2026-10-23服务端初始化修复复发（累计再加1）：首轮查询整份实现/经验文档和完整工具描述导致截断，且初版验证将clean与build合并调用，未遵守本地独立clean规则。已缩小为已定位章节、构建日志落tmp只读短尾，最终按独立clean→新进程build重新验证；截断结果不作为已完整阅读证据。后续构建命令审查固定拒绝同一次wrapper调用同时含clean和build/test，字节码回归与生产JAR校验作为本次可执行验收门禁。适用边界为本地阅读与构建流程，状态继续观察。 本次上游服务端兼容补充：测试文件路径猜测及Windows字面通配再次失败，已改为rg --files返回实际路径、目录配-g；新增真实JAR变换回归与完整构建校验，不以失败读取作为已完成核对证据。
 
 - 2026-10-23崩溃修复补充：删除重复Mixin后，CodeGraph watcher及sync仍返回旧类；完整index成功后当前MCP查询仍能返回已删除路径，属于索引视图残留，不能将其视为文件或产物存在证据。本轮以Test-Path=false、注册配置无该条目及独立clean后JAR条目检查确认移除；新增跨Mixin冲突测试直接读取配置和编译类，避免依赖索引完成校验。适用边界为当前CLI/MCP索引视图一致性，索引状态仍观察。
 
@@ -1397,3 +1402,17 @@ Last updated: 2026-09-27
 - 验证方法：Node工具测试、Gradle测试和双Forge构建；下一次获授权后按截图清单复测实际UI与容器收支。
 - 适用边界：配方同步、JEI、Tooltip与冰柜Jade兼容，不改变原生FluidUtil领取流程或实际加工时间。
 - 状态：修复与自动防线已落实；实机仍待授权。
+
+### ERR-20261023-02：公共初始化路径无条件解析客户端事件方法
+
+- 2026-10-23上游榨汁机同类隔离补充：服务端日志20:40:08在ModBlockEntities注册抛SoundInstance非法物理侧异常。真实香气果园JAR的声音字段/方法虽标OnlyIn，公共setRemoved仍直接引用SoundInstance，构造器仍写被移除的声音计数器，tick仍引用被移除的方法。仅检查监听器或运行后取消事件不能阻止类校验期错误。升级防线为JuicerServerClassPatchTest：对真实原类及模拟DistCleaner后的类执行补丁，检查全部客户端引用和悬空成员、ASM BasicVerifier、父类生命周期及重复变换；插件仅服务器且目标存在时启用。适用边界是该真实上游榨汁机的声音隔离，不屏蔽其它模组注册异常；Supplementaries后续错误需重启复核，未以静态构建宣称实机启动成功。本轮独立clean后基线47.4.10、47.4.28兼容及恢复基线build均通过，328项测试零失败/零错误/零跳过，生产映射和JAR内容检查通过；自动防线已落实，专用服务器实测待用户复核。
+
+- 触发场景：专用服务器启动 ICEcore 失败，日志报告 `ModMixing.clientSetup(FMLClientSetupEvent)` 的 `NoSuchMethodError`。
+- 事实证据：`ICECore` 原先无条件执行 `modBus.addListener(ModMixing::clientSetup)`；目标方法标记 `@OnlyIn(Dist.CLIENT)`。服务端 DistCleaner 移除客户端方法后，方法引用解析失败。
+- 根因：把物理侧限制注解误当作事件监听器注册的运行时保护。
+- 影响：ICEcore 在 Forge ModLoader 初始化阶段失败，专用服务器无法启动。
+- 正确做法：客户端专属监听器的注册本身必须由 `DistExecutor.safeRunWhenOn(Dist.CLIENT, ...)` 或 `@EventBusSubscriber(value=Dist.CLIENT)` 隔离，公共初始化路径不得直接解析客户端方法引用。
+- 防复发措施：`MixingClientIsolationTest` 检查真实编译字节码中的公共入口引用、客户端订阅注解及两类渲染器注册；客户端注册统一放入 `MixingClient` 的 CLIENT 事件订阅类，涉及 `@OnlyIn` 方法时同时检查调用方隔离。
+- 验证方法：`gradlew.bat test --offline`、Forge 47.4.10 `gradlew.bat clean build --offline`，并检查生产 JAR。
+- 适用边界：Forge 1.20.1 模组的物理客户端/专用服务器事件注册；不替代事件回调内部的 `level.isClientSide` 业务判断。
+- 状态：已修复。客户端隔离字节码测试通过；独立 clean 后 Forge 47.4.10 完整 build、47.4.28 兼容 build 及恢复 47.4.10 的最终 build 均通过，326 项测试零失败/零跳过，verifyProductionJar 及最终 JAR 入口检查通过；专用服务器实际启动仍待用户复测。

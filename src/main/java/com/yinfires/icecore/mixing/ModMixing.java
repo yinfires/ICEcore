@@ -1,9 +1,6 @@
 package com.yinfires.icecore.mixing;
 
 import com.yinfires.icecore.ICECore;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
-import com.yinfires.icecore.oven.OvenRenderer;
-import com.yinfires.icecore.oven.ModOven;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -12,10 +9,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -47,9 +41,4 @@ public final class ModMixing {
         RECIPE_SERIALIZERS.register(bus);
     }
 
-    @OnlyIn(Dist.CLIENT)
-    public static void clientSetup(FMLClientSetupEvent event) {
-        event.enqueueWork(() -> BlockEntityRenderers.register(MIXING_BOWL_ENTITY.get(), MixingBowlRenderer::new));
-        event.enqueueWork(() -> BlockEntityRenderers.register(ModOven.OVEN_ENTITY.get(), OvenRenderer::new));
-    }
 }

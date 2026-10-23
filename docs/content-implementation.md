@@ -44,6 +44,14 @@ Last updated: 2026-10-05
 
 ## 当前状态
 
+### 建筑客户端对应服务端（2026-10-23）
+
+- 来源为用户指定的 `D:\Minecraft\PCL启动器\.minecraft\versions\异次元餐厅-建筑`，部署到 `D:\Minecraft\服务端\异次元餐厅-建筑`，不覆盖同级其它服务器。Minecraft 1.20.1 / Forge 47.4.22，运行时固定 `D:\java\jdk17\bin\java.exe`；`run.bat` 自动切换工作目录，按Forge生成的win_args启动并使用nogui，`user_jvm_args.txt`设置1GB初始/4GB上限与G1GC。
+- 保留85个模组及config、defaultconfigs、moonlight-global-datapacks、KubeJS config/data/server_scripts/startup_scripts；排除16个客户端展示、输入与渲染模组（AdvancementPlaques、Better_Modlist、Controlling、Embeddium、EntityCulling、Fusion、ImmediatelyFast、JECharacters、JEI、ModernUI、MouseTweaks、Oculus、OELib、OneEnoughItem、Searchables、SmartKeyPrompts）。原提示脚本有Platform物理侧与模组存在性守卫，服务端跳过。客户端存档、玩家身份、资源包、截图、缓存及启动器数据不迁移。
+- 服务端ICEcore采用已有完整构建成品 `build/libs/icecore-0.1.1.jar`，SHA-256 `ABAA6C90B842F3F6FBE6999B25D89A69239B8B9D03BC104B0F17D542814D92C4`，包含本日已记录的客户端注册隔离与香气果园榨汁机专用服务器补丁；来源客户端旧包未替换。
+- 用户选择新建创造世界并明确接受EULA、授权启动测试。server.properties使用creative、force-gamemode=true、peaceful、allow-flight=true、spawn-protection=0；普通世界、10人、正版验证、25565端口，视距8/模拟距离6。未配置公网端口转发、防火墙规则、OP名单或离线登录。
+- 验证：Forge安装完成，实际服务端日志21:29:39出现Done，25565监听正常，KubeJS启动2/2与服务端4/4脚本均零错误零警告；21:31:15经原版关闭钩子正常保存所有维度，level.dat已落盘，进程退出且端口释放。模组预备阶段仍有上游Mixin配置/缺失可选类警告，其中世界名酒SMC插件缺失记录为ERROR但未阻断启动；未修改上游包。未启动客户端，客户端实际登录与建造交互尚未验证。仅部署/配置操作，无新增游戏tick、网络轮询或模组实现。
+
 ### 按游戏天保质期与过期物品
 
 - 2026-10-19实机反馈修正：FridgeBlockEntity.getCombinedContainer在原生直接字段组装前绑定自身、基座和邻居；CombinedContainer通过包外PreservedContainer聚合暂停标志，Slot读取再次保持冻结。DefaultContainer反序列化后重绑，已加载冰箱首次tick及日期变化仅检查本半27格，避免普通库存访问改变所有者后持续扣天；不全世界扫描。CozyCafe原生取下先shrink使主手成为可用空槽，脏盘可能填入后被使用结果覆盖，现仅延后该次原生消耗至原生食物/脏盘交付完成，保留原生添加、溢出掉落和音效。创造Tooltip同时检查客户端gameMode与Player，消除模式/能力同步先后造成的闪显；过期描述显式GRAY，保质期样式保持。默认描述灰色规则已写AGENTS.md，现有ItemDescriptions默认灰色保持。ShelfLifeRegressionTest新增3项真实上游时序/入口及样式门禁；定向测试、独立clean后的Forge47.4.10完整build、Forge47.4.28完整build均通过，244项测试零失败及verifyProductionJar通过；最终恢复47.4.10完整build通过，产物SHA-256为ad8a30c37ff033b740365044bcc7165be49ee7d0e11a2dcd0d3cf4aa1f56bf6c。未启动或部署客户端，上下冰箱跨日/重载、创造切换以及主副手空槽/满背包取盘仍待实机复测。
@@ -972,3 +980,19 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 
 - 本轮验收记录：工具11项测试、292项Java测试、Forge47.4.10/47.4.28完整构建及生产校验通过；目标客户端未运行时备份并应用54项文件变更，408条生成、0跳过、0物品问题、0悬空标签，再check零差异。旧JAR备份tmp/recipe-sync-fix/icecore-before.jar；正式管理器变更前备份tmp/recipe-sync-fix/recipe-manager.before.json；客户端生成文件含旧脚本回滚在config/icecore/recipe-sync/rollback.json。葡萄规则已按用户确认统一为每个250mB、每杯250mB，四个可装一桶或四杯，杯桶JEI各自独立；实际装桶保留原生FluidUtil。全部截图实机回归仍未启动。
 - 最终独立clean后Forge47.4.10完整build通过（11任务全部执行，292测试零失败），确认生产JAR不含已撤除的WorkstationJuicerExtractionMixin。重新部署后本地与客户端SHA-256一致：DA03DED6CFFD0299A1FA4706CCC99B514385E0C38C1681A9A874DC7B7C10BBA7。Git差异格式检查与CodeGraph状态正常；未启动客户端。
+
+### 客户端事件注册的服务端隔离修复（2026-10-23）
+
+- 移除 `ICECore` 中无条件客户端方法引用，将混合碗与烤炉渲染器注册迁入 `mixing.client.MixingClient` 的 `EntityRenderersEvent.RegisterRenderers`；通过 `@Mod.EventBusSubscriber(value=Dist.CLIENT, bus=MOD)` 限定物理客户端，`ModMixing` 仅保留公共注册。
+- 根因是服务端 DistCleaner 移除 `@OnlyIn(Dist.CLIENT)` 方法后，公共构造器仍无条件解析方法引用，触发 `NoSuchMethodError`。
+
+- 验证：`MixingClientIsolationTest` 直接读取编译字节码，拒绝公共入口重新链接客户端 setup/渲染方法，校验订阅类 CLIENT 注解与两种渲染器注册。变更只在客户端启动注册时运行一次，O(1)，无新增 tick、网络或缓存。独立 clean 后 Forge 47.4.10 完整 build、47.4.28 兼容 build 及恢复 47.4.10 的最终 build 均通过，326 项测试零失败/零跳过，verifyProductionJar 通过。最终 JAR 类、订阅元数据、公共入口及语言资源检查通过，SHA-256：547E520434C8FF2FE4436A4553B59E13BAA23FD81496AA73A055E1E40086C403；未部署、未启动游戏，专用服务器启动待用户复测。
+
+### 香气果园榨汁机专用服务器兼容（2026-10-23）
+
+- 依据 `D:/下载/latest.log` 20:40:08 的注册异常及 `libs/kaleidoscope_fragrantorchard-1.0.0-ALPHA-1.20.1.jar`：原生 `JuicerBlockEntity.m_7651_()V` 直接链接客户端声音类；构造器仍初始化已由 DistCleaner 移除的 soundTickCounter，tick 仍引用被移除的 tickClientSound。SRG 映射确认 m_7651_ 是 BlockEntity.setRemoved。
+- `ICECoreMixinPlugin` 仅在 DEDICATED_SERVER 且目标资源存在时启用 `WorkstationJuicerServerSoundMixin`，preApply 调用 `compat.fragrantorchard.JuicerServerClassPatch`，在 JVM 定义目标类前清除声音成员及遗留引用。服务端 setRemoved 保留且仅调用父类；构造器声音计数写入和客户端 tick 调用分别以等栈效果 POP2/POP 消费，保持原生服务端配方、库存、流体、同步及方块实体生命周期。物理客户端不应用补丁，继续原生声音入口。
+- 补丁使用 ASM 是因为公共方法仍含客户端类型参与校验，运行后 HEAD 取消无法解决类定义期问题；变换在目标类加载时执行一次，复杂度 O(类指令数)，不增加 tick/渲染/网络路径工作、缓存或日志。
+- 同份日志中的 Supplementaries globe/notice_board 缺失出现在榨汁机方块实体注册异常之后；Forge GameData.postRegisterEvents 将每轮注册派发和对象回填置于同一 try 中，异常后继续其它注册表，CreateCompat 后续读取方块实体供应器而失败，符合注册中断后的连带错误。保留其原生注册；是否随根因修复消失须专用服务器重启确认。
+- `JuicerServerClassPatchTest` 从真实上游 JAR 读取原始类和模拟 DistCleaner 后的类，两种输入均验证无客户端链接、无悬空声音成员、幂等性、全部方法 ASM BasicVerifier 栈校验及父类移除链；`WorkstationMixinContractTest` 覆盖原生加工和已有注入契约。独立 clean 后 Forge 47.4.10 完整 build、47.4.28 兼容 build 及恢复 47.4.10 的最终 build 全部通过，328 项测试零失败/零错误/零跳过；verifyProductionJar、JAR 内补丁类/注册/语言资源及不打包上游类检查通过。最终 JAR SHA-256：ABAA6C90B842F3F6FBE6999B25D89A69239B8B9D03BC104B0F17D542814D92C4。CodeGraph sync 未纳入新增类后执行完整 index，MCP 已查询到补丁类；未部署，未启动客户端或服务器，实际启动与 Supplementaries 连带异常待用户复测。
+- 验证：`MixingClientIsolationTest` 直接读取编译字节码，拒绝公共入口重新链接客户端 setup/渲染方法，校验订阅类 CLIENT 注解与两种渲染器注册。变更只在客户端启动注册时运行一次，O(1)，无新增 tick、网络或缓存。独立 clean 后 Forge 47.4.10 完整 build、47.4.28 兼容 build 及恢复 47.4.10 的最终 build 均通过，326 项测试零失败/零跳过，verifyProductionJar 通过。最终 JAR 类、订阅元数据、公共入口及语言资源检查通过，SHA-256：547E520434C8FF2FE4436A4553B59E13BAA23FD81496AA73A055E1E40086C403；未部署、未启动游戏，专用服务器启动待用户复测。

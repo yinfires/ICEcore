@@ -43,7 +43,6 @@ public final class ICECore {
         if (ModList.get().isLoaded("dew_drop_farmland_growth") && ModList.get().isLoaded("dew_drop_watering_cans")) {
             com.yinfires.icecore.compat.dewdrop.DewDropIrrigationEvents.register();
         }
-        modBus.addListener(ModMixing::clientSetup);
         if (ModList.get().isLoaded("cozycafe")) {
             com.yinfires.icecore.compat.cozycafe.customer.CafeCustomerEvents.register();
             com.yinfires.icecore.compat.cozycafe.seating.CozyCafeSeatingEvents.register();

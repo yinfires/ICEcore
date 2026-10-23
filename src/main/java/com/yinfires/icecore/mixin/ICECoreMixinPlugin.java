@@ -18,6 +18,9 @@ public final class ICECoreMixinPlugin implements IMixinConfigPlugin {
     @Override public void onLoad(String mixinPackage) {}
     @Override public String getRefMapperConfig() { return null; }
     @Override public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
+        if (mixinClassName.endsWith("WorkstationJuicerServerSoundMixin"))
+            return net.minecraftforge.fml.loading.FMLLoader.getDist() == net.minecraftforge.api.distmarker.Dist.DEDICATED_SERVER
+                    && present(targetClassName);
         if (mixinClassName.endsWith("EmbeddiumExactSortMixin")) return verifiedSortClass(targetClassName);
         if (mixinClassName.contains("WoodModernTooltip") || mixinClassName.contains("WoodJade") || mixinClassName.contains("ShelfJadeAccessor")) return present(targetClassName);
         if (mixinClassName.contains("RackDisplay")) return present(targetClassName)
@@ -51,6 +54,10 @@ public final class ICECoreMixinPlugin implements IMixinConfigPlugin {
     }
     @Override public void acceptTargets(Set<String> myTargets, Set<String> otherTargets) {}
     @Override public List<String> getMixins() { return null; }
-    @Override public void preApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {}
+    @Override public void preApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
+        if (mixinClassName.endsWith("WorkstationJuicerServerSoundMixin")) {
+            com.yinfires.icecore.compat.fragrantorchard.JuicerServerClassPatch.apply(targetClass);
+        }
+    }
     @Override public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {}
 }
