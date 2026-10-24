@@ -6,6 +6,7 @@ public final class ICECoreConfig {
     public static final ForgeConfigSpec SPEC;
     public static final ForgeConfigSpec.BooleanValue DISABLE_FOOD_CONSUMPTION;
     public static final ForgeConfigSpec.BooleanValue ENABLE_MOD_COMPATIBILITY;
+    public static final ForgeConfigSpec.BooleanValue DISABLE_ALL_ADVANCEMENTS;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -18,6 +19,12 @@ public final class ICECoreConfig {
                 .comment("Recognizes drink and skewer item classes and tags supplied by supported mods.")
                 .translation("config.icecore.food.enable_mod_compatibility")
                 .define("enableModCompatibility", true);
+        builder.pop();
+        builder.push("advancements");
+        DISABLE_ALL_ADVANCEMENTS = builder
+                .comment("Disables every advancement, including hidden recipe unlocks. Restart or reload server resources after changing.")
+                .translation("config.icecore.advancements.disable_all")
+                .define("disableAll", false);
         builder.pop();
         SPEC = builder.build();
     }
@@ -36,5 +43,9 @@ public final class ICECoreConfig {
 
     public static boolean enableModCompatibility() {
         return ENABLE_MOD_COMPATIBILITY.get();
+    }
+
+    public static boolean disableAllAdvancements() {
+        return DISABLE_ALL_ADVANCEMENTS.get();
     }
 }

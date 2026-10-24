@@ -95,11 +95,9 @@ public final class BuildingClientEvents {
             // actually valid.  The suppression blanks the preview for a few
             // ticks to hide the stale ghost that lingers at the just-placed
             // spot while the server ack/inventory update is in flight.  On an
-            // invalid placement (red preview) the server places nothing, the
+            // invalid placement the server places nothing, the
             // held stack never changes, and there is no phantom to hide, so
-            // arming it would only blink the red preview out for ~150ms - the
-            // "disappears, worst on failure" flash.  Skipping it there keeps the
-            // red preview continuously visible.
+            // arming it would unnecessarily suppress the next valid preview.
             PlacementPreview placement = computePlacementPreview(
                     minecraft, stack, event.getHand(), event.getHitVec());
             if (placement != null && placement.allowed()) {
@@ -340,26 +338,20 @@ public final class BuildingClientEvents {
             return;
         }
         PlacementPreview placement = computePlacementPreview(minecraft, held, heldHand, hit);
-        if (placement == null) {
+        if (placement == null || !placement.allowed()) {
             clearPreviewState();
             return;
         }
-        if (placement.allowed()) {
-            renderPlacementPreview(event.getPoseStack(), minecraft, placement.origin(), placement.state(),
-                    RenderType.translucent());
-        } else {
-            renderInvalidPreview(event.getPoseStack(), minecraft, placement.origin(), placement.state(),
-                    RenderType.translucent(), INVALID_PREVIEW_ALPHA);
-        }
+        renderPlacementPreview(event.getPoseStack(), minecraft, placement.origin(), placement.state(),
+                RenderType.translucent());
     }
 
     private static void renderWrenchPreviewModel(PoseStack poseStack, Minecraft minecraft,
                                                   WrenchPreview preview, boolean desired) {
-        // Identical to the failed placement preview: same model renderer,
-        // vertex tint, alpha and vanilla RenderType.translucent() batch.  The
+        // Use a tinted translucent model for the dismantling target. The
         // original block is already removed from the chunk mesh by
         // RenderChunkRegionMixin, so the translucent model blends over the real
-        // terrain behind the target exactly like the placement failure preview.
+        // terrain behind the target.
         // No depth mask is used: a depth-only near-offset mask would cull the
         // terrain behind the block and force the translucent model to blend
         // with the cleared sky instead.
@@ -611,7 +603,7 @@ public final class BuildingClientEvents {
             return;
         }
         PlacementPreview placement = computePlacementPreview(minecraft, held, hand, hit);
-        if (placement == null) {
+        if (placement == null || !placement.allowed()) {
             BuildingClientRenderState.clear();
             return;
         }
@@ -682,25 +674,11 @@ public final class BuildingClientEvents {
         bufferSource.endBatch(renderType);
     }
 
-    private static void renderInvalidPreview(PoseStack poseStack, Minecraft minecraft,
-                                               BlockPos origin, BlockState state, RenderType renderType,
-                                               float alpha) {
-        MultiBufferSource.BufferSource bufferSource = previewBufferSource();
-        MultiBufferSource previewBuffers = new PreviewBufferSource(
-                bufferSource, INVALID_PREVIEW_RED, INVALID_PREVIEW_GREEN, INVALID_PREVIEW_BLUE,
-                alpha, true);
-        for (BlockPos previewPos : previewPositions(state, origin)) {
-            renderGhost(poseStack, previewPos, BuildingStructure.stateAt(state, origin, previewPos),
-                    previewBuffers, renderType);
-        }
-        bufferSource.endBatch(renderType);
-    }
-
     private static MultiBufferSource.BufferSource previewBufferSource() {
         // Do not append preview vertices to LevelRenderer's particle/entity
         // BufferSource.  That source is still owned by the active render stage;
         // sharing it allows a later flush or another listener to submit the
-        // same failed vertices a second time.  Both preview states use this
+        // same vertices a second time. Placement and dismantling use this
         // one-layer translucent source, so they have identical batch behavior.
         return PREVIEW_BUFFER_SOURCE;
     }

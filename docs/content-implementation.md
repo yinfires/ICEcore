@@ -32,6 +32,15 @@
 
 Last updated: 2026-10-05
 
+### 全部成就进度与潮汐出生赠书（2026-10-24）
+
+- `ICECoreConfig` 新增 COMMON 配置 `advancements.disableAll=false`；指定异次元餐厅客户端设置为 `true`，同时 `config/tide/tide_server.json` 的原生 `journal.giveJournal=false`。已有百鱼全书不回收。
+- `mixin.ServerAdvancementsDisableMixin` 在 `ServerAdvancementManager.apply(Map, ResourceManager, ProfilerFiller)` 的 HEAD 按开关清空本次加载的进度定义。Forge 47.4.10 `output.tsrg` 确认完整 SRG 选择器为 `m_5787_(Ljava/util/Map;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V`；真实字节码确认 `SimpleJsonResourceReloadListener.prepare` 提供可变 HashMap，原生 apply 随后新建并替换 AdvancementList，因此首次加载及 `/reload` 都得到空树。注入不取消原生流程，不改共享 JSON 监听器、配方、QuestService 或 TutorialService。
+- 所有命名空间、隐藏配方书解锁进度都移除，进度奖励与通知随之停止；合成配方保留。仅在服务端资源加载时读取一次布尔值并清空 O(n) 定义表，无 tick 扫描、额外网络包、缓存或持久日志。配置变更需重启，或配置加载新值后 `/reload`。
+- 不主动删除历史进度文件；原版玩家进度 load/save 仍运行，后续保存可能重写未加载的历史记录，故不能承诺切回开关后恢复历史。需要保留历史时先备份存档。
+- 验证入口：`ServerAdvancementsDisableTest` 覆盖默认保留、跨命名空间及隐藏进度、重复重载、恢复开关、真实原生进度树重建及 SRG/描述符与两侧注册。目标客户端 JSON/TOML 独立回读；不把客户端外部可变配置作为仓库测试前置条件。实机新玩家赠书、空进度页与通知仍待授权。
+- 验证结果：独立 clean 后 Forge 47.4.10 完整 build 通过（332 项测试），verifyProductionJar 检查通过；用户确认退出后核对目标进程不存在，部署 `build/libs/icecore-0.1.1.jar` 到指定客户端并校验 SHA-256 相同，退出后重写并回读 COMMON 开关及 Tide 赠书开关。客户端未启动。
+
 ## 使用与维护
 
 - 2026-10-10 Git 文档边界：`.gitignore` 移除 `/docs/` 强制忽略并明确放行 `/AGENTS.md` 与 `/docs/`，允许工作区规则与全部文档被提交、推送；`tmp/`、`tool/`、`libs/`、`wiki/`、缓存和构建产物继续忽略。验证使用 `git check-ignore` 与 `git status --short --untracked-files=all`，不执行提交或推送，无运行时开销。
@@ -848,6 +857,8 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 
 ### 冒险模式建造系统
 
+- 2026-10-24 放置预览仅在合法时显示（覆盖下方历史失败预览说明）：`BuildingClientEvents.onRender` 与 `refreshHiddenRenderState` 均使用 `computePlacementPreview` 的完整 `allowed` 结果；任一区域、承托、方向、生存、占用或碰撞检查失败时不渲染，并清除放置隐藏坐标。移除未再使用的 `renderInvalidPreview`；扳手深红预览与网格事务、右键认领、服务端校验、成功放置的3 tick抑制均保持原入口。未新增协议、配置或玩家文字；仅在既有逐帧结果上增加布尔判断，失败路径不再生成预览顶点或隐藏坐标集合，无新增扫描、I/O、日志及网络。验证：静态核对两个消费者先拒绝并清理、后渲染/隐藏的顺序，运行 `BuildingInteractionContractTest` 与 `BuildingDependencyTest` 回归既有交互及依赖契约；Forge 47.4.10独立clean后完整build通过，328项测试零失败，verifyProductionJar通过；成品包含BuildingClientEvents、保留扳手渲染方法且已移除失败放置渲染方法，无测试或临时条目；CodeGraph已更新，Git忽略边界通过。区域边界、多格部分受阻、合法/非法目标切换及扳手实际画面待实机授权，静态检查不替代游戏验收。
+
 - 承托依赖保护验证结果：8项定向测试通过；Forge 47.4.10 独立clean后完整build成功，verifyProductionJar通过，成品JAR的BuildingRules/BuildingServerActions与中英文提示已核对，UTF-8和Git忽略边界通过，CodeGraph已索引两个hasDependents入口。clean首轮停在ForgeGradle远程证书握手，结束本次进程后使用文档列出的离线证书检查参数重试成功，未改项目校验。未启动或部署客户端；真实标签依赖与主副手运行验收仍待授权。共享工作区另有交互改动，完整构建验证的是当时整体状态。
 
 - 2026-10-17 扳手承托依赖保护：`BuildingRules.hasDependents` 归一化目标并通过 `BuildingStructure` 获取全结构，每格检查六邻格、排除内部格；按当前有效列表的 `supports` 与目标朝外的 `allowedFaces` 判断，任一匹配即禁止拆除，不检查依赖方块区域或其它承托。`BuildingServerActions.remove` 在权限/距离后、内容确认和背包检查前执行，拒绝时清除强拆确认并通过 `PlayerFeedback` 显示 `icecore.build.block_depended_on`，双语资源同步。仅冒险模式扳手生效，Shift 不绕过；交互认领与客户端预览保持原入口。每次请求复杂度 O(S×6×L×E)，S 为结构格数、L 为列表数、E 为列表条目匹配成本；内部格排除 O(S)，当前结构有界为 1–2 格，命中立即退出，只有局部坐标及一次回调分配，无 tick 扫描、I/O、持久化关系或新增网络。验证入口：`BuildingDependencyTest` 的邻格方向/多格/短路行为测试和规则契约，`BuildingInteractionContractTest` 的失败顺序、确认清理、认领及双语检查；普通 JUnit 不初始化 Minecraft 方块注册表，真实规则与主副手交互实机待授权。
@@ -855,7 +866,7 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 | 字段 | 内容 |
 | --- | --- |
 | 功能领域 | 冒险模式放置、破坏与开发者规则 |
-| 玩家行为 | 冒险模式可在有效区域、承托列表和方向限制均满足时放置受管方块；手持扳手可拆除属于有效列表的受管方块，列表配置区域时还需位于该区域内；客户端显示半透明成功/深红失败预览；非空容器普通右键禁止拆除，两次 Shift+右键确认后会清空内容并只返还方块；扳手对着拆除目标右键时，即使最终拆除条件不满足，也不会触发门开关等目标方块交互；建造系统产生的即时反馈统一显示在原版底部信息栏。 |
+| 玩家行为 | 冒险模式可在有效区域、承托列表和方向限制均满足时放置受管方块；手持扳手可拆除属于有效列表的受管方块，列表配置区域时还需位于该区域内；客户端仅在完整放置校验通过时显示半透明放置预览，扳手保留深红拆除预览；非空容器普通右键禁止拆除，两次 Shift+右键确认后会清空内容并只返还方块；扳手对着拆除目标右键时，即使最终拆除条件不满足，也不会触发门开关等目标方块交互；建造系统产生的即时反馈统一显示在原版底部信息栏。 |
 | 配置入口 | 世界 `data/icecore_building.json`；管理员命令 `/icecore build ...`，权限等级 2 |
 | 代码入口 | `building.BuildingDataManager`、`BuildingRuntimeCache`、`BuildingCommands`、`BuildingEvents`、`BuildingServerActions`、`BuildingStructure`、`BuildingClientRenderState`、`building.render` 下的网格交接接口、`item.ModItems`、`building.BuildingClientEvents`、`mixin.MultiPlayerGameModeMixin`、`mixin.ClientBlockStateUseMixin`、`mixin.BlockStateUseMixin`、`mixin.RenderChunkRegionMixin`、`mixin.ChunkRebuildTaskMixin`、`mixin.EmbeddiumWorldSliceMixin`、`mixin.EmbeddiumChunkBuildOutputMixin`、`mixin.EmbeddiumRenderSectionMixin`、`mixin.EmbeddiumRenderRegionManagerMixin` |
 | 实现链路 | 世界生命周期加载并缓存规则 → 命令复制、校验并原子保存 → 服务端在冒险模式 `RightClickBlock`/Forge 放置流程中重算区域、承托、方向、距离和多格放置，并逐一确认结构占用位置可替换且无遮挡 → 扳手拆除直接从权威规则数据匹配有效方块列表，检查区域（若配置）与距离，再模拟背包容量并整体处理结构位置；服务端 `RightClickBlock` 与扳手物品 `useOn` 共用该拆除入口 → 规则快照同步到客户端用于预览；客户端使用与服务端共享的状态属性结构解析，先归一化关键位置，再为所有去重后的占用位置渲染顶点着色半透明模型；成功预览保留原纹理，放置失败预览与成功预览共用原版 `RenderType.translucent()` 批次，仅通过顶点颜色改为深红；扳手拆除预览在 `AFTER_PARTICLES` 阶段由 `renderWrenchPreviewModel` 直接复用放置失败预览的 `RenderType.translucent()` 批次、顶点深红颜色和透明度，在真实表面深度与目标背后的真实地形混合，实际视觉与放置失败预览完全一致；原方块由 `RenderChunkRegionMixin`/Embeddium `WorldSlice` Mixin 从异步重建的区块网格移除，稳态下不进入新网格，不再需要额外的深度遮罩；不使用只写深度加负多边形偏移的遮罩，因为该遮罩会把目标背后的地形一并按深度剔除，导致半透明模型只能与被清空的天空色混合（表现为整块不透明的天空色）；代价是准星切到新目标后、异步区块重建完成前的 1~2 帧内原方块会短暂带红显示，随后由隐藏坐标从网格移除即恢复；异步重建时由 `RenderChunkRegionMixin` 和 Embeddium `WorldSlice` Mixin 读取隐藏坐标并从新网格移除原方块；隐藏坐标快照由 `onRender`（`AFTER_PARTICLES`）逐帧调用 `refreshHiddenRenderState` 用当帧命中目标更新，与预览同源同帧，避免客户端 tick（20Hz）与渲染（60Hz+）错拍导致切换目标时旧方块短暂变成缺口；`BuildingClientRenderState.update` 在坐标集合不变时提前返回，静止准星不标脏；放置受管方块时 `onRightClick` 先用共享的 `computePlacementPreview` 判定该次放置是否有效(`allowed`)：仅在有效时才启动放置抑制窗口(`suppressPlacementPreviewTicks`)并同步 `BuildingClientRenderState.clear()` 解除放置位置隐藏；抑制窗口只用于遮住服务端确认/背包同步在途时停留在刚放位置的幻影预览，放置失败时服务端不放置任何方块、手持栈不变、无幻影可遮，若仍启动抑制只会让红色失败预览黑屏约 150ms，故失败时不启动抑制，红色失败预览保持常显；放置成功才短暂抑制一次幻影；`onRender`、`refreshHiddenRenderState` 与 `onRightClick` 共用 `computePlacementPreview` 计算归一化关键位置、结构状态与放置有效性，三者对同一目标和有效性判定一致，且每帧不再重复计算多次；放置预览和扳手预览均在各自批次结束时提交且不绘制边框；扳手命中受管拆除目标时取消客户端 `RightClickBlock`，`MultiPlayerGameModeMixin` 和客户端 `BlockState.use` 入口均再次硬拦截本地方块交互，同时保留外层 `useItemOn` 创建的 `ServerboundUseItemOnPacket`；服务端 `BlockState.use` 入口也按受管目标硬拦截，因此背包已满、距离、区域或其它拆除校验失败时仍只显示拆除结果，不会触发门开关等目标方块交互；所有扳手拦截判定均为手部无关（判定"任一手持扳手且准星指向受管目标"而非当前交互手），因为 `Minecraft.startUseItem` 在主手扳手返回 `PASS` 后会用副手重试 `useItemOn`，只按当前手判定会让副手/空手的重试触发门等方块 `BlockState.use`；开发者调整模式保留客户端左右键数据包链，生存/冒险使用结果标记、创造模式取消本地左键但保留 Forge 数据包，以阻止本地交互并由服务端最高优先级记录坐标、取消实际交互，客户端绘制无深度遮挡的三维线框边界。 |

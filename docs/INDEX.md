@@ -6,6 +6,7 @@ Last updated: 2026-10-23（顾客与共享经营机制）
 
 | 任务类型 | 必读文档 | 读取范围 |
 | --- | --- | --- |
+| 全部成就进度禁用、隐藏配方解锁与潮汐出生赠书 | [内容实现索引](content-implementation.md)、[全局配置 Wiki](../wiki/全局配置.md) | 读取进度资源加载入口、COMMON 开关、Tide 原生赠书开关、重启/重载与历史存档边界 |
 | CozyCafe顾客类型、口味点餐、共享声望、小费、每日客流与H查询 | [顾客与经营机制](cafe-customer-flow-design.md)、[内容实现索引](content-implementation.md)、[使用说明](../wiki/咖啡馆顾客与经营.md) | 已接入；读取本次规则、服务端配置、持久化、真实组件适配和自动/实机验证边界；替代原未实现客流方案 |
 | CozyCafe上菜、装盘、桌面器皿清桌与竹匾背包取出 | [内容实现索引](content-implementation.md)、[容器兼容](workstation-container-compatibility.md) | 读取2026-10-22上菜条目，核对共享装盘判定、待取器皿持久化、禁止非空菜单强拆、正常背包容量模拟和两版真实JAR契约 |
 | 配方管理器同步与16类设备转换 | [配方管理器同步](recipe-manager-sync.md)、[工作方块容器兼容](workstation-container-compatibility.md) | 读取命令、旧脚本清理、设备数量/时长、葡萄杯桶容量和截图待测清单；生成成功不代表游戏可制作 |
