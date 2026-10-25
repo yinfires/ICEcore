@@ -80,3 +80,21 @@ END 提交供下一 START 消费，避免依赖同阶段监听顺序。停止条
 - 2026-10-18后续外观要求：ICEcore组合键兼容中的单键/组合键两条原生绘制分支统一传入pressed=false；所有SmartKeyPrompts提示保持未按下外观，不改变按键绑定、实际输入、提示条件或原生键帽样式。SmartKeyPromptsComboContractTest直接检查编译字节码两处调用前均为ICONST_0，防止某分支残留按压变化。
 
 - 2026-10-18蒸笼改为lid_combo，使用潜行键+使用键显示开关盖，不再提交拾取提示；已用目标Rhino复测更新规则。蒸笼叠加与取下由模组交互限制，脚本仅显示操作说明。
+
+## 工作方块简化声明（2026-10-25）
+
+在指定客户端 `kubejs/client_scripts/icecore_workstation_prompts.js` 的集中配置区调用局部函数 `add(blockId, keys, action)`；不需要增加操作分支或修改启动脚本。例如：
+
+```js
+add('kaleidoscope_cookery:oil_pot', 'shift+right', 'pickup')
+add('kaleidoscope_cookery:trash_can', 'left', 'put')
+add('kaleidoscope_cookery:trash_can', 'right', 'take')
+```
+
+- `blockId` 是完整方块 ID，同一方块多次声明即显示多项操作，按声明顺序提交。
+- `keys` 使用 `shift`（潜行）、`right`（使用）、`left`（攻击），以 `+` 连接组合键；这些是绑定别名，实际键位从 `Client.options` 获取。未知别名在加载时抛错，不静默映射。
+- `action` 对应 `icecore.workstation_prompt.<action>` 翻译键；已有 `lid`、`put`、`take`、`stir`、`pickup`，新增操作文案时须同步客户端中英文语言文件。
+- 油壶对准即显示潜行＋使用“拾取”，不检查是否已潜行或空手；真实拾取仍要求主手空手。既有方块显示条件保持，酒桶仍仅 ceiling 层外围八格显示。
+- 声明在加载时按方块归集并拆分键别名；每 tick 只查询当前目标规则。提示按“键表达式＋操作”缓存，避免茶壶单键拾取与油壶组合键拾取互相污染；组合键开关盖保留原 `lid_combo` 分组，其余保留操作分组，兼容现有黑名单。
+- 三种绑定任一变化即清空提示缓存，后续按需创建新对象；无玩家/世界清理缓存，打开界面或非方块目标停止提交。既有启动脚本 END 转发、原生组合键渲染与未按下外观保持。
+- 目标 Rhino 2001.2.3-build.10 解释验证通过：十类方块、酒桶层/索引、START/END、三种改键、旧分组、油壶/茶壶切换、1000 tick 对象复用、界面/准星丢失/断线、重复加载、缺依赖及专用服务端不注册。临时验证入口为 `tmp/WorkstationRhinoCheck.java`；模拟绑定不代表实机 HUD 已验收，未启动客户端。本次仅脚本及文档改动，无需构建或部署模组 JAR。

@@ -53,6 +53,11 @@ Last updated: 2026-10-05
 
 ## 当前状态
 
+### 草莓作物中文名称覆盖（2026-10-25）
+
+- 指定客户端 `kubejs/assets/farm_and_charm/lang/zh_cn.json` 新增 `block.farm_and_charm.strawberry_crop` → `草莓`，仅覆盖中文显示值；物品、种子与野生草莓名称不变，英文沿用上游。
+- 来源为 `libs/letsdo-farm_and_charm-forge-1.0.14.jar` 实际语言资源：该键中文原值为“作物草莓”，英文为“Strawberry Crop”。复用 KubeJS 所属命名空间资源覆盖，无代码、tick 或网络开销；JSON 解析及唯一键检查通过。已运行客户端可用 F3+T 重载资源，实际显示待游戏内确认。
+
 ### 建筑客户端对应服务端（2026-10-23）
 
 - 来源为用户指定的 `D:\Minecraft\PCL启动器\.minecraft\versions\异次元餐厅-建筑`，部署到 `D:\Minecraft\服务端\异次元餐厅-建筑`，不覆盖同级其它服务器。Minecraft 1.20.1 / Forge 47.4.22，运行时固定 `D:\java\jdk17\bin\java.exe`；`run.bat` 自动切换工作目录，按Forge生成的win_args启动并使用nogui，`user_jvm_args.txt`设置1GB初始/4GB上限与G1GC。
@@ -381,6 +386,8 @@ ICEcore 当前提供 Forge 加载骨架、固定 NPC、全服共享虚拟货币�
 - 2026-10-17验证：定向冰箱/建造回归通过；独立clean成功后Forge47.4.10完整build通过，Forge47.4.28（实际Maven最新47.x）带有限联网超时offline完整build通过，最终恢复47.4.10完整build与verifyProductionJar通过。183项测试零失败，生产包包含新方块/物品模型/战利品和包外桥接，不含net/blay09上游类、测试配方或旧Accessor。最终 `build/libs/icecore-0.1.1.jar` SHA-256为 `bdcf4395075916a7f9814bb1ee57f5f276fd5dfcffd96a190f013b292583dbad`。UTF-8、双语键集合、版本一致性、现存本地Markdown规则引用与Git忽略边界通过；CodeGraph已收录新增符号。实机未启动/未部署，仍需验证两半交互、厨房/升级/自动化、多玩家、重载、两半库存/确认变化/区域边界下扳手拆放、爆炸/取消放置与最终物品和门动画画面。
 
 ### 工作方块情境按键提示（2026-10-18）
+
+- 2026-10-25 简化声明：客户端脚本统一用 `add(blockId, keys, action)` 注册同一方块的一项或多项操作，所有原规则已迁移；油壶新增 `add('kaleidoscope_cookery:oil_pot', 'shift+right', 'pickup')`。`shift/right/left` 读取真实潜行/使用/攻击绑定，复用已有中英文“拾取”；对准即显示，实际油壶拾取仍按主手空手条件执行。声明时归集规则并拆键，每 tick 仅 O(1) 目标查询及 O(目标提示数) 提交（当前最多2项），不扫描全表；按键表达式与操作联合缓存，改键/退出世界失效，无新增网络、I/O、反射或日志。酒桶筛选、原分组/黑名单及原生渲染链保持。目标 Rhino 解释回归十类方块、三键改绑、茶壶/油壶缓存隔离、1000 tick 对象复用、START/END、界面/目标/断线清理、重复加载与依赖/物理侧门禁通过；脚本与文档已更新，无 Java/JAR 改动，实际 HUD 仍待授权验证。编写方式见 [简化声明](smartkeyprompts-kubejs.md#工作方块简化声明2026-10-25)。下列2026-10-18记录为此前实现与验证，旧类型分支由本次声明替代。
 
 - 方块规则部署于指定客户端`kubejs/startup_scripts/icecore_workstation_prompts.js`与`client_scripts/icecore_workstation_prompts.js`。启动脚本经Platform客户端/依赖检查注册Forge END，客户端绑定SKP$PromptUtils按条件每tick提交；IIFE/var避免目标Rhino共享作用域冲突。完整重启加载启动注册。
 - 精确ID：kaleidoscope_tavern:barrel仅layer=ceiling且index非4外围八格显示右键开关盖；kaleidoscope_world_liquor:freezer、kaleidoscope_fragrantorchard:juicer、youkaisfeasts:fermentation_tank、kaleidoscope_cookery:stockpot显示潜行+使用开关盖；icecore:mixing_bowl显示潜行+使用搅拌；kaleidoscope_cookery:trash_can显示攻击投入/使用取出；kaleidoscope_cookery:steamer显示潜行+使用开关盖，teapot显示使用拾取。除酒桶几何范围外对准即显示，不以持物/加工/遮挡过滤。
