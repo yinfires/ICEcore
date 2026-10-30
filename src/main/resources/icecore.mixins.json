@@ -53,6 +53,7 @@
     "FridgeBlockEntityTypeMixin",
     "FridgePairingMixin",
     "WorkstationStateMixin",
+    "WorkstationBakerySinkShapeMixin",
     "WorkstationTrashCanMixin",
     "WorkstationTrashEnterMixin",
     "WorkstationTrashAnimationMixin",
@@ -130,6 +131,11 @@
     "ShelfJadeAccessorMixin"
   ],
   "client": [
+    "StoveSurfaceAoMixin",
+    "StoveSurfaceLightmapMixin",
+    "StoveSurfaceShadeMixin",
+    "StoveSurfaceEmbeddiumModeMixin",
+    "StoveSurfaceEmbeddiumDataMixin",
     "CozyCafeCustomerRendererMixin",
     "CozyCafeNativeScrollerMixin",
     "CozyCafeTableRendererMixin",

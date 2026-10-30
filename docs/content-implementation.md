@@ -1,5 +1,24 @@
 # ICEcore 内容实现索引
 
+### Bakery 水槽与柜台砖底统一（2026-10-30）
+
+- 目标版本：Bakery 2.0.6、Farm & Charm 1.0.14、Farmer's Delight 1.3.4、Refurbished Furniture 1.0.20。模型资源修改 `bakery:kitchen_sink` 与 `bakery:brick_counter`；`farmersdelight:stove` 几何与贴图保持原样，其点燃表面光照按下方追加条目修正。三款模组同时存在时启用内置客户端资源包与水槽形状适配；不新增方块、物品、配置、网络协议、交互提示或持久化状态。
+- 可见特征映射：两种方块的砖体为 X/Z=0–16、Y=0–12，四个竖面直接引用 `farmersdelight:block/stove_side` 并使用 UV `[0,4,16,16]`，按原始高度截取，灰缝及横向周期与炉灶侧面一致；底面引用 `stove_bottom`。水槽底座移除原 Z=2 内缩，保留原生 Y=12–16 的槽沿、内壁、盆底、水面、上下半结构与上方水龙头。柜台 Y=12–16 为四像素厚台面，顶面与家具重制版的原生五种图案/旋转相同；其三像素侧边保留原像素并在底部补一行，避免拉伸或覆盖顶面纹理。砖体与台面分界固定 Y=12。
+- 资源入口：`resourcepacks/kitchen_bricks` 只覆盖 Bakery 柜台 blockstates、柜台模型、空/满水水槽下半模型；五个静态柜台子模型与一张 64×64 台面图集位于该包 `assets/icecore`。`compat.bakery.client.KitchenResourcePack` 通过原生 `AddPackFindersEvent` 提供默认启用的 TOP 包，避免普通模组资源顺序不确定；包名称复用 Bakery 方块翻译键。覆盖仍遵循用户资源包优先级，不写客户端 KubeJS 资产。炉灶纹理与水槽原生纹理保持外部资源引用。
+- 转角链路：`KitchenCounterGeometry` 使用 Forge `IGeometryLoader/IUnbakedGeometry` 解析并按原生 ModelState 烘焙五种模型、四个朝向；`BakedModelWrapper#getModelData` 在区块构建时调用 `KitchenConnections.shape`，最多读取前后两个相邻方块，`getQuads` 仅选择预烘焙模型。算法来自真实 `KitchenCabinetryBlock#getShape`：反朝向邻居优先形成左右内角，朝向邻居形成左右外角；允许本款柜台、水槽下半与炉灶参与，排除水龙头上半及其它方块。原 Bakery `type` 属性保持不变，资源变体仅按 facing 匹配全部原 type，旧存档无需迁移。邻居放置/拆除/旋转沿原生 ClientLevel→LevelRenderer 的一格脏区重建，未另建客户端扫描监听器。
+- 碰撞链路：`WorkstationBakerySinkShapeMixin` 在真实 `SinkBlock.m_5940_` RETURN 处仅对指定水槽下半合并完整 Y=0–12 底座；`KitchenSinkShapes` 保留原形状全部上部并缓存四个水平朝向。真实 SRG、描述符及反编译原形状已核对；插件沿已有 Workstation 类资源门禁处理缺失依赖。补水、填水、放置、拆除、掉落与 Dew Drop 兼容入口均未改写。
+- 性能边界：静态柜台每变体两个元素、11个面；台面新增图集基础 RGBA 内存 16 KiB，额外五种预烘焙模型随资源重载重建。无逐帧计算、tick、额外网络、同步文件 I/O、无界缓存或日志。模型数据按五个枚举共享，外部数据非空时才合并；水槽形状至多四项，热路径只作目标检查与缓存查找。
+- 可编辑工程、来源及验收：`D:/Minecraft/Mod Develop/模型/厨房砖底统一/` 的 `source/` 保存五种柜台、空/满水槽和三方块连续对照的自包含 `.bbmodel`，`export/resourcepack` 为正式资源副本，`preview/` 为真实 Blockbench 重导入的正/侧/俯/底面及连续排列截图。`scripts/build_assets.py` 生成资源；`verify_assets.py` 独立检查五种顶面 UV/旋转、保护区逐像素不变、四条侧边原像素与补行、砖底尺寸、槽沿/水面不变和 UV 范围；`blockbench_verify.py` 在空工程重导入并核对几何数量与内嵌贴图。参考资源来自上述版本真实 JAR 的 `assets/bakery/models/block/brick_sink_bottom*.json`、`assets/refurbished_furniture/models/block/kitchen_cabinetry_*.json` 和 `spruce_kitchen_cabinetry.png`，用途限本次柜体与台面适配，不将家具柜门或内缩柜身复制进成品。
+- 自动验证：`KitchenCounterTest` 覆盖四向转角/优先级、模型数据更新与外部数据保留、共享模型数据和水槽碰撞底座/凹槽/缓存；`KitchenResourcesTest` 核对台面四像素厚、砖体 UV、全原 type 的朝向映射、空满槽保护面逐项相同、真实上游注入签名与可选门禁。Forge 47.4.10 基线、官方当前最新 47.4.28 兼容构建及最终恢复 47.4.10 构建均通过，341 项测试全部通过，生产映射与 JAR 内容校验通过；未启动或部署 Minecraft，游戏内光照、混合摆放刷新、实际补水交互及第三方渲染后端仍需实机验收。纯模型/纹理与局部形状适配不改版本号、更新日志或 Wiki。
+
+### 农夫乐事炉灶表面光照（2026-10-30）
+
+- 用户截图 `D:/图片/QQ20261030-121557.png` 显示开启平滑光照后炉灶和邻接砖体亮度断层；用户进一步明确“发光时本身贴图不会变亮”。真实 Forge 47.4.10 `ModelBlockRenderer.tesselateBlock` 对发光方块跳过 AO，`LevelRenderer.getLightColor` 将材质发光值作为亮度下限，原生遮蔽值又因点燃状态变为1；Embeddium 0.3.31 的 `BlockRenderer.getLightingMode` 同样跳过平滑光照，`LightDataAccess.compute` 还把亮度下限与强制 AO=1 打入缓存，`FlatLightPipeline.getOffsetLightmap` 取邻接环境亮度和本体 luminance 的较大值。不能只换贴图或只修改模型 ambientocclusion 解决。
+- `compat.bakery.client.StoveSurfaceLighting` 仅识别 `farmersdelight:stove` 且 `lit=true`：客户端材质采样的 emission 返回0，AO遮蔽值通过已有不可变 `lit=false` 状态查询；不写世界、不改 BlockState 发光 API、不改世界亮度或光源传播、燃烧功能和火焰贴图。材质仍接受真实天空光与方块环境光，不承诺点火前后每个像素绝对相同或不同位置完全同亮。
+- 原版链路为客户端 `StoveSurfaceAoMixin`（Forge tessellation 的 AO 条件）、`StoveSurfaceLightmapMixin`（LevelRenderer 材质发光下限）、`StoveSurfaceShadeMixin`（ModelBlockRenderer.Cache 遮蔽缓存）；Embeddium 链路为 `StoveSurfaceEmbeddiumModeMixin`（平滑/平面分支）与 `StoveSurfaceEmbeddiumDataMixin`（渲染光照缓存的 luminance 与 AO）。全部只注册于 mixin `client`，可选后端按类资源门禁，未打包 Embeddium 类或增加编译依赖；非目标方块/未点燃状态原样调用原逻辑。不开全局满亮，不关闭用户 AO，也不压暗纹理。
+- 性能：仅区块光照采样时执行常数次方块身份比较；目标方块身份在注册完成后的首次渲染惰性缓存，取未点燃状态是查询既有状态表，无扫描、反射、状态新建、线程局部状态、额外 tick、网络或日志。正常点燃/熄灭和光照更新沿原生脏区重建。
+- 验证入口：`StoveSurfaceLightingTest` 验证材质旁路、原 state 真实发光值保留、未点燃/非目标回退、遮蔽状态及无世界交互；`StoveLightingUpstreamTest` 对真实 Forge/Embeddium 字节码检查全部选择器、描述符、精确调用点、注册冲突、客户端隔离和可选后端缺失。命名策略仅对 Forge 新增且无 SRG 映射的完整 tesselateBlock 重载签名设置精确例外，并校验真实类存在该重载、映射文件没有对应项；其余 Minecraft 方法继续强制 SRG。47.4.10、47.4.28 和恢复基线的完整构建均通过，最终 341 项测试无失败、错误或跳过，生产 JAR 含全部五个客户端 Mixin 与目标辅助类。游戏内还需覆盖平滑光照开/关、昼/夜、点燃/熄灭、单炉/并排/拐角、周围光源照明、Embeddium 与原版后端；未获启动授权时不启动客户端，不以构建或编辑器截图替代实机光照验收。
+
 ### CozyCafe顾客类型、共享声望与每日客流（2026-10-23）
 
 - 启动冲突修正：删除新增的重复菜单提示Mixin，合并回既有CozyCafeNormalFoodTooltipMixin，菜单行与背包槽均捕获真实物品栈并走原生ItemStack提示入口，finally清理。错误报告证实同调用点Redirect独占冲突；CafeCustomerUpstreamTest新增扫描全部已注册CozyCafe Redirect的重复占用检查，并对两版JAR核验两处捕获与显示入口。修正后Forge47.4.10独立clean/build通过，324项测试零失败、零跳过，生产映射校验通过；JAR确认无已移除类。客户端启动复测待用户执行，未部署。

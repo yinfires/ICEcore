@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "bakery:block/brick_counter",
+      "y": 0
+    },
+    "facing=east": {
+      "model": "bakery:block/brick_counter",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "bakery:block/brick_counter",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "bakery:block/brick_counter",
+      "y": 270
+    }
+  }
+}
