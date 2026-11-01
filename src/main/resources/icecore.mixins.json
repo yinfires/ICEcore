@@ -203,6 +203,7 @@
     "AdventureContainerScreenMixin",
     "SDMShopClientMixin",
     "PostChainAccessor",
+    "XaeroEditorAccessor",
     "JeiRecipeManagerInternalMixin",
     "WorkstationCookeryOverlayMixin",
     "WorkstationJadeFluidOrderMixin",

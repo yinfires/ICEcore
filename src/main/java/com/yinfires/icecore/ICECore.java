@@ -25,6 +25,7 @@ public final class ICECore {
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ICECoreClientConfig.SPEC, "icecore-client.toml");
         net.minecraftforge.common.ForgeMod.enableMilkFluid();
         ICECoreNetwork.register();
+        com.yinfires.icecore.worldmap.MapNetwork.register();
         com.yinfires.icecore.quest.objective.ObjectiveRegistry.bootstrap();
         com.yinfires.icecore.quest.QuestNetworking.install();
         com.yinfires.icecore.tutorial.TutorialNetworking.install();

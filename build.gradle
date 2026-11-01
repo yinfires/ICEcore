@@ -55,6 +55,8 @@ repositories {
 }
 
 dependencies {
+    compileOnly files('libs/xaeroworldmap-forge-1.20.1-1.47.0.jar')
+    compileOnly files('libs/xaerolib-forge-1.20.1-1.7.3.jar')
     implementation fg.deobf('local:cookingforblockheads-forge-1.20.1:16.0.15')
     implementation fg.deobf('local:balm-forge-1.20.1:7.3.44')
     compileOnly files('libs/kaleidoscope_grilling-1.1.1-forge1.20.1.jar')

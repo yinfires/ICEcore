@@ -21,6 +21,7 @@ public final class ICECoreMixinPlugin implements IMixinConfigPlugin {
         if (mixinClassName.endsWith("WorkstationJuicerServerSoundMixin"))
             return net.minecraftforge.fml.loading.FMLLoader.getDist() == net.minecraftforge.api.distmarker.Dist.DEDICATED_SERVER
                     && present(targetClassName);
+        if (mixinClassName.contains("XaeroEditor")) return present(targetClassName);
         if (mixinClassName.endsWith("EmbeddiumExactSortMixin")) return verifiedSortClass(targetClassName);
         if (mixinClassName.contains("StoveSurfaceEmbeddium")) return present(targetClassName);
         if (mixinClassName.contains("WoodModernTooltip") || mixinClassName.contains("WoodJade") || mixinClassName.contains("ShelfJadeAccessor")) return present(targetClassName);
